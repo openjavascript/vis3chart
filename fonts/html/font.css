@@ -1,0 +1,19 @@
+
+/*声明 WebFont*/
+@font-face {
+  font-family: 'fc_hxbkh';
+  src: url('../font/HuXiaoBoKuHei.eot');
+  src:
+    url('../font/HuXiaoBoKuHei.eot?#font-spider') format('embedded-opentype'),
+    url('../font/HuXiaoBoKuHei.woff2') format('woff2'),
+    url('../font/HuXiaoBoKuHei.woff') format('woff'),
+    url('../font/HuXiaoBoKuHei.ttf') format('truetype'),
+    url('../font/HuXiaoBoKuHei.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/*使用指定字体*/
+div{
+    font-family: 'fc_hxbkh';
+}

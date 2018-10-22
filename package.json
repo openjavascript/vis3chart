@@ -1,0 +1,33 @@
+{
+  "name": "vis3chart",
+  "version": "1.0.15",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "babel  -w ./src/ -d ./dist/",
+    "public": "babel ./src/ -d ./dist/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openjavascript/vis3chart.git"
+  },
+  "author": "suches<908292921@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "fabric": "^2.4.2-b",
+    "json-utilsx": "1.0.7",
+    "konva": "2.4.0",
+    "lodash": "^4.17.11",
+    "three.meshline": "^1.1.0",
+    "three.textsprite": "^18.8.6",
+    "three.texttexture": "^18.8.6"
+  },
+  "bugs": {
+    "url": "https://github.com/openjavascript/vis3chart/issues"
+  },
+  "homepage": "https://github.com/openjavascript/vis3chart#readme"
+}
