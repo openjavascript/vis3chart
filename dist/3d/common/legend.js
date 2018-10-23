@@ -81,6 +81,25 @@ var Legend = function (_VisChartBase) {
 
             console.log('geometry3d', geometry3d);
 
+            var group = new THREE.Group();
+
+            var sizePos = geometry3d.size2dto3d(490, 100, this.width, this.height, this.camera);
+            var pos = geometry3d.pos2dto3d(0, 0, this.width, this.height, this.camera);
+
+            var geometry = new THREE.PlaneBufferGeometry(sizePos.x, sizePos.y, 32);
+            var material = new THREE.MeshBasicMaterial({
+                color: this.parseColor(0xffffff),
+                side: THREE.DoubleSide
+            });
+            var plane = new THREE.Mesh(geometry, material);
+            plane.position.x = pos.x + sizePos.x / 2;
+            plane.position.y = pos.y - sizePos.y / 2;
+            /*
+            */
+            group.add(plane);
+            this.scene.add(group);
+            console.log(pos, sizePos);
+
             this.data.data.map(function (item, key) {
                 var x = 0,
                     y = 0,
@@ -108,10 +127,10 @@ var Legend = function (_VisChartBase) {
                 color = _this2.parseColor(color);
                 if (!_this2.inited) {
 
-                    var pos = geometry3d.pos2dto3d(x, y, _this2.width, _this2.height, _this2.camera);
+                    var _pos = geometry3d.pos2dto3d(x, y, _this2.width, _this2.height, _this2.camera);
                     var gpos = geometry3d.pos2dto3d(0, 0, _this2.width, _this2.height, _this2.camera);
 
-                    var group = new THREE.Group();
+                    var _group = new THREE.Group();
 
                     var geometry = new THREE.PlaneBufferGeometry(_this2.itemWidth(), _this2.itemHeight(), 32);
                     var material = new THREE.MeshBasicMaterial({
@@ -119,9 +138,9 @@ var Legend = function (_VisChartBase) {
                         side: THREE.DoubleSide
                     });
                     var plane = new THREE.Mesh(geometry, material);
-                    plane.position.x = pos.x;
-                    plane.position.y = pos.y;
-                    group.add(plane);
+                    plane.position.x = _pos.x;
+                    plane.position.y = _pos.y;
+                    _group.add(plane);
 
                     /*
                                     let rect = new Konva.Rect( {
@@ -185,7 +204,7 @@ var Legend = function (_VisChartBase) {
                     
                                     this.layer.add( group );
                     */
-                    _this2.scene.add(group);
+                    _this2.scene.add(_group);
                 } else {
                     /*
                     let curgroup = this.group[key];

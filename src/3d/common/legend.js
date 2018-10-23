@@ -45,6 +45,27 @@ export default class Legend extends VisChartBase  {
 
         console.log( 'geometry3d', geometry3d );
 
+
+        let group = new THREE.Group();
+
+        let sizePos = geometry3d.size2dto3d( 490, 100, this.width, this.height, this.camera );
+        let pos= geometry3d.pos2dto3d( 0, 0, this.width, this.height, this.camera );
+
+        var geometry = new THREE.PlaneBufferGeometry( sizePos.x, sizePos.y, 32 );
+        var material = new THREE.MeshBasicMaterial( {
+            color: this.parseColor( 0xffffff )
+            , side: THREE.DoubleSide
+        } );
+        var plane = new THREE.Mesh( geometry, material );
+        plane.position.x = pos.x + sizePos.x / 2;
+        plane.position.y = pos.y - sizePos.y / 2;
+        /*
+        */
+        group.add( plane );
+        this.scene.add( group );
+        console.log( pos, sizePos );
+
+
         this.data.data.map( ( item, key ) => {
             var x = 0, y = 0
                 , count = key + 1
