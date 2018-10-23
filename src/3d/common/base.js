@@ -8,6 +8,12 @@ import ju from 'json-utilsx';
 export default class ThreeBase extends VisChartBase {
     constructor( box, width, height ){
         super( box, width, height );
+
+    }
+
+    _setSize( width, height ){
+        super._setSize( width, height );
+        this.totalAngle = -360;
     }
 
     render() {

@@ -186,7 +186,7 @@ var Dount = function (_VisChartBase) {
             this.countAngle -= this.animationStep;
 
             if (!this.isSeriesAnimation()) {
-                this.countAngle = -this.totalAngle;
+                this.countAngle = this.totalAngle;
             }
 
             if (this.countAngle <= -360 || !this.isAnimation()) {
@@ -552,7 +552,7 @@ var Dount = function (_VisChartBase) {
 
                 val.percent = parseInt(val._percent * 100);
 
-                val.endAngle = -_this5.totalAngle * val._totalPercent;
+                val.endAngle = _this5.totalAngle * val._totalPercent;
             });
 
             //修正浮点数精确度
@@ -563,7 +563,7 @@ var Dount = function (_VisChartBase) {
                 item._percent = 1 - tmp;
                 item.percent = parseInt(item._percent * 100);
                 item._totalPercent = 1;
-                item.endAngle = -this.totalAngle;
+                item.endAngle = this.totalAngle;
             }
 
             this.lineRange = {
@@ -644,7 +644,7 @@ var Dount = function (_VisChartBase) {
                         break;
                     }
                 }
-                //console.log( 'key', key );
+                console.log('key', key);
                 switch (key) {
                     case 4:
                         {
@@ -663,48 +663,58 @@ var Dount = function (_VisChartBase) {
                             break;
                         }
 
-                    /*
-                    case 1: {
-                        let tmpY = item[ 0 ].lineEnd.y;
-                        //console.log( item );
-                        for( let i = item.length - 2; i >= 0; i-- ){
-                            let pre = item[ i + 1], cur = item[ i ];
-                            if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y <= pre.lineEnd.y ){
-                                tmpY = pre.lineEnd.y + this.lineHeight;
-                                cur.lineEnd.y = tmpY;
-                                cur.lineExpend.y = tmpY;
+                    case 1:
+                        {
+                            var _tmpY = item[0].lineEnd.y;
+                            for (var _i2 = item.length - 2; _i2 >= 0; _i2--) {
+                                var _pre2 = item[_i2 + 1],
+                                    _cur2 = item[_i2];
+                                console.log(_pre2.lineEnd.y, _cur2.lineEnd.y, _this5.lineHeight);
+                                if (Math.abs(_pre2.lineEnd.y - _cur2.lineEnd.y) < _this5.lineHeight || _cur2.lineEnd.y >= _pre2.lineEnd.y) {
+                                    _tmpY = _pre2.lineEnd.y - _this5.lineHeight;
+                                    _cur2.lineEnd.y = _tmpY;
+                                    _cur2.lineExpend.y = _tmpY;
+                                }
                             }
+                            break;
                         }
-                        break;
-                    }
-                    case 2: {
-                        let tmpY = item[ 0 ].lineEnd.y;
-                        for( let i = 1; i < item.length; i++ ){
-                            let pre = item[ i - 1], cur = item[ i ], zero = item[0];
-                             if( Math.abs( pre.lineEnd.y + this.fixCy() ) < this.lineHeight ){
-                                pre.lineExpend.y = pre.lineEnd.y =  pre.lineExpend.y + this.lineHeight;
+                    case 2:
+                        {
+                            var _tmpY2 = item[0].lineEnd.y;
+                            for (var _i3 = 1; _i3 < item.length; _i3++) {
+                                var _pre3 = item[_i3 - 1],
+                                    _cur3 = item[_i3],
+                                    zero = item[0];
+
+                                if (Math.abs(_pre3.lineEnd.y + _this5.fixCy()) < _this5.lineHeight) {
+                                    _pre3.lineExpend.y = _pre3.lineEnd.y = _pre3.lineExpend.y + _this5.lineHeight;
+                                }
+                                if (Math.abs(_pre3.lineEnd.y - _cur3.lineEnd.y) < _this5.lineHeight || _cur3.lineEnd.y >= _pre3.lineEnd.y) {
+
+                                    _tmpY2 = _pre3.lineEnd.y - _this5.lineHeight;
+                                    _cur3.lineEnd.y = _tmpY2;
+                                    _cur3.lineExpend.y = _tmpY2;
+                                }
                             }
-                            if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight   || cur.lineEnd.y <= pre.lineEnd.y  ){
-                                 tmpY = pre.lineEnd.y + this.lineHeight;
-                                cur.lineEnd.y = tmpY;
-                                cur.lineExpend.y = tmpY;
-                            }
+
+                            break;
                         }
-                         break;
-                    }
-                    case 8: {
-                        let tmpY = 0;
-                        for( let i = 1; i < item.length ; i++ ){
-                            let pre = item[ i - 1], cur = item[ i ];
-                            if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight  || cur.lineEnd.y >= pre.lineEnd.y ){
-                                tmpY = pre.lineEnd.y - this.lineHeight;
-                                cur.lineEnd.y = tmpY;
-                                cur.lineExpend.y = cur.lineEnd.y;
+
+                    case 8:
+                        {
+                            var _tmpY3 = 0;
+                            for (var _i4 = 1; _i4 < item.length; _i4++) {
+                                var _pre4 = item[_i4 - 1],
+                                    _cur4 = item[_i4];
+                                if (Math.abs(_pre4.lineEnd.y - _cur4.lineEnd.y) < _this5.lineHeight || _cur4.lineEnd.y <= _pre4.lineEnd.y) {
+                                    _tmpY3 = _pre4.lineEnd.y + _this5.lineHeight;
+                                    _cur4.lineEnd.y = _tmpY3;
+                                    _cur4.lineExpend.y = _cur4.lineEnd.y;
+                                }
                             }
+
+                            break;
                         }
-                         break;
-                    }
-                    */
                 }
             });
         }

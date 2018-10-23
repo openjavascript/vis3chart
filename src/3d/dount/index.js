@@ -131,7 +131,7 @@ export default class Dount extends VisChartBase  {
         this.countAngle -= this.animationStep;
 
         if( !this.isSeriesAnimation() ){
-            this.countAngle = -this.totalAngle;
+            this.countAngle = this.totalAngle;
         }
 
         if( this.countAngle <= -360 || !this.isAnimation() ){
@@ -498,7 +498,7 @@ export default class Dount extends VisChartBase  {
 
             val.percent = parseInt( val._percent * 100 );
 
-            val.endAngle = -this.totalAngle * val._totalPercent;
+            val.endAngle = this.totalAngle * val._totalPercent;
 
         });
 
@@ -510,7 +510,7 @@ export default class Dount extends VisChartBase  {
             item._percent = 1 - tmp;
             item.percent = parseInt( item._percent * 100 );
             item._totalPercent = 1;
-            item.endAngle = -this.totalAngle;
+            item.endAngle = this.totalAngle;
         }
 
         this.lineRange = {
@@ -591,7 +591,7 @@ export default class Dount extends VisChartBase  {
                     break;
                 }
             }
-            //console.log( 'key', key );
+            console.log( 'key', key );
             switch( key ){
                 case 4: {
                     let tmpY = 0;
@@ -608,14 +608,13 @@ export default class Dount extends VisChartBase  {
                     break;
                 }
 
-                /*
                 case 1: {
                     let tmpY = item[ 0 ].lineEnd.y;
-                    //console.log( item );
                     for( let i = item.length - 2; i >= 0; i-- ){
                         let pre = item[ i + 1], cur = item[ i ];
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y <= pre.lineEnd.y ){
-                            tmpY = pre.lineEnd.y + this.lineHeight;
+                        console.log( pre.lineEnd.y, cur.lineEnd.y, this.lineHeight );
+                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y >= pre.lineEnd.y ){
+                            tmpY = pre.lineEnd.y - this.lineHeight;
                             cur.lineEnd.y = tmpY;
                             cur.lineExpend.y = tmpY;
                         }
@@ -630,9 +629,9 @@ export default class Dount extends VisChartBase  {
                         if( Math.abs( pre.lineEnd.y + this.fixCy() ) < this.lineHeight ){
                             pre.lineExpend.y = pre.lineEnd.y =  pre.lineExpend.y + this.lineHeight;
                         }
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight   || cur.lineEnd.y <= pre.lineEnd.y  ){
+                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight   || cur.lineEnd.y >= pre.lineEnd.y  ){
 
-                            tmpY = pre.lineEnd.y + this.lineHeight;
+                            tmpY = pre.lineEnd.y - this.lineHeight;
                             cur.lineEnd.y = tmpY;
                             cur.lineExpend.y = tmpY;
                         }
@@ -640,12 +639,13 @@ export default class Dount extends VisChartBase  {
 
                     break;
                 }
+
                 case 8: {
                     let tmpY = 0;
                     for( let i = 1; i < item.length ; i++ ){
                         let pre = item[ i - 1], cur = item[ i ];
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight  || cur.lineEnd.y >= pre.lineEnd.y ){
-                            tmpY = pre.lineEnd.y - this.lineHeight;
+                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight  || cur.lineEnd.y <= pre.lineEnd.y ){
+                            tmpY = pre.lineEnd.y + this.lineHeight;
                             cur.lineEnd.y = tmpY;
                             cur.lineExpend.y = cur.lineEnd.y;
                         }
@@ -653,7 +653,6 @@ export default class Dount extends VisChartBase  {
 
                     break;
                 }
-                */
             }
         });
     }
