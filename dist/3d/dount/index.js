@@ -680,7 +680,7 @@ var Dount = function (_VisChartBase) {
                         break;
                     }
                 }
-                console.log('key', key);
+                //console.log( 'key', key );
                 switch (key) {
                     case 4:
                         {
@@ -688,7 +688,7 @@ var Dount = function (_VisChartBase) {
                             for (var _i = item.length - 2; _i >= 0; _i--) {
                                 var _pre = item[_i + 1],
                                     _cur = item[_i];
-                                console.log(_pre.lineEnd.y, _cur.lineEnd.y, _this5.lineHeight);
+                                //console.log( pre.lineEnd.y, cur.lineEnd.y, this.lineHeight );
                                 if (Math.abs(_pre.lineEnd.y - _cur.lineEnd.y) < _this5.lineHeight || _cur.lineEnd.y <= _pre.lineEnd.y) {
                                     //console.log( pre.lineEnd.y, cur.lineEnd.y );
                                     tmpY = _pre.lineEnd.y + _this5.lineHeight;

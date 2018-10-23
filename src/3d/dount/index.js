@@ -639,13 +639,13 @@ export default class Dount extends VisChartBase  {
                     break;
                 }
             }
-            console.log( 'key', key );
+            //console.log( 'key', key );
             switch( key ){
                 case 4: {
                     let tmpY = 0;
                     for( let i = item.length - 2; i >= 0 ; i-- ){
                         let pre = item[ i + 1], cur = item[ i ];
-                        console.log( pre.lineEnd.y, cur.lineEnd.y, this.lineHeight );
+                        //console.log( pre.lineEnd.y, cur.lineEnd.y, this.lineHeight );
                         if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y <= pre.lineEnd.y ){
                             //console.log( pre.lineEnd.y, cur.lineEnd.y );
                             tmpY = pre.lineEnd.y + this.lineHeight;

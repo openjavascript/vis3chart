@@ -102,11 +102,6 @@ var ThreeBase = function (_VisChartBase) {
                     var geometry = new THREE.ShapeBufferGeometry(shape);
                     var mesh = new THREE.Mesh(geometry, material);
                     group.add(mesh);
-
-                    /*
-                    mesh.renderOrder = 10 + key;
-                    mesh.material.depthTest=false;
-                    */
                 }
             }
 
@@ -122,7 +117,13 @@ var ThreeBase = function (_VisChartBase) {
             var pivot = new THREE.Object3D();
             pivot.add(group);
 
-            pivot.scale.set(this.sizeRate, this.sizeRate, this.sizeRate);
+            console.log('initSVGBackground');
+            console.log(this.width / this.rateWidth, item.width);
+            console.log(box, size);
+
+            //pivot.scale.set( .8, .8, .8  );
+
+            //pivot.scale.set( this.rateWidth, this.rateHeight, 0  );
 
             this.addDestroy(pivot);
 

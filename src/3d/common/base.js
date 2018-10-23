@@ -90,11 +90,6 @@ export default class ThreeBase extends VisChartBase {
                 let geometry = new THREE.ShapeBufferGeometry( shape );
                 let mesh = new THREE.Mesh( geometry, material );
                 group.add( mesh );
-
-                /*
-                mesh.renderOrder = 10 + key;
-                mesh.material.depthTest=false;
-                */
             }
         }
 
@@ -111,7 +106,13 @@ export default class ThreeBase extends VisChartBase {
         let pivot = new THREE.Object3D();
         pivot.add( group );
 
-        pivot.scale.set( this.sizeRate, this.sizeRate, this.sizeRate  );
+        console.log( 'initSVGBackground' );
+        console.log( this.width / this.rateWidth, item.width );
+        console.log( box, size );
+
+        //pivot.scale.set( .8, .8, .8  );
+        
+        //pivot.scale.set( this.rateWidth, this.rateHeight, 0  );
 
         this.addDestroy( pivot );
 
