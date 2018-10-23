@@ -39,7 +39,10 @@ var ThreeBase = function (_VisChartBase) {
         key: '_setSize',
         value: function _setSize(width, height) {
             _get(ThreeBase.prototype.__proto__ || Object.getPrototypeOf(ThreeBase.prototype), '_setSize', this).call(this, width, height);
+
             this.totalAngle = -360;
+
+            this.sizeRate = 1;
         }
     }, {
         key: 'render',

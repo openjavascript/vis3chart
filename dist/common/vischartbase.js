@@ -62,10 +62,6 @@ var VisChartBase = function () {
             this.sizeRate = 1;
 
             this.standSize = 330;
-
-            if (this.min < this.standSize) {
-                this.sizeRate = this.min / this.standSize;
-            }
         }
     }, {
         key: 'update',

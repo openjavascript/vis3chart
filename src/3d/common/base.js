@@ -13,7 +13,10 @@ export default class ThreeBase extends VisChartBase {
 
     _setSize( width, height ){
         super._setSize( width, height );
+
         this.totalAngle = -360;
+
+        this.sizeRate = 1;
     }
 
     render() {
@@ -24,7 +27,6 @@ export default class ThreeBase extends VisChartBase {
 
         return this;
     }
-
 
     loadImage(){
         if( this.images.length ) return;
