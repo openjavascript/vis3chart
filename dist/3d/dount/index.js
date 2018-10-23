@@ -63,7 +63,6 @@ var Dount = function (_VisChartBase) {
         _this.name = 'Dount_' + Date.now();
 
         _this._setSize(width, height);
-
         return _this;
     }
 

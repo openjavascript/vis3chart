@@ -21,7 +21,6 @@ export default class Dount extends VisChartBase  {
         this.name = 'Dount_' + Date.now();
 
         this._setSize( width, height );
-
     }
 
     _setSize( width, height ){

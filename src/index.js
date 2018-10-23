@@ -1,5 +1,7 @@
 
+
 import VisChartBase from './3d/common/base.js';
+import Legend from './3d/common/legend.js';
 
 import Dount from './3d/dount/index.js';
 
@@ -7,6 +9,7 @@ import ju from 'json-utilsx';
 import * as constant from './common/constant.js';
 
 import * as geometry from './geometry/geometry.js';
+
 
 const THREE = require( 'three' );
 
@@ -79,7 +82,12 @@ export default class VisThree extends VisChartBase {
             this.box.appendChild( this.renderer.domElement );
 
             //this.scene.rotation.x = geometry.radians( 45 );
-            //this.scene.rotation.y = geometry.radians( 135 );
+            //this.scene.rotation.y = geometry.radians( 290 );
+
+            this.cameraHelper = new THREE.CameraHelper( this.camera );
+            this.cameraHelper.visible = false;
+            this.scene.add( this.cameraHelper );
+
 
             console.log( this.scene, this.camera );
         }
@@ -144,21 +152,25 @@ export default class VisThree extends VisChartBase {
 
         this.clearUpdate();
 
-        /*if( ju.jsonInData( this.data, 'legend.data' ) &&  this.data.legend.data.length ){
+        if( ju.jsonInData( this.data, 'legend.data' ) &&  this.data.legend.data.length ){
             if( this.legend && ignoreLegend ){
                 this.emptyblock = 'kao';
             }else{
                 this.legend = new Legend( this.box, this.width, this.height );
-                this.legend.setStage( this.stage );
                 this.legend.setOptions( {
-                    onChange: ( group ) => {
+                    renderer: this.renderer
+                    , scene: this.scene
+                    , camera: this.camera
+                    , stage: this.stage
+                    , config: this.config
+                    , onChange: ( group ) => {
                         //console.log( 'legend onchange', group );
                         this.initChart();
                     }
                 });
                 this.legend.update( this.data.legend );
             }
-        }*/
+        }
         this.initChart();
         return this;
     }
