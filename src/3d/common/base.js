@@ -15,6 +15,7 @@ export default class ThreeBase extends VisChartBase {
         super._setSize( width, height );
 
         this.totalAngle = -360;
+        this.deep = 0;
 
         this.sizeRate = 1;
     }
@@ -27,6 +28,35 @@ export default class ThreeBase extends VisChartBase {
 
         return this;
     }
+
+    getWidth(){
+        let r = this.width; 
+
+        if( ju.jsonInData( this, 'config.cameraPosition.z' ) ){
+            r = this.config.cameraPosition.z;
+        }
+
+        return r;
+    }
+
+    getHeight(){
+        let r = this.height; 
+
+        if( ju.jsonInData( this, 'config.cameraPosition.z' ) ){
+            r = this.config.cameraPosition.z;
+        }
+
+        return r;
+    }
+
+    getDeepWidth(){
+        let r = this.deep; 
+        if( ju.jsonInData( this, 'config.cameraPosition.z' ) ){
+            r = this.config.cameraPosition.z / this.width * this.config.cameraPosition.z;
+        }
+        return r;
+    }
+
 
     loadImage(){
         if( this.images.length ) return;
@@ -196,4 +226,24 @@ export default class ThreeBase extends VisChartBase {
         return color;
     }
 
+    pos2dto3d( x, y, camera ){
+        var vec = new THREE.Vector3(); // create once and reuse
+        var pos = new THREE.Vector3(); // create once and reuse
+        camera = camera || this.camera;
+
+        vec.set(
+            ( x / this.width ) * 2 - 1,
+            - ( y / this.width ) * 2 + 1,
+            0.5 );
+
+        vec.unproject( camera );
+
+        vec.sub( camera.position ).normalize();
+
+        var distance = - camera.position.z / vec.z;
+
+        pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+
+        return pos;
+    }
 }

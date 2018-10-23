@@ -41,6 +41,7 @@ var ThreeBase = function (_VisChartBase) {
             _get(ThreeBase.prototype.__proto__ || Object.getPrototypeOf(ThreeBase.prototype), '_setSize', this).call(this, width, height);
 
             this.totalAngle = -360;
+            this.deep = 0;
 
             this.sizeRate = 1;
         }
@@ -50,6 +51,37 @@ var ThreeBase = function (_VisChartBase) {
             this.renderer && this.scene && this.camera && this.renderer.render(this.scene, this.camera);
 
             return this;
+        }
+    }, {
+        key: 'getWidth',
+        value: function getWidth() {
+            var r = this.width;
+
+            if (_jsonUtilsx2.default.jsonInData(this, 'config.cameraPosition.z')) {
+                r = this.config.cameraPosition.z;
+            }
+
+            return r;
+        }
+    }, {
+        key: 'getHeight',
+        value: function getHeight() {
+            var r = this.height;
+
+            if (_jsonUtilsx2.default.jsonInData(this, 'config.cameraPosition.z')) {
+                r = this.config.cameraPosition.z;
+            }
+
+            return r;
+        }
+    }, {
+        key: 'getDeepWidth',
+        value: function getDeepWidth() {
+            var r = this.deep;
+            if (_jsonUtilsx2.default.jsonInData(this, 'config.cameraPosition.z')) {
+                r = this.config.cameraPosition.z / this.width * this.config.cameraPosition.z;
+            }
+            return r;
         }
     }, {
         key: 'loadImage',
@@ -219,6 +251,25 @@ var ThreeBase = function (_VisChartBase) {
             }
 
             return color;
+        }
+    }, {
+        key: 'pos2dto3d',
+        value: function pos2dto3d(x, y, camera) {
+            var vec = new THREE.Vector3(); // create once and reuse
+            var pos = new THREE.Vector3(); // create once and reuse
+            camera = camera || this.camera;
+
+            vec.set(x / this.width * 2 - 1, -(y / this.width) * 2 + 1, 0.5);
+
+            vec.unproject(camera);
+
+            vec.sub(camera.position).normalize();
+
+            var distance = -camera.position.z / vec.z;
+
+            pos.copy(camera.position).add(vec.multiplyScalar(distance));
+
+            return pos;
         }
     }]);
 

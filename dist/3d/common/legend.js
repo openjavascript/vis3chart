@@ -16,6 +16,10 @@ var _geometry = require('../../geometry/geometry.js');
 
 var geometry = _interopRequireWildcard(_geometry);
 
+var _geometry3d = require('../../geometry/geometry3d.js');
+
+var geometry3d = _interopRequireWildcard(_geometry3d);
+
 var _jsonUtilsx = require('json-utilsx');
 
 var _jsonUtilsx2 = _interopRequireDefault(_jsonUtilsx);
@@ -75,6 +79,8 @@ var Legend = function (_VisChartBase) {
         value: function init() {
             var _this2 = this;
 
+            console.log('geometry3d', geometry3d);
+
             this.data.data.map(function (item, key) {
                 var x = 0,
                     y = 0,
@@ -86,7 +92,6 @@ var Legend = function (_VisChartBase) {
                         {
                             x = _this2.space() + (_this2.space() + _this2.columnWidth()) * (key % _this2.column());
                             y = _this2.height - (_this2.row() - curRow) * (_this2.spaceY() + _this2.rowHeight());
-                            //console.log( x, y, key, this.direction(), curRow );
                             break;
                         }
                 }
@@ -103,16 +108,20 @@ var Legend = function (_VisChartBase) {
                 color = _this2.parseColor(color);
                 if (!_this2.inited) {
 
-                    console.log(key, x, y);
+                    var pos = geometry3d.pos2dto3d(x, y, _this2.width, _this2.height, _this2.camera);
+                    var gpos = geometry3d.pos2dto3d(0, 0, _this2.width, _this2.height, _this2.camera);
 
                     var group = new THREE.Group();
 
-                    var geometryx = new THREE.CircleGeometry(5, 32);
-                    var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-                    var circle = new THREE.Mesh(geometryx, material);
-                    circle.position.x = x;
-                    //circle.position.y = y;
-                    group.add(circle);
+                    var geometry = new THREE.PlaneBufferGeometry(_this2.itemWidth(), _this2.itemHeight(), 32);
+                    var material = new THREE.MeshBasicMaterial({
+                        color: _this2.parseColor(color),
+                        side: THREE.DoubleSide
+                    });
+                    var plane = new THREE.Mesh(geometry, material);
+                    plane.position.x = pos.x;
+                    plane.position.y = pos.y;
+                    group.add(plane);
 
                     /*
                                     let rect = new Konva.Rect( {
@@ -244,7 +253,8 @@ var Legend = function (_VisChartBase) {
         key: 'columnWidth',
         value: function columnWidth() {
             //return ( this.width - ( this.column() - 1 + 2 ) * this.space() ) / this.column();
-            return (350 / 2 - (this.column() - 1 + 2) * this.space()) / this.column();
+            var width = this.width;
+            return (width - (this.column() - 1 + 2) * this.space()) / this.column();
         }
     }, {
         key: 'column',
@@ -264,7 +274,7 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'rowHeight',
         value: function rowHeight() {
-            return this.data.rowHeight || 22;
+            return this.data.rowHeight || 30;
         }
     }, {
         key: 'row',
