@@ -138,16 +138,16 @@ export default class PointAt {
 
 
         if( angle >= 0 && angle <= 90 ){
-            r = PointAt.DIRE_NAME.rightBottom;
-        }else if( angle > 90 && angle <= 180 ){
-            r = PointAt.DIRE_NAME.leftBottom;
-        }else if( angle > 180 && angle <= 270 ){
-            r = PointAt.DIRE_NAME.leftTop;
-        }else{
             r = PointAt.DIRE_NAME.rightTop;
+        }else if( angle > 90 && angle <= 180 ){
+            r = PointAt.DIRE_NAME.leftTop;
+        }else if( angle > 180 && angle <= 270 ){
+            r = PointAt.DIRE_NAME.leftBottom;
+        }else{
+            r = PointAt.DIRE_NAME.rightBottom;
         }
 
-        console.log( 'autoAngle', angle, r );
+        //console.log( 'autoAngle', angle, r );
 
         return r;
     }

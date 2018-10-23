@@ -100,7 +100,7 @@ var Dount = function (_VisChartBase) {
                 "8": []
             };
 
-            this.lineWidth = 22;
+            this.lineWidth = 28;
             this.lineSpace = 10;
             this.lineAngle = 35;
             this.lineHeight = 15;
@@ -447,8 +447,8 @@ var Dount = function (_VisChartBase) {
 
 
                 if (this.lineLengthCount >= this.lineLength) {
-                    this.addIcon(path, layer);
-                    this.addText(path, layer);
+                    this.addIcon(path, layer, i);
+                    this.addText(path, layer, i);
                     /*
                     */
                     //console.log( 'line done' );
@@ -461,7 +461,7 @@ var Dount = function (_VisChartBase) {
         }
     }, {
         key: 'addIcon',
-        value: function addIcon(path, layer) {
+        value: function addIcon(path, layer, ix) {
             if (!path.lineicon) {
                 var geometry = new THREE.CircleGeometry(3, 32);
                 var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
@@ -475,11 +475,11 @@ var Dount = function (_VisChartBase) {
         }
     }, {
         key: 'addText',
-        value: function addText(path, layer) {
+        value: function addText(path, layer, ix) {
             if (!path.text) {
                 var sprite = path.text = new _three4.default({
-                    textSize: 12,
-                    redrawInterval: 250,
+                    textSize: 11,
+                    redrawInterval: 0,
                     texture: {
                         text: path.itemData.percent + '%',
                         fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
@@ -488,40 +488,50 @@ var Dount = function (_VisChartBase) {
                         color: 0xffffff
                     }
                 });
-                this.scene.add(sprite);
-                this.clearList.push(sprite);
+                this.clearList.push(path.text);
+                path.text.material.opacity = 0;
+                this.scene.add(path.text);
             }
+
             var text = path.text;
 
             var textPoint = path.itemData.textPoint,
                 angleDirect = path.itemData.pointDirection.autoAngle();
 
             textPoint = _jsonUtilsx2.default.clone(path.itemData.lineEnd);
-            //console.log( 'addText', text );
-            /*
-             switch( angleDirect ){
-                case 1: {
-                    textPoint.x -= text.textWidth
-                    break;
-                }
-                case 2: {
-                    break;
-                }
-                case 4: {
-                    break;
-                }
-                case 8: {
-                    textPoint.x -= text.textWidth
-                    break;
-                }
-            }
-            */
 
             var textX = textPoint.x,
                 textY = textPoint.y,
                 direct = path.itemData.pointDirection.auto();
             text.position.x = textX;
             text.position.y = textY;
+
+            if (!ix || true) {
+
+                setTimeout(function () {
+                    var position = new THREE.Vector3();
+                    position.setFromMatrixPosition(text.matrixWorld);
+
+                    //console.log( 'addText', text, angleDirect, 'scale y', text.scale.y, text.scale.x, position );
+
+                    text.position.y = textY + text.scale.y / 2 - 3;
+
+                    switch (angleDirect) {
+                        case 8:
+                        case 1:
+                            {
+                                text.position.x = textX - text.scale.x / 2 + 2;
+                                break;
+                            }
+                        default:
+                            {
+                                text.position.x = textX + text.scale.x / 2 - 2;
+                                break;
+                            }
+                    }
+                    path.text.material.opacity = 1;
+                }, 100);
+            }
         }
     }, {
         key: 'calcLayoutPosition',
@@ -671,7 +681,25 @@ var Dount = function (_VisChartBase) {
                     }
                 }
                 console.log('key', key);
-                /*switch( key ){
+                switch (key) {
+                    case 4:
+                        {
+                            var tmpY = 0;
+                            for (var _i = item.length - 2; _i >= 0; _i--) {
+                                var _pre = item[_i + 1],
+                                    _cur = item[_i];
+                                console.log(_pre.lineEnd.y, _cur.lineEnd.y, _this5.lineHeight);
+                                if (Math.abs(_pre.lineEnd.y - _cur.lineEnd.y) < _this5.lineHeight || _cur.lineEnd.y <= _pre.lineEnd.y) {
+                                    //console.log( pre.lineEnd.y, cur.lineEnd.y );
+                                    tmpY = _pre.lineEnd.y + _this5.lineHeight;
+                                    _cur.lineEnd.y = tmpY;
+                                    _cur.lineExpend.y = tmpY;
+                                }
+                            }
+                            break;
+                        }
+
+                    /*
                     case 1: {
                         let tmpY = item[ 0 ].lineEnd.y;
                         //console.log( item );
@@ -700,19 +728,6 @@ var Dount = function (_VisChartBase) {
                         }
                          break;
                     }
-                    case 4: {
-                        let tmpY = 0;
-                        for( let i = item.length - 2; i >= 0 ; i-- ){
-                            let pre = item[ i + 1], cur = item[ i ];
-                            if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y >= pre.lineEnd.y ){
-                                //console.log( pre.lineEnd.y, cur.lineEnd.y );
-                                tmpY = pre.lineEnd.y - this.lineHeight;
-                                cur.lineEnd.y = tmpY;
-                                cur.lineExpend.y = tmpY;
-                            }
-                        }
-                        break;
-                    }
                     case 8: {
                         let tmpY = 0;
                         for( let i = 1; i < item.length ; i++ ){
@@ -725,7 +740,8 @@ var Dount = function (_VisChartBase) {
                         }
                          break;
                     }
-                }*/
+                    */
+                }
             });
         }
     }]);

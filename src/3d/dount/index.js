@@ -55,7 +55,7 @@ export default class Dount extends VisChartBase  {
             , "8": []
         };
 
-        this.lineWidth = 22;
+        this.lineWidth = 28;
         this.lineSpace = 10;
         this.lineAngle = 35;
         this.lineHeight = 15;
@@ -411,8 +411,8 @@ export default class Dount extends VisChartBase  {
 
 
             if( this.lineLengthCount >= this.lineLength ){
-                this.addIcon( path, layer );
-                this.addText( path, layer );
+                this.addIcon( path, layer, i );
+                this.addText( path, layer, i );
                 /*
                 */
                 //console.log( 'line done' );
@@ -422,7 +422,7 @@ export default class Dount extends VisChartBase  {
         }
     }
 
-    addIcon( path, layer ){
+    addIcon( path, layer, ix ){
         if( !path.lineicon ){
             var geometry = new THREE.CircleGeometry( 3, 32 );
             var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
@@ -435,11 +435,11 @@ export default class Dount extends VisChartBase  {
         path.lineicon.position.y = path.itemData.lineExpend.y;
     }
 
-    addText( path, layer ){
+    addText( path, layer, ix ){
         if( !path.text ){
             let sprite = path.text = new TextSprite({
-              textSize: 12,
-              redrawInterval: 250,
+              textSize: 11,
+              redrawInterval: 0,
               texture: {
                 text: `${path.itemData.percent}%`,
                 fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
@@ -448,9 +448,11 @@ export default class Dount extends VisChartBase  {
                 color: 0xffffff
               }
             });
-            this.scene.add(sprite);
-            this.clearList.push( sprite );
+            this.clearList.push( path.text );
+            path.text.material.opacity = 0;
+            this.scene.add(path.text);
         }
+
         let text = path.text;
 
         let textPoint = path.itemData.textPoint
@@ -458,26 +460,6 @@ export default class Dount extends VisChartBase  {
             ;
 
         textPoint = ju.clone( path.itemData.lineEnd );
-        //console.log( 'addText', text );
-        /*
-
-        switch( angleDirect ){
-            case 1: {
-                textPoint.x -= text.textWidth
-                break;
-            }
-            case 2: {
-                break;
-            }
-            case 4: {
-                break;
-            }
-            case 8: {
-                textPoint.x -= text.textWidth
-                break;
-            }
-        }
-        */
 
         let textX =  textPoint.x
             , textY =  textPoint.y
@@ -485,6 +467,36 @@ export default class Dount extends VisChartBase  {
             ;
         text.position.x = textX;
         text.position.y = textY;
+
+
+        if( !ix || true ){
+
+            setTimeout( ()=>{
+                var position = new THREE.Vector3();
+                position.setFromMatrixPosition( text.matrixWorld );
+
+                //console.log( 'addText', text, angleDirect, 'scale y', text.scale.y, text.scale.x, position );
+
+                text.position.y = textY + text.scale.y / 2 - 3;
+
+                switch( angleDirect ){
+                    case 8:
+                    case 1: {
+                        text.position.x = textX - text.scale.x / 2 + 2;
+                        break;
+                    }
+                    default: {
+                        text.position.x = textX + text.scale.x / 2 - 2;
+                        break;
+                    }
+                }
+                path.text.material.opacity = 1;
+
+            }, 100 );
+        
+        }
+
+
     }
 
     calcLayoutPosition() {
@@ -628,7 +640,23 @@ export default class Dount extends VisChartBase  {
                 }
             }
             console.log( 'key', key );
-            /*switch( key ){
+            switch( key ){
+                case 4: {
+                    let tmpY = 0;
+                    for( let i = item.length - 2; i >= 0 ; i-- ){
+                        let pre = item[ i + 1], cur = item[ i ];
+                        console.log( pre.lineEnd.y, cur.lineEnd.y, this.lineHeight );
+                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y <= pre.lineEnd.y ){
+                            //console.log( pre.lineEnd.y, cur.lineEnd.y );
+                            tmpY = pre.lineEnd.y + this.lineHeight;
+                            cur.lineEnd.y = tmpY;
+                            cur.lineExpend.y = tmpY;
+                        }
+                    }
+                    break;
+                }
+
+                /*
                 case 1: {
                     let tmpY = item[ 0 ].lineEnd.y;
                     //console.log( item );
@@ -660,19 +688,6 @@ export default class Dount extends VisChartBase  {
 
                     break;
                 }
-                case 4: {
-                    let tmpY = 0;
-                    for( let i = item.length - 2; i >= 0 ; i-- ){
-                        let pre = item[ i + 1], cur = item[ i ];
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y >= pre.lineEnd.y ){
-                            //console.log( pre.lineEnd.y, cur.lineEnd.y );
-                            tmpY = pre.lineEnd.y - this.lineHeight;
-                            cur.lineEnd.y = tmpY;
-                            cur.lineExpend.y = tmpY;
-                        }
-                    }
-                    break;
-                }
                 case 8: {
                     let tmpY = 0;
                     for( let i = 1; i < item.length ; i++ ){
@@ -686,7 +701,8 @@ export default class Dount extends VisChartBase  {
 
                     break;
                 }
-            }*/
+                */
+            }
         });
     }
 
