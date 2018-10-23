@@ -71,7 +71,7 @@ export default class VisThree extends VisChartBase {
             )
             this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
             this.renderer.setPixelRatio( window.devicePixelRatio );
-            //this.renderer.setClearColor( 0xffffff, .2 );
+            this.renderer.setClearColor( 0xffffff, .2 );
             this.renderer.sortObjects  = true;
             this.box.innerHTML = '';
             this.box.appendChild( this.renderer.domElement );

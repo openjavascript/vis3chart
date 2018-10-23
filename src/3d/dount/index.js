@@ -55,7 +55,7 @@ export default class Dount extends VisChartBase  {
             , "8": []
         };
 
-        this.lineWidth = 28;
+        this.lineWidth = 32;
         this.lineSpace = 10;
         this.lineAngle = 35;
         this.lineHeight = 15;
@@ -170,52 +170,6 @@ export default class Dount extends VisChartBase  {
         window.requestAnimationFrame( ()=>{ this.animation() } );
 
         if( this.isDone ){
-
-            /*
-            let sprite = new TextSprite({
-              textSize: 12,
-              redrawInterval: 250,
-              texture: {
-                text: '50%',
-                fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
-              },
-              material: {
-                color: 0xffffff
-              }
-            });
-            this.scene.add(sprite);
-            */
-
-            /*
-            let texture = new TextTexture({
-              text: '50%',
-              fontFamily: 'MicrosoftYaHei',
-              fontSize: 28,
-              fontStyle: 'normal',
-            });
-            let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
-            let sprite = new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(12);
-            //sprite.position.x = -50;
-            this.scene.add(sprite);
-            */
-
-                /*
-            let font = new THREE.Font( window.fontjson );
-            var textShapes = font.generateShapes( 'hello中文', 8 );
-            var text = new THREE.ShapeGeometry( textShapes );
-            var textMesh = new THREE.Mesh( text, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) ;
-            textMesh.geometry = text;
-            textMesh.geometry.needsUpdate = true;
-
-            var box= new THREE.Box3().setFromObject( textMesh );
-
-            console.log( textMesh, box.min, box.max, box.getSize( new THREE.Vector3() ) );
-            textMesh.position.x = -box.max.x / 2;
-
-            this.scene.add( textMesh );
-            */
-
             window.requestAnimationFrame( ()=>{ this.animationLine() } );
         }
     }
@@ -329,7 +283,20 @@ export default class Dount extends VisChartBase  {
             }
             color = this.parseColor( color );
 
-            let geometryx = new THREE.RingGeometry( 
+            let line, material, geometryx, mesh, arc, tmp; 
+
+            line = new MeshLine();
+            material = new MeshLineMaterial({
+                color: new THREE.Color( 0xffffff )
+                , lineWidth: 2
+            });
+            geometryx = new THREE.Geometry();
+            line.setGeometry( geometryx );
+            mesh = new THREE.Mesh( line.geometry, material );
+            this.scene.add( mesh );
+            this.line.push( mesh );
+
+            geometryx = new THREE.RingGeometry( 
                 this.inRadius
                 , this.outRadius
                 , 256 
@@ -337,26 +304,13 @@ export default class Dount extends VisChartBase  {
                 , geometry.radians( 0 )
                 , geometry.radians( -0.1 )
             );
-            let material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide } );
-            let arc = new THREE.Mesh( geometryx, material );
+            material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide } );
+            arc = new THREE.Mesh( geometryx, material );
+            arc.renderOrder = 1;
 
             this.scene.add( arc );
 
-            var line = new MeshLine();
-            var material = new MeshLineMaterial({
-                color: new THREE.Color( 0xffffff )
-                , lineWidth: 2
-            });
-
-            var geometryx = new THREE.Geometry();
-            line.setGeometry( geometryx );
-
-            var mesh = new THREE.Mesh( line.geometry, material );
-            this.scene.add( mesh );
-
-            this.line.push( mesh );
-
-            let tmp = { 
+            tmp = { 
                 arc: arc 
                 , pathData: [] 
                 , itemData: val
@@ -437,8 +391,8 @@ export default class Dount extends VisChartBase  {
 
     addText( path, layer, ix ){
         if( !path.text ){
-            let sprite = path.text = new TextSprite({
-              textSize: 11,
+            /*let sprite = path.text = new TextSprite({
+              textSize: 12,
               redrawInterval: 0,
               texture: {
                 text: `${path.itemData.percent}%`,
@@ -447,9 +401,19 @@ export default class Dount extends VisChartBase  {
               material: {
                 color: 0xffffff
               }
+            });*/
+
+            let texture = new TextTexture({
+              text: `${path.itemData.percent}%`,
+              fontFamily: 'MicrosoftYaHei',
+              fontSize: 42,
+              fontStyle: 'normal',
             });
+            let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
+            let sprite = path.text = new THREE.Sprite(material);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(18);
+
             this.clearList.push( path.text );
-            path.text.material.opacity = 0;
             this.scene.add(path.text);
         }
 
@@ -469,34 +433,22 @@ export default class Dount extends VisChartBase  {
         text.position.y = textY;
 
 
-        if( !ix || true ){
+        var position = new THREE.Vector3();
+        position.setFromMatrixPosition( text.matrixWorld );
 
-            setTimeout( ()=>{
-                var position = new THREE.Vector3();
-                position.setFromMatrixPosition( text.matrixWorld );
+        text.position.y = textY + text.scale.y / 2 - 1;
 
-                //console.log( 'addText', text, angleDirect, 'scale y', text.scale.y, text.scale.x, position );
-
-                text.position.y = textY + text.scale.y / 2 - 3;
-
-                switch( angleDirect ){
-                    case 8:
-                    case 1: {
-                        text.position.x = textX - text.scale.x / 2 + 2;
-                        break;
-                    }
-                    default: {
-                        text.position.x = textX + text.scale.x / 2 - 2;
-                        break;
-                    }
-                }
-                path.text.material.opacity = 1;
-
-            }, 100 );
-        
+        switch( angleDirect ){
+            case 8:
+            case 1: {
+                text.position.x = textX - text.scale.x / 2 + 2;
+                break;
+            }
+            default: {
+                text.position.x = textX + text.scale.x / 2 - 2;
+                break;
+            }
         }
-
-
     }
 
     calcLayoutPosition() {
@@ -577,7 +529,7 @@ export default class Dount extends VisChartBase  {
 
             val.midAngle = val.startAngle + ( val.endAngle - val.startAngle ) / 2;
 
-            val.lineStart = geometry.distanceAngleToPoint( this.outRadius, val.midAngle );
+            val.lineStart = geometry.distanceAngleToPoint( this.outRadius - 2, val.midAngle );
             val.lineEnd = geometry.distanceAngleToPoint( this.outRadius + this.lineLength, val.midAngle );
 
             val.textPoint = geometry.distanceAngleToPoint( this.outRadius + this.lineLength, val.midAngle );

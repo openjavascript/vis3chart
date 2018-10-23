@@ -117,13 +117,9 @@ var ThreeBase = function (_VisChartBase) {
             var pivot = new THREE.Object3D();
             pivot.add(group);
 
-            console.log('initSVGBackground');
-            console.log(this.width / this.rateWidth, item.width);
-            console.log(box, size);
+            var scale = item.opt.scale || 1;
 
-            //pivot.scale.set( .8, .8, .8  );
-
-            //pivot.scale.set( this.rateWidth, this.rateHeight, 0  );
+            pivot.scale.set(scale, scale, scale);
 
             this.addDestroy(pivot);
 

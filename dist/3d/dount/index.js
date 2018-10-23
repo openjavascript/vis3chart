@@ -100,7 +100,7 @@ var Dount = function (_VisChartBase) {
                 "8": []
             };
 
-            this.lineWidth = 28;
+            this.lineWidth = 32;
             this.lineSpace = 10;
             this.lineAngle = 35;
             this.lineHeight = 15;
@@ -220,49 +220,6 @@ var Dount = function (_VisChartBase) {
             });
 
             if (this.isDone) {
-
-                /*
-                let sprite = new TextSprite({
-                  textSize: 12,
-                  redrawInterval: 250,
-                  texture: {
-                    text: '50%',
-                    fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
-                  },
-                  material: {
-                    color: 0xffffff
-                  }
-                });
-                this.scene.add(sprite);
-                */
-
-                /*
-                let texture = new TextTexture({
-                  text: '50%',
-                  fontFamily: 'MicrosoftYaHei',
-                  fontSize: 28,
-                  fontStyle: 'normal',
-                });
-                let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
-                let sprite = new THREE.Sprite(material);
-                sprite.scale.setX(texture.imageAspect).multiplyScalar(12);
-                //sprite.position.x = -50;
-                this.scene.add(sprite);
-                */
-
-                /*
-                let font = new THREE.Font( window.fontjson );
-                var textShapes = font.generateShapes( 'hello中文', 8 );
-                var text = new THREE.ShapeGeometry( textShapes );
-                var textMesh = new THREE.Mesh( text, new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) ;
-                textMesh.geometry = text;
-                textMesh.geometry.needsUpdate = true;
-                var box= new THREE.Box3().setFromObject( textMesh );
-                console.log( textMesh, box.min, box.max, box.getSize( new THREE.Vector3() ) );
-                textMesh.position.x = -box.max.x / 2;
-                this.scene.add( textMesh );
-                */
-
                 window.requestAnimationFrame(function () {
                     _this3.animationLine();
                 });
@@ -373,27 +330,32 @@ var Dount = function (_VisChartBase) {
                 }
                 color = this.parseColor(color);
 
-                var _geometryx = new THREE.RingGeometry(this.inRadius, this.outRadius, 256, 1, geometry.radians(0), geometry.radians(-0.1));
-                var _material = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
-                var arc = new THREE.Mesh(_geometryx, _material);
+                var line = void 0,
+                    material = void 0,
+                    geometryx = void 0,
+                    mesh = void 0,
+                    arc = void 0,
+                    tmp = void 0;
 
-                this.scene.add(arc);
-
-                var line = new _three5.MeshLine();
-                var _material = new _three5.MeshLineMaterial({
+                line = new _three5.MeshLine();
+                material = new _three5.MeshLineMaterial({
                     color: new THREE.Color(0xffffff),
                     lineWidth: 2
                 });
-
-                var _geometryx = new THREE.Geometry();
-                line.setGeometry(_geometryx);
-
-                var mesh = new THREE.Mesh(line.geometry, _material);
+                geometryx = new THREE.Geometry();
+                line.setGeometry(geometryx);
+                mesh = new THREE.Mesh(line.geometry, material);
                 this.scene.add(mesh);
-
                 this.line.push(mesh);
 
-                var tmp = {
+                geometryx = new THREE.RingGeometry(this.inRadius, this.outRadius, 256, 1, geometry.radians(0), geometry.radians(-0.1));
+                material = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
+                arc = new THREE.Mesh(geometryx, material);
+                arc.renderOrder = 1;
+
+                this.scene.add(arc);
+
+                tmp = {
                     arc: arc,
                     pathData: [],
                     itemData: val,
@@ -477,19 +439,29 @@ var Dount = function (_VisChartBase) {
         key: 'addText',
         value: function addText(path, layer, ix) {
             if (!path.text) {
-                var sprite = path.text = new _three4.default({
-                    textSize: 11,
-                    redrawInterval: 0,
-                    texture: {
-                        text: path.itemData.percent + '%',
-                        fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
-                    },
-                    material: {
-                        color: 0xffffff
-                    }
+                /*let sprite = path.text = new TextSprite({
+                  textSize: 12,
+                  redrawInterval: 0,
+                  texture: {
+                    text: `${path.itemData.percent}%`,
+                    fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
+                  },
+                  material: {
+                    color: 0xffffff
+                  }
+                });*/
+
+                var texture = new _three2.default({
+                    text: path.itemData.percent + '%',
+                    fontFamily: 'MicrosoftYaHei',
+                    fontSize: 42,
+                    fontStyle: 'normal'
                 });
+                var material = new THREE.SpriteMaterial({ map: texture, color: 0xffffff });
+                var sprite = path.text = new THREE.Sprite(material);
+                sprite.scale.setX(texture.imageAspect).multiplyScalar(18);
+
                 this.clearList.push(path.text);
-                path.text.material.opacity = 0;
                 this.scene.add(path.text);
             }
 
@@ -506,31 +478,23 @@ var Dount = function (_VisChartBase) {
             text.position.x = textX;
             text.position.y = textY;
 
-            if (!ix || true) {
+            var position = new THREE.Vector3();
+            position.setFromMatrixPosition(text.matrixWorld);
 
-                setTimeout(function () {
-                    var position = new THREE.Vector3();
-                    position.setFromMatrixPosition(text.matrixWorld);
+            text.position.y = textY + text.scale.y / 2 - 1;
 
-                    //console.log( 'addText', text, angleDirect, 'scale y', text.scale.y, text.scale.x, position );
-
-                    text.position.y = textY + text.scale.y / 2 - 3;
-
-                    switch (angleDirect) {
-                        case 8:
-                        case 1:
-                            {
-                                text.position.x = textX - text.scale.x / 2 + 2;
-                                break;
-                            }
-                        default:
-                            {
-                                text.position.x = textX + text.scale.x / 2 - 2;
-                                break;
-                            }
+            switch (angleDirect) {
+                case 8:
+                case 1:
+                    {
+                        text.position.x = textX - text.scale.x / 2 + 2;
+                        break;
                     }
-                    path.text.material.opacity = 1;
-                }, 100);
+                default:
+                    {
+                        text.position.x = textX + text.scale.x / 2 - 2;
+                        break;
+                    }
             }
         }
     }, {
@@ -617,7 +581,7 @@ var Dount = function (_VisChartBase) {
 
                 val.midAngle = val.startAngle + (val.endAngle - val.startAngle) / 2;
 
-                val.lineStart = geometry.distanceAngleToPoint(_this5.outRadius, val.midAngle);
+                val.lineStart = geometry.distanceAngleToPoint(_this5.outRadius - 2, val.midAngle);
                 val.lineEnd = geometry.distanceAngleToPoint(_this5.outRadius + _this5.lineLength, val.midAngle);
 
                 val.textPoint = geometry.distanceAngleToPoint(_this5.outRadius + _this5.lineLength, val.midAngle);
