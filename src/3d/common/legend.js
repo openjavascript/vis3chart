@@ -77,6 +77,8 @@ export default class Legend extends VisChartBase  {
                     x, y
                 );
 
+                console.log( 'x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y );
+
                 let group = new THREE.Group();
                     group.transparent = true;
 

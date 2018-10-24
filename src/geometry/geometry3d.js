@@ -10,7 +10,7 @@ export function pos2dto3d( x, y, screenWidth, screenHeight, camera ){
     var pos = new THREE.Vector3(); // create once and reuse
     vec.set(
         ( x / screenWidth ) * 2 - 1,
-        - ( y / screenWidth ) * 2 + 1,
+        - ( y / screenHeight ) * 2 + 1,
         0.5 );
 
     vec.unproject( camera );
@@ -56,7 +56,7 @@ export function to3dx( x, screenWidth, screenHeight, camera ){
     var pos = new THREE.Vector3(); // create once and reuse
     vec.set(
         ( x / screenWidth ) * 2 - 1,
-        - ( y / screenWidth ) * 2 + 1,
+        - ( y / screenHeight ) * 2 + 1,
         0.5 );
 
     vec.unproject( camera );
@@ -77,7 +77,7 @@ export function to3dy( y, screenWidth, screenHeight, camera ){
     var pos = new THREE.Vector3(); // create once and reuse
     vec.set(
         ( x / screenWidth ) * 2 - 1,
-        - ( y / screenWidth ) * 2 + 1,
+        - ( y / screenHeight ) * 2 + 1,
         0.5 );
 
     vec.unproject( camera );

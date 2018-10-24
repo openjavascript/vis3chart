@@ -18,7 +18,7 @@ function pos2dto3d(x, y, screenWidth, screenHeight, camera) {
 
     var vec = new THREE.Vector3(); // create once and reuse
     var pos = new THREE.Vector3(); // create once and reuse
-    vec.set(x / screenWidth * 2 - 1, -(y / screenWidth) * 2 + 1, 0.5);
+    vec.set(x / screenWidth * 2 - 1, -(y / screenHeight) * 2 + 1, 0.5);
 
     vec.unproject(camera);
     vec.sub(camera.position).normalize();
@@ -61,7 +61,7 @@ function to3dx(x, screenWidth, screenHeight, camera) {
 
     var vec = new THREE.Vector3(); // create once and reuse
     var pos = new THREE.Vector3(); // create once and reuse
-    vec.set(x / screenWidth * 2 - 1, -(y / screenWidth) * 2 + 1, 0.5);
+    vec.set(x / screenWidth * 2 - 1, -(y / screenHeight) * 2 + 1, 0.5);
 
     vec.unproject(camera);
     vec.sub(camera.position).normalize();
@@ -79,7 +79,7 @@ function to3dy(y, screenWidth, screenHeight, camera) {
 
     var vec = new THREE.Vector3(); // create once and reuse
     var pos = new THREE.Vector3(); // create once and reuse
-    vec.set(x / screenWidth * 2 - 1, -(y / screenWidth) * 2 + 1, 0.5);
+    vec.set(x / screenWidth * 2 - 1, -(y / screenHeight) * 2 + 1, 0.5);
 
     vec.unproject(camera);
     vec.sub(camera.position).normalize();

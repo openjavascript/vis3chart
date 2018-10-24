@@ -120,6 +120,8 @@ var Legend = function (_VisChartBase) {
                 if (!_this2.inited) {
                     var pos = geometry3d.pos2dto3d(x, y);
 
+                    console.log('x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y);
+
                     var group = new THREE.Group();
                     group.transparent = true;
 
