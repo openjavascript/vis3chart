@@ -7,6 +7,7 @@ import Dount from './3d/dount/index.js';
 
 import ju from 'json-utilsx';
 import * as constant from './common/constant.js';
+import './common/threex.domevents.js';
 
 import * as geometry from './geometry/geometry.js';
 
