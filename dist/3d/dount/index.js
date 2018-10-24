@@ -496,7 +496,7 @@ var Dount = function (_VisChartBase) {
             var position = new THREE.Vector3();
             position.setFromMatrixPosition(text.matrixWorld);
 
-            text.position.y = textY + text.scale.y / 2 - geometry3d.to3d(4);
+            text.position.y = textY + text.scale.y / 2 - geometry3d.to3d(3);
 
             switch (angleDirect) {
                 case 8:
@@ -518,7 +518,10 @@ var Dount = function (_VisChartBase) {
             this.inRadius = geometry3d.to3d(Math.ceil(this.inPercent * this.min / 2));
             this.outRadius = geometry3d.to3d(Math.ceil(this.outPercent * this.min / 2));
 
-            this.lineHeight = geometry3d.to3d(22);
+            this.lineHeight = geometry3d.to3d(24);
+            this.lineWidth = geometry3d.to3d(50);
+            this.lineLength = geometry3d.to3d(25);
+
             return this;
         }
     }, {
