@@ -246,7 +246,7 @@ var Dount = function (_VisChartBase) {
         key: 'drawCircle',
         value: function drawCircle() {
             this.circleRadius = geometry3d.to3d(Math.ceil(this.circlePercent * this.min / 2));
-            console.log(this.circleRadius);
+            //console.log( this.circleRadius );
 
             var line = new _three5.MeshLine();
 

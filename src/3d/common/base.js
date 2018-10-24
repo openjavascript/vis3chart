@@ -1,5 +1,6 @@
 
 import VisChartBase from '../../common/vischartbase.js';
+import * as geometry3d from '../../geometry/geometry3d.js';
 
 const THREE = require( 'three' );
 
@@ -9,6 +10,10 @@ export default class ThreeBase extends VisChartBase {
     constructor( box, width, height, camera ){
         super( box, width, height, camera );
         camera && ( this.camera = camera );
+
+        geometry3d.screenWidth = this.width;
+        geometry3d.screenHeight = this.height;
+        geometry3d.camera = this.camera;
     }
 
     _setSize( width, height ){
@@ -144,7 +149,10 @@ export default class ThreeBase extends VisChartBase {
         let pivot = new THREE.Object3D();
         pivot.add( group );
 
-        var scale = item.opt.scale || 1;
+        var scale =  geometry3d.to3d( Math.max( item.width, item.height ) ) / Math.max( box.max.x, size.x );
+        if( item.opt.scaleOffset ){
+            scale += item.opt.scaleOffset;
+        }
 
         pivot.scale.set( scale, scale, scale );
 
@@ -182,7 +190,6 @@ export default class ThreeBase extends VisChartBase {
                     this.getRotationAttr( item ) 
                 ] += this.getRotationStep( item );
             });
-
             this.render();
         };
 

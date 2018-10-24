@@ -189,7 +189,7 @@ export default class Dount extends VisChartBase  {
 
     drawCircle(){
         this.circleRadius = geometry3d.to3d( Math.ceil( this.circlePercent * this.min / 2 ) );
-        console.log( this.circleRadius );
+        //console.log( this.circleRadius );
 
         var line = new MeshLine();
 

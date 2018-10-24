@@ -12,9 +12,15 @@ var _vischartbase = require('../../common/vischartbase.js');
 
 var _vischartbase2 = _interopRequireDefault(_vischartbase);
 
+var _geometry3d = require('../../geometry/geometry3d.js');
+
+var geometry3d = _interopRequireWildcard(_geometry3d);
+
 var _jsonUtilsx = require('json-utilsx');
 
 var _jsonUtilsx2 = _interopRequireDefault(_jsonUtilsx);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35,6 +41,10 @@ var ThreeBase = function (_VisChartBase) {
         var _this = _possibleConstructorReturn(this, (ThreeBase.__proto__ || Object.getPrototypeOf(ThreeBase)).call(this, box, width, height, camera));
 
         camera && (_this.camera = camera);
+
+        geometry3d.screenWidth = _this.width;
+        geometry3d.screenHeight = _this.height;
+        geometry3d.camera = _this.camera;
         return _this;
     }
 
@@ -163,7 +173,10 @@ var ThreeBase = function (_VisChartBase) {
             var pivot = new THREE.Object3D();
             pivot.add(group);
 
-            var scale = item.opt.scale || 1;
+            var scale = geometry3d.to3d(Math.max(item.width, item.height)) / Math.max(box.max.x, size.x);
+            if (item.opt.scaleOffset) {
+                scale += item.opt.scaleOffset;
+            }
 
             pivot.scale.set(scale, scale, scale);
 
@@ -206,7 +219,6 @@ var ThreeBase = function (_VisChartBase) {
                 this._images.map(function (item) {
                     item.ele.rotation[_this4.getRotationAttr(item)] += _this4.getRotationStep(item);
                 });
-
                 this.render();
             };
 
