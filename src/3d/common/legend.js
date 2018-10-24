@@ -56,7 +56,7 @@ export default class Legend extends VisChartBase  {
             switch( this.direction() ){
                 case 'bottom': {
                     x = this.space() + ( this.space() + this.columnWidth() ) * ( key % this.column() );
-                    y = this.height - ( this.row() - curRow ) * ( this.spaceY() + this.rowHeight() );
+                    y = ( this.height ) - ( this.row() - curRow ) * ( this.spaceY() + this.rowHeight() );
                     break;
                 }
             }
@@ -76,18 +76,14 @@ export default class Legend extends VisChartBase  {
                 let pos = geometry3d.pos2dto3d( 
                     x, y
                 );
-                /*
-                pos.x = x;
-                pos.y = y;
-                */
-
-                //15 442 -119.77665876648787 -96.93788908643722 0
-                console.log( x, y, pos.x, pos.y, pos.z, geometry3d.to3dy( 451) );
 
                 let group = new THREE.Group();
                     group.transparent = true;
 
-                var bgGeometry = new THREE.PlaneBufferGeometry( geometry3d.to3d( this.columnWidth() ), this.itemHeight(), 32 );
+                var bgGeometry = new THREE.PlaneBufferGeometry( 
+                    geometry3d.to3d( this.columnWidth() )
+                    , geometry3d.to3d( this.itemHeight() )
+                    , 32 );
                 var bgMaterial = new THREE.MeshBasicMaterial( {
                     color: this.parseColor( 0xffffff )
                     , side: THREE.DoubleSide
@@ -99,7 +95,10 @@ export default class Legend extends VisChartBase  {
                 bgPlane.position.y = pos.y;
                 group.add( bgPlane );
 
-                var rectGeometry = new THREE.PlaneBufferGeometry( this.itemWidth(), this.itemHeight(), 32 );
+                var rectGeometry = new THREE.PlaneBufferGeometry( 
+                    geometry3d.to3d( this.itemWidth() )
+                    , geometry3d.to3d( this.itemHeight() )
+                    , 32 );
                 var rectMaterial = new THREE.MeshBasicMaterial( {
                     color: color
                     , side: THREE.DoubleSide
@@ -182,7 +181,7 @@ export default class Legend extends VisChartBase  {
     }
 
     outerHeight(){
-        return this.rowHeight() * this.row() + this.space();
+        return this.rowHeight() * this.row() + this.spaceY();
     }
 
     total(){
@@ -192,11 +191,11 @@ export default class Legend extends VisChartBase  {
     }
 
     itemWidth(){
-        return geometry3d.to3d( this.data.itemWidth || 5 );
+        return ( this.data.itemWidth || 5 );
     }
 
     itemHeight(){
-        return geometry3d.to3d( this.data.itemHeight || 5 );
+        return ( this.data.itemHeight || 5 );
     }
 
     columnWidth(){
@@ -214,11 +213,11 @@ export default class Legend extends VisChartBase  {
     }
 
     spaceY(){
-        return this.data.space || 10;
+        return this.data.space || 5;
     }
 
     rowHeight(){
-        return geometry3d.to3d( this.data.rowHeight || 30 );
+        return ( this.data.rowHeight || 20 );
     }
 
     row(){

@@ -119,18 +119,11 @@ var Legend = function (_VisChartBase) {
 
                 if (!_this2.inited) {
                     var pos = geometry3d.pos2dto3d(x, y);
-                    /*
-                    pos.x = x;
-                    pos.y = y;
-                    */
-
-                    //15 442 -119.77665876648787 -96.93788908643722 0
-                    console.log(x, y, pos.x, pos.y, pos.z, geometry3d.to3dy(451));
 
                     var group = new THREE.Group();
                     group.transparent = true;
 
-                    var bgGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.columnWidth()), _this2.itemHeight(), 32);
+                    var bgGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.columnWidth()), geometry3d.to3d(_this2.itemHeight()), 32);
                     var bgMaterial = new THREE.MeshBasicMaterial({
                         color: _this2.parseColor(0xffffff),
                         side: THREE.DoubleSide,
@@ -142,7 +135,7 @@ var Legend = function (_VisChartBase) {
                     bgPlane.position.y = pos.y;
                     group.add(bgPlane);
 
-                    var rectGeometry = new THREE.PlaneBufferGeometry(_this2.itemWidth(), _this2.itemHeight(), 32);
+                    var rectGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.itemWidth()), geometry3d.to3d(_this2.itemHeight()), 32);
                     var rectMaterial = new THREE.MeshBasicMaterial({
                         color: color,
                         side: THREE.DoubleSide,
@@ -224,7 +217,7 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'outerHeight',
         value: function outerHeight() {
-            return this.rowHeight() * this.row() + this.space();
+            return this.rowHeight() * this.row() + this.spaceY();
         }
     }, {
         key: 'total',
@@ -236,12 +229,12 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'itemWidth',
         value: function itemWidth() {
-            return geometry3d.to3d(this.data.itemWidth || 5);
+            return this.data.itemWidth || 5;
         }
     }, {
         key: 'itemHeight',
         value: function itemHeight() {
-            return geometry3d.to3d(this.data.itemHeight || 5);
+            return this.data.itemHeight || 5;
         }
     }, {
         key: 'columnWidth',
@@ -263,12 +256,12 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'spaceY',
         value: function spaceY() {
-            return this.data.space || 10;
+            return this.data.space || 5;
         }
     }, {
         key: 'rowHeight',
         value: function rowHeight() {
-            return geometry3d.to3d(this.data.rowHeight || 30);
+            return this.data.rowHeight || 20;
         }
     }, {
         key: 'row',
