@@ -43,10 +43,10 @@ var THREE = require('three');
 var Legend = function (_VisChartBase) {
     _inherits(Legend, _VisChartBase);
 
-    function Legend(box, width, height) {
+    function Legend(box, width, height, camera) {
         _classCallCheck(this, Legend);
 
-        var _this = _possibleConstructorReturn(this, (Legend.__proto__ || Object.getPrototypeOf(Legend)).call(this, box, width, height));
+        var _this = _possibleConstructorReturn(this, (Legend.__proto__ || Object.getPrototypeOf(Legend)).call(this, box, width, height, camera));
 
         _this.name = 'Legend ' + Date.now();
 
@@ -79,11 +79,15 @@ var Legend = function (_VisChartBase) {
         value: function init() {
             var _this2 = this;
 
+            geometry3d.screenWidth = this.width;
+            geometry3d.screenHeight = this.height;
+            geometry3d.camera = this.camera;
+
             //console.log( 'geometry3d', geometry3d );
             var group = new THREE.Group();
 
-            var sizePos = geometry3d.size2dto3d(490, 100, this.width, this.height, this.camera);
-            var pos = geometry3d.pos2dto3d(0, 0, this.width, this.height, this.camera);
+            var sizePos = geometry3d.size2dto3d(490, 100);
+            var pos = geometry3d.pos2dto3d(0, 0);
 
             var geometry = new THREE.PlaneBufferGeometry(sizePos.x, sizePos.y, 32);
             var material = new THREE.MeshBasicMaterial({
@@ -127,8 +131,8 @@ var Legend = function (_VisChartBase) {
                 color = _this2.parseColor(color);
                 if (!_this2.inited) {
 
-                    var _pos = geometry3d.pos2dto3d(x, y, _this2.width, _this2.height, _this2.camera);
-                    var gpos = geometry3d.pos2dto3d(0, 0, _this2.width, _this2.height, _this2.camera);
+                    var _pos = geometry3d.pos2dto3d(x, y);
+                    var gpos = geometry3d.pos2dto3d(0, 0);
 
                     var _group = new THREE.Group();
 

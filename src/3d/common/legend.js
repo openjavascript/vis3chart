@@ -13,8 +13,8 @@ import * as utils from '../../common/utils.js';
 
 
 export default class Legend extends VisChartBase  {
-    constructor( box, width, height ){
-        super( box, width, height );
+    constructor( box, width, height, camera ){
+        super( box, width, height, camera );
 
         this.name = 'Legend ' + Date.now();
 
@@ -42,12 +42,15 @@ export default class Legend extends VisChartBase  {
     }
 
     init(){
+        geometry3d.screenWidth = this.width;
+        geometry3d.screenHeight = this.height;
+        geometry3d.camera = this.camera;
 
         //console.log( 'geometry3d', geometry3d );
         let group = new THREE.Group();
 
-        let sizePos = geometry3d.size2dto3d( 490, 100, this.width, this.height, this.camera );
-        let pos= geometry3d.pos2dto3d( 0, 0, this.width, this.height, this.camera );
+        let sizePos = geometry3d.size2dto3d( 490, 100 );
+        let pos= geometry3d.pos2dto3d( 0, 0 );
 
         var geometry = new THREE.PlaneBufferGeometry( sizePos.x, sizePos.y, 32 );
         var material = new THREE.MeshBasicMaterial( {
@@ -93,16 +96,10 @@ export default class Legend extends VisChartBase  {
 
             let pos = geometry3d.pos2dto3d( 
                 x, y
-                , this.width, this.height
-                , this.camera 
             );
             let gpos = geometry3d.pos2dto3d( 
                 0, 0
-                , this.width, this.height
-                , this.camera 
             );
-
-
 
             let group = new THREE.Group();
 

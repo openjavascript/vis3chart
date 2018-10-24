@@ -181,7 +181,7 @@ var VisThree = function (_VisChartBase) {
                 if (this.legend && ignoreLegend) {
                     this.emptyblock = 'kao';
                 } else {
-                    this.legend = new _legend2.default(this.box, this.width, this.height);
+                    this.legend = new _legend2.default(this.box, this.width, this.height, this.camera);
                     this.legend.setOptions({
                         renderer: this.renderer,
                         scene: this.scene,

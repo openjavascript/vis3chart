@@ -156,7 +156,7 @@ export default class VisThree extends VisChartBase {
             if( this.legend && ignoreLegend ){
                 this.emptyblock = 'kao';
             }else{
-                this.legend = new Legend( this.box, this.width, this.height );
+                this.legend = new Legend( this.box, this.width, this.height, this.camera );
                 this.legend.setOptions( {
                     renderer: this.renderer
                     , scene: this.scene
