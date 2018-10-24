@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.pos2dto3d = pos2dto3d;
 exports.size2dto3d = size2dto3d;
 exports.to3d = to3d;
+exports.to3dx = to3dx;
+exports.to3dy = to3dy;
 
 var THREE = require('three');
 
@@ -48,4 +50,40 @@ function to3d(x, screenWidth, screenHeight, camera) {
     var pos0 = pos2dto3d(0, 0, screenWidth, screenHeight, camera);
     var posx = pos2dto3d(x, y, screenWidth, screenHeight, camera);
     return Math.abs(posx.x - pos0.x);
+}
+
+function to3dx(x, screenWidth, screenHeight, camera) {
+    screenWidth = screenWidth || this.screenWidth;
+    screenHeight = screenHeight || this.screenHeight;
+    camera = camera || this.camera;
+
+    var y = 0;
+
+    var vec = new THREE.Vector3(); // create once and reuse
+    var pos = new THREE.Vector3(); // create once and reuse
+    vec.set(x / screenWidth * 2 - 1, -(y / screenWidth) * 2 + 1, 0.5);
+
+    vec.unproject(camera);
+    vec.sub(camera.position).normalize();
+    var distance = -camera.position.z / vec.z;
+    pos.copy(camera.position).add(vec.multiplyScalar(distance));
+    return pos.x;
+}
+
+function to3dy(y, screenWidth, screenHeight, camera) {
+    screenWidth = screenWidth || this.screenWidth;
+    screenHeight = screenHeight || this.screenHeight;
+    camera = camera || this.camera;
+
+    var x = 0;
+
+    var vec = new THREE.Vector3(); // create once and reuse
+    var pos = new THREE.Vector3(); // create once and reuse
+    vec.set(x / screenWidth * 2 - 1, -(y / screenWidth) * 2 + 1, 0.5);
+
+    vec.unproject(camera);
+    vec.sub(camera.position).normalize();
+    var distance = -camera.position.z / vec.z;
+    pos.copy(camera.position).add(vec.multiplyScalar(distance));
+    return pos.x;
 }

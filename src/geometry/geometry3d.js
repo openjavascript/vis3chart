@@ -45,3 +45,48 @@ export function to3d( x, screenWidth, screenHeight, camera ){
     return Math.abs( posx.x - pos0.x );
 }
 
+export function to3dx( x, screenWidth, screenHeight, camera ){
+    screenWidth     = screenWidth   || this.screenWidth;
+    screenHeight    = screenHeight  || this.screenHeight;
+    camera          = camera        || this.camera;
+
+    let y = 0;
+
+    var vec = new THREE.Vector3(); // create once and reuse
+    var pos = new THREE.Vector3(); // create once and reuse
+    vec.set(
+        ( x / screenWidth ) * 2 - 1,
+        - ( y / screenWidth ) * 2 + 1,
+        0.5 );
+
+    vec.unproject( camera );
+    vec.sub( camera.position ).normalize();
+    var distance = - camera.position.z / vec.z;
+    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    return pos.x;
+}
+
+export function to3dy( y, screenWidth, screenHeight, camera ){
+    screenWidth     = screenWidth   || this.screenWidth;
+    screenHeight    = screenHeight  || this.screenHeight;
+    camera          = camera        || this.camera;
+
+    let x = 0;
+
+    var vec = new THREE.Vector3(); // create once and reuse
+    var pos = new THREE.Vector3(); // create once and reuse
+    vec.set(
+        ( x / screenWidth ) * 2 - 1,
+        - ( y / screenWidth ) * 2 + 1,
+        0.5 );
+
+    vec.unproject( camera );
+    vec.sub( camera.position ).normalize();
+    var distance = - camera.position.z / vec.z;
+    pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
+    return pos.x;
+}
+
+
+
+

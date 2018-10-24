@@ -70,18 +70,22 @@ export default class Legend extends VisChartBase  {
                 color = item.textStyle.color;
             }
 
-
             color = this.parseColor( color );
 
             if( !this.inited ){
                 let pos = geometry3d.pos2dto3d( 
                     x, y
                 );
-                let gpos = geometry3d.pos2dto3d( 
-                    0, 0
-                );
+                /*
+                pos.x = x;
+                pos.y = y;
+                */
+
+                //15 442 -119.77665876648787 -96.93788908643722 0
+                console.log( x, y, pos.x, pos.y, pos.z, geometry3d.to3dy( 451) );
 
                 let group = new THREE.Group();
+                    group.transparent = true;
 
                 var bgGeometry = new THREE.PlaneBufferGeometry( geometry3d.to3d( this.columnWidth() ), this.itemHeight(), 32 );
                 var bgMaterial = new THREE.MeshBasicMaterial( {
@@ -99,6 +103,7 @@ export default class Legend extends VisChartBase  {
                 var rectMaterial = new THREE.MeshBasicMaterial( {
                     color: color
                     , side: THREE.DoubleSide
+                    , transparent: true
                 } );
                 var rectPlane = new THREE.Mesh( rectGeometry, rectMaterial );
                 rectPlane.position.x = pos.x;
@@ -110,6 +115,7 @@ export default class Legend extends VisChartBase  {
                   fontFamily: 'MicrosoftYaHei',
                   fontSize: 42,
                   fontStyle: 'normal',
+                  transparent: true
                 });
                 let textMaterial = new THREE.SpriteMaterial({map: textTexture, color: this.parseColor( this.textColor ) });
                 let textSprite = new THREE.Sprite(textMaterial);
@@ -122,6 +128,26 @@ export default class Legend extends VisChartBase  {
 
                 this.scene.add( group );
 
+                let data = {
+                    ele: group
+                    , item: item
+                    , disabled: false
+                    , rect: rectPlane
+                    , bg: bgPlane
+                    , text: textSprite
+                };
+                this.domEvents.addEventListener( group, 'click', ()=>{
+                    data.disabled = !data.disabled;
+                    if( data.disabled ){
+                        //group.opacity( .6 );
+                        rectMaterial.opacity = .6;
+                        textMaterial.opacity = .6;
+                    }else{
+                        rectMaterial.opacity = 1;
+                        textMaterial.opacity = 1;
+                    }
+                    this.onChange && this.onChange( data );
+                });
             }else{
                 /*
                 let curgroup = this.group[key];
@@ -149,17 +175,6 @@ export default class Legend extends VisChartBase  {
     update( data ){
         this.data = data || {};
         if( !( this.data && this.data.data && this.data.data.length ) ) return;
-
-        /*
-        console.log( 
-            this.column()
-            , this.row()
-            , this.direction() 
-            , this.outerHeight()
-            , 'columnWidth:', this.columnWidth()
-        );
-        console.log( this.width, this.width - ( this.column() - 1  + 2 ) * this.space() );
-        */
 
         this.init();
 
@@ -199,11 +214,11 @@ export default class Legend extends VisChartBase  {
     }
 
     spaceY(){
-        return this.data.space || 0;
+        return this.data.space || 10;
     }
 
     rowHeight(){
-        return this.data.rowHeight || 30;
+        return geometry3d.to3d( this.data.rowHeight || 30 );
     }
 
     row(){

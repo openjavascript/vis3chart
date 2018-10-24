@@ -1,4 +1,5 @@
 
+const THREE = require( 'three' );
 
 import VisChartBase from './3d/common/base.js';
 import Legend from './3d/common/legend.js';
@@ -7,12 +8,9 @@ import Dount from './3d/dount/index.js';
 
 import ju from 'json-utilsx';
 import * as constant from './common/constant.js';
-import './common/threex.domevents.js';
+import THREEx from './common/threex.domevents.js';
 
 import * as geometry from './geometry/geometry.js';
-
-
-const THREE = require( 'three' );
 
 import ld from 'lodash';
 
@@ -89,6 +87,7 @@ export default class VisThree extends VisChartBase {
             this.cameraHelper.visible = false;
             this.scene.add( this.cameraHelper );
 
+            this.domEvents   = new THREEx.DomEvents(this.camera, this.renderer.domElement);
 
             console.log( this.scene, this.camera );
         }
@@ -164,9 +163,10 @@ export default class VisThree extends VisChartBase {
                     , camera: this.camera
                     , stage: this.stage
                     , config: this.config
+                    , domEvents: this.domEvents
                     , onChange: ( group ) => {
-                        //console.log( 'legend onchange', group );
-                        this.initChart();
+                        console.log( 'legend onchange', group );
+                        //this.initChart();
                     }
                 });
                 this.legend.update( this.data.legend );
@@ -214,6 +214,7 @@ export default class VisThree extends VisChartBase {
                         , camera: this.camera
                         , stage: this.stage
                         , config: this.config
+                        , domEvents: this.domEvents
                     });
                 }
             }

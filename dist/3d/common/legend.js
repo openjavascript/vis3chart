@@ -119,9 +119,16 @@ var Legend = function (_VisChartBase) {
 
                 if (!_this2.inited) {
                     var pos = geometry3d.pos2dto3d(x, y);
-                    var gpos = geometry3d.pos2dto3d(0, 0);
+                    /*
+                    pos.x = x;
+                    pos.y = y;
+                    */
+
+                    //15 442 -119.77665876648787 -96.93788908643722 0
+                    console.log(x, y, pos.x, pos.y, pos.z, geometry3d.to3dy(451));
 
                     var group = new THREE.Group();
+                    group.transparent = true;
 
                     var bgGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.columnWidth()), _this2.itemHeight(), 32);
                     var bgMaterial = new THREE.MeshBasicMaterial({
@@ -138,7 +145,8 @@ var Legend = function (_VisChartBase) {
                     var rectGeometry = new THREE.PlaneBufferGeometry(_this2.itemWidth(), _this2.itemHeight(), 32);
                     var rectMaterial = new THREE.MeshBasicMaterial({
                         color: color,
-                        side: THREE.DoubleSide
+                        side: THREE.DoubleSide,
+                        transparent: true
                     });
                     var rectPlane = new THREE.Mesh(rectGeometry, rectMaterial);
                     rectPlane.position.x = pos.x;
@@ -149,7 +157,8 @@ var Legend = function (_VisChartBase) {
                         text: label,
                         fontFamily: 'MicrosoftYaHei',
                         fontSize: 42,
-                        fontStyle: 'normal'
+                        fontStyle: 'normal',
+                        transparent: true
                     });
                     var textMaterial = new THREE.SpriteMaterial({ map: textTexture, color: _this2.parseColor(_this2.textColor) });
                     var textSprite = new THREE.Sprite(textMaterial);
@@ -161,6 +170,27 @@ var Legend = function (_VisChartBase) {
                     group.add(textSprite);
 
                     _this2.scene.add(group);
+
+                    var data = {
+                        ele: group,
+                        item: item,
+                        disabled: false,
+                        rect: rectPlane,
+                        bg: bgPlane,
+                        text: textSprite
+                    };
+                    _this2.domEvents.addEventListener(group, 'click', function () {
+                        data.disabled = !data.disabled;
+                        if (data.disabled) {
+                            //group.opacity( .6 );
+                            rectMaterial.opacity = .6;
+                            textMaterial.opacity = .6;
+                        } else {
+                            rectMaterial.opacity = 1;
+                            textMaterial.opacity = 1;
+                        }
+                        _this2.onChange && _this2.onChange(data);
+                    });
                 } else {
                     /*
                     let curgroup = this.group[key];
@@ -186,17 +216,6 @@ var Legend = function (_VisChartBase) {
         value: function update(data) {
             this.data = data || {};
             if (!(this.data && this.data.data && this.data.data.length)) return;
-
-            /*
-            console.log( 
-                this.column()
-                , this.row()
-                , this.direction() 
-                , this.outerHeight()
-                , 'columnWidth:', this.columnWidth()
-            );
-            console.log( this.width, this.width - ( this.column() - 1  + 2 ) * this.space() );
-            */
 
             this.init();
 
@@ -244,12 +263,12 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'spaceY',
         value: function spaceY() {
-            return this.data.space || 0;
+            return this.data.space || 10;
         }
     }, {
         key: 'rowHeight',
         value: function rowHeight() {
-            return this.data.rowHeight || 30;
+            return geometry3d.to3d(this.data.rowHeight || 30);
         }
     }, {
         key: 'row',
