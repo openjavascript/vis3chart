@@ -416,15 +416,18 @@ export default class Dount extends VisChartBase  {
               }
             });*/
 
+
+            let fontSize = geometry3d.to3d( 30 );
+
             let texture = new TextTexture({
               text: `${path.itemData.percent}%`,
               fontFamily: 'MicrosoftYaHei',
-              fontSize: 42,
-              fontStyle: 'normal',
+              fontSize: fontSize * 2,
+              fontStyle: 'italic',
             });
-            let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
+            let material = new THREE.SpriteMaterial({map: texture, color: this.lineColor });
             let sprite = path.text = new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(18);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
 
             this.clearList.push( path.text );
             this.scene.add(path.text);
@@ -449,7 +452,7 @@ export default class Dount extends VisChartBase  {
         var position = new THREE.Vector3();
         position.setFromMatrixPosition( text.matrixWorld );
 
-        text.position.y = textY + text.scale.y / 2 - 1;
+        text.position.y = textY + text.scale.y / 2 - geometry3d.to3d( 4 );
 
         switch( angleDirect ){
             case 8:
@@ -467,6 +470,8 @@ export default class Dount extends VisChartBase  {
     calcLayoutPosition() {
         this.inRadius = geometry3d.to3d( Math.ceil( this.inPercent * this.min / 2 ) );
         this.outRadius =  geometry3d.to3d( Math.ceil( this.outPercent * this.min / 2 ) );
+
+        this.lineHeight = geometry3d.to3d( 22 );
         return this;
     }
 

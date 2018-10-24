@@ -91,6 +91,8 @@ var Legend = function (_VisChartBase) {
             geometry3d.screenHeight = this.height;
             geometry3d.camera = this.camera;
 
+            console.log('text size', geometry3d.to3d(20));
+
             this.data.data.map(function (item, key) {
                 var x = 0,
                     y = 0,
@@ -106,6 +108,8 @@ var Legend = function (_VisChartBase) {
                         }
                 }
 
+                y += 4;
+
                 var label = item.name || key + '';
 
                 var color = _this2.colors[key % _this2.colors.length];
@@ -120,7 +124,7 @@ var Legend = function (_VisChartBase) {
                 if (!_this2.inited) {
                     var pos = geometry3d.pos2dto3d(x, y);
 
-                    console.log('x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y);
+                    //console.log( 'x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y );
 
                     var group = new THREE.Group();
                     group.transparent = true;
@@ -148,16 +152,18 @@ var Legend = function (_VisChartBase) {
                     rectPlane.position.y = pos.y;
                     group.add(rectPlane);
 
+                    var fontSize = geometry3d.to3d(22);
+
                     var textTexture = new _three2.default({
                         text: label,
                         fontFamily: 'MicrosoftYaHei',
-                        fontSize: 42,
+                        fontSize: fontSize * 2,
                         fontStyle: 'normal',
                         transparent: true
                     });
                     var textMaterial = new THREE.SpriteMaterial({ map: textTexture, color: _this2.parseColor(_this2.textColor) });
                     var textSprite = new THREE.Sprite(textMaterial);
-                    textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(10);
+                    textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(fontSize);
 
                     textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + textSprite.scale.x / 2 - 3;
                     textSprite.position.y = pos.y;

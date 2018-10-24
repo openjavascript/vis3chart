@@ -47,6 +47,8 @@ export default class Legend extends VisChartBase  {
         geometry3d.screenHeight = this.height;
         geometry3d.camera = this.camera;
 
+        console.log( 'text size', geometry3d.to3d( 20 ) );
+
         this.data.data.map( ( item, key ) => {
             var x = 0, y = 0
                 , count = key + 1
@@ -60,6 +62,8 @@ export default class Legend extends VisChartBase  {
                     break;
                 }
             }
+
+            y += 4;
 
             let label = item.name || key + '';
 
@@ -77,7 +81,7 @@ export default class Legend extends VisChartBase  {
                     x, y
                 );
 
-                console.log( 'x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y );
+                //console.log( 'x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y );
 
                 let group = new THREE.Group();
                     group.transparent = true;
@@ -111,16 +115,18 @@ export default class Legend extends VisChartBase  {
                 rectPlane.position.y = pos.y;
                 group.add( rectPlane );
 
+                let fontSize = geometry3d.to3d( 22 );
+
                 let textTexture = new TextTexture({
                   text: label,
                   fontFamily: 'MicrosoftYaHei',
-                  fontSize: 42,
+                  fontSize: fontSize * 2,
                   fontStyle: 'normal',
                   transparent: true
                 });
                 let textMaterial = new THREE.SpriteMaterial({map: textTexture, color: this.parseColor( this.textColor ) });
                 let textSprite = new THREE.Sprite(textMaterial);
-                textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(10);
+                textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(fontSize);
 
                 textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
                 textSprite.position.y = pos.y;

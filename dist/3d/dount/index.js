@@ -464,15 +464,17 @@ var Dount = function (_VisChartBase) {
                   }
                 });*/
 
+                var fontSize = geometry3d.to3d(30);
+
                 var texture = new _three2.default({
                     text: path.itemData.percent + '%',
                     fontFamily: 'MicrosoftYaHei',
-                    fontSize: 42,
-                    fontStyle: 'normal'
+                    fontSize: fontSize * 2,
+                    fontStyle: 'italic'
                 });
-                var material = new THREE.SpriteMaterial({ map: texture, color: 0xffffff });
+                var material = new THREE.SpriteMaterial({ map: texture, color: this.lineColor });
                 var sprite = path.text = new THREE.Sprite(material);
-                sprite.scale.setX(texture.imageAspect).multiplyScalar(18);
+                sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
 
                 this.clearList.push(path.text);
                 this.scene.add(path.text);
@@ -494,7 +496,7 @@ var Dount = function (_VisChartBase) {
             var position = new THREE.Vector3();
             position.setFromMatrixPosition(text.matrixWorld);
 
-            text.position.y = textY + text.scale.y / 2 - 1;
+            text.position.y = textY + text.scale.y / 2 - geometry3d.to3d(4);
 
             switch (angleDirect) {
                 case 8:
@@ -515,6 +517,8 @@ var Dount = function (_VisChartBase) {
         value: function calcLayoutPosition() {
             this.inRadius = geometry3d.to3d(Math.ceil(this.inPercent * this.min / 2));
             this.outRadius = geometry3d.to3d(Math.ceil(this.outPercent * this.min / 2));
+
+            this.lineHeight = geometry3d.to3d(22);
             return this;
         }
     }, {
