@@ -9,10 +9,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var VisChartBase = function () {
-    function VisChartBase(box, width, height) {
+    function VisChartBase(box, width, height, camera) {
         _classCallCheck(this, VisChartBase);
 
         this.box = box;
+        camera && (this.camera = camera);
 
         this.name = 'VisChartBase_' + Date.now();
 

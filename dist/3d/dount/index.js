@@ -16,6 +16,10 @@ var _geometry = require('../../geometry/geometry.js');
 
 var geometry = _interopRequireWildcard(_geometry);
 
+var _geometry3d = require('../../geometry/geometry3d.js');
+
+var geometry3d = _interopRequireWildcard(_geometry3d);
+
 var _pointat = require('../common/pointat.js');
 
 var _pointat2 = _interopRequireDefault(_pointat);
@@ -55,10 +59,10 @@ var THREE = require('three');
 var Dount = function (_VisChartBase) {
     _inherits(Dount, _VisChartBase);
 
-    function Dount(box, width, height) {
+    function Dount(box, width, height, camera) {
         _classCallCheck(this, Dount);
 
-        var _this = _possibleConstructorReturn(this, (Dount.__proto__ || Object.getPrototypeOf(Dount)).call(this, box, width, height));
+        var _this = _possibleConstructorReturn(this, (Dount.__proto__ || Object.getPrototypeOf(Dount)).call(this, box, width, height, camera));
 
         _this.name = 'Dount_' + Date.now();
 
@@ -124,6 +128,10 @@ var Dount = function (_VisChartBase) {
     }, {
         key: 'init',
         value: function init() {
+            geometry3d.screenWidth = this.width;
+            geometry3d.screenHeight = this.height;
+            geometry3d.camera = this.camera;
+
             this.calcLayoutPosition();
             return this;
         }
@@ -496,6 +504,8 @@ var Dount = function (_VisChartBase) {
     }, {
         key: 'calcLayoutPosition',
         value: function calcLayoutPosition() {
+            this.inRadius = geometry3d.to3d(Math.ceil(this.inPercent * this.min / 2));
+            this.outRadius = geometry3d.to3d(Math.ceil(this.outPercent * this.min / 2));
             return this;
         }
     }, {

@@ -29,10 +29,13 @@ var THREE = require('three');
 var ThreeBase = function (_VisChartBase) {
     _inherits(ThreeBase, _VisChartBase);
 
-    function ThreeBase(box, width, height) {
+    function ThreeBase(box, width, height, camera) {
         _classCallCheck(this, ThreeBase);
 
-        return _possibleConstructorReturn(this, (ThreeBase.__proto__ || Object.getPrototypeOf(ThreeBase)).call(this, box, width, height));
+        var _this = _possibleConstructorReturn(this, (ThreeBase.__proto__ || Object.getPrototypeOf(ThreeBase)).call(this, box, width, height, camera));
+
+        camera && (_this.camera = camera);
+        return _this;
     }
 
     _createClass(ThreeBase, [{

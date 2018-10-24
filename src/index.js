@@ -197,7 +197,7 @@ export default class VisThree extends VisChartBase {
             }else{
                 switch( val.type ){
                     case constant.CHART_TYPE.dount: {
-                        ins = new Dount( this.box, this.width, this.height );
+                        ins = new Dount( this.box, this.width, this.height, this.camera );
                         break;
                     }
                     /*case constant.CHART_TYPE.gauge: {

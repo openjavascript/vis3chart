@@ -6,9 +6,9 @@ const THREE = require( 'three' );
 import ju from 'json-utilsx';
 
 export default class ThreeBase extends VisChartBase {
-    constructor( box, width, height ){
-        super( box, width, height );
-
+    constructor( box, width, height, camera ){
+        super( box, width, height, camera );
+        camera && ( this.camera = camera );
     }
 
     _setSize( width, height ){

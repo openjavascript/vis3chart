@@ -1,6 +1,7 @@
 
 import VisChartBase from '../common/base.js';
 import * as geometry from '../../geometry/geometry.js';
+import * as geometry3d from '../../geometry/geometry3d.js';
 
 import PointAt from '../common/pointat.js';
 
@@ -15,9 +16,10 @@ import TextSprite from 'three.textsprite';
 
 import {MeshLine, MeshLineMaterial} from 'three.meshline'
 
+
 export default class Dount extends VisChartBase  {
-    constructor( box, width, height ){
-        super( box, width, height );
+    constructor( box, width, height, camera ){
+        super( box, width, height, camera );
         this.name = 'Dount_' + Date.now();
 
         this._setSize( width, height );
@@ -75,10 +77,13 @@ export default class Dount extends VisChartBase  {
         this.lineRight = this.fixCx() + this.outRadius + this.lineSpace;
 
         this.init();
-
     }
 
     init(){
+        geometry3d.screenWidth = this.width;
+        geometry3d.screenHeight = this.height;
+        geometry3d.camera = this.camera;
+
         this.calcLayoutPosition();
         return this;
     }
@@ -447,6 +452,8 @@ export default class Dount extends VisChartBase  {
     }
 
     calcLayoutPosition() {
+        this.inRadius = geometry3d.to3d( Math.ceil( this.inPercent * this.min / 2 ) );
+        this.outRadius =  geometry3d.to3d( Math.ceil( this.outPercent * this.min / 2 ) );
         return this;
     }
 

@@ -1,7 +1,8 @@
 
 export default class VisChartBase {
-    constructor( box, width, height ){
+    constructor( box, width, height, camera ){
         this.box = box;
+        camera && ( this.camera = camera );
 
         this.name = 'VisChartBase_' + Date.now();
 

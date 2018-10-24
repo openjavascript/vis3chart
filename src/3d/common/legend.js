@@ -43,9 +43,7 @@ export default class Legend extends VisChartBase  {
 
     init(){
 
-        console.log( 'geometry3d', geometry3d );
-
-
+        //console.log( 'geometry3d', geometry3d );
         let group = new THREE.Group();
 
         let sizePos = geometry3d.size2dto3d( 490, 100, this.width, this.height, this.camera );
@@ -63,7 +61,7 @@ export default class Legend extends VisChartBase  {
         */
         group.add( plane );
         this.scene.add( group );
-        console.log( pos, sizePos );
+        //console.log( pos, sizePos );
 
 
         this.data.data.map( ( item, key ) => {

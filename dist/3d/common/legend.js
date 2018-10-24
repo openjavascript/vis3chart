@@ -79,8 +79,7 @@ var Legend = function (_VisChartBase) {
         value: function init() {
             var _this2 = this;
 
-            console.log('geometry3d', geometry3d);
-
+            //console.log( 'geometry3d', geometry3d );
             var group = new THREE.Group();
 
             var sizePos = geometry3d.size2dto3d(490, 100, this.width, this.height, this.camera);
@@ -98,7 +97,8 @@ var Legend = function (_VisChartBase) {
             */
             group.add(plane);
             this.scene.add(group);
-            console.log(pos, sizePos);
+            //console.log( pos, sizePos );
+
 
             this.data.data.map(function (item, key) {
                 var x = 0,

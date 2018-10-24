@@ -225,7 +225,7 @@ var VisThree = function (_VisChartBase) {
                     switch (val.type) {
                         case constant.CHART_TYPE.dount:
                             {
-                                ins = new _index2.default(_this3.box, _this3.width, _this3.height);
+                                ins = new _index2.default(_this3.box, _this3.width, _this3.height, _this3.camera);
                                 break;
                             }
                         /*case constant.CHART_TYPE.gauge: {
