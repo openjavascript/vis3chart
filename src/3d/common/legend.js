@@ -9,7 +9,8 @@ import ju from 'json-utilsx';
 
 import * as utils from '../../common/utils.js';
 
-
+import TextTexture from 'three.texttexture';
+import TextSprite from 'three.textsprite';
 
 
 export default class Legend extends VisChartBase  {
@@ -46,27 +47,6 @@ export default class Legend extends VisChartBase  {
         geometry3d.screenHeight = this.height;
         geometry3d.camera = this.camera;
 
-        //console.log( 'geometry3d', geometry3d );
-        let group = new THREE.Group();
-
-        let sizePos = geometry3d.size2dto3d( 490, 100 );
-        let pos= geometry3d.pos2dto3d( 0, 0 );
-
-        var geometry = new THREE.PlaneBufferGeometry( sizePos.x, sizePos.y, 32 );
-        var material = new THREE.MeshBasicMaterial( {
-            color: this.parseColor( 0xffffff )
-            , side: THREE.DoubleSide
-        } );
-        var plane = new THREE.Mesh( geometry, material );
-        plane.position.x = pos.x + sizePos.x / 2;
-        plane.position.y = pos.y - sizePos.y / 2;
-        /*
-        */
-        group.add( plane );
-        this.scene.add( group );
-        //console.log( pos, sizePos );
-
-
         this.data.data.map( ( item, key ) => {
             var x = 0, y = 0
                 , count = key + 1
@@ -92,89 +72,54 @@ export default class Legend extends VisChartBase  {
 
 
             color = this.parseColor( color );
+
             if( !this.inited ){
+                let pos = geometry3d.pos2dto3d( 
+                    x, y
+                );
+                let gpos = geometry3d.pos2dto3d( 
+                    0, 0
+                );
 
-            let pos = geometry3d.pos2dto3d( 
-                x, y
-            );
-            let gpos = geometry3d.pos2dto3d( 
-                0, 0
-            );
+                let group = new THREE.Group();
 
-            let group = new THREE.Group();
+                var bgGeometry = new THREE.PlaneBufferGeometry( geometry3d.to3d( this.columnWidth() ), this.itemHeight(), 32 );
+                var bgMaterial = new THREE.MeshBasicMaterial( {
+                    color: this.parseColor( 0xffffff )
+                    , side: THREE.DoubleSide
+                    , opacity: 0
+                    , transparent: true
+                } );
+                var bgPlane = new THREE.Mesh( bgGeometry, bgMaterial );
+                bgPlane.position.x = pos.x + geometry3d.to3d( this.columnWidth() ) / 2;
+                bgPlane.position.y = pos.y;
+                group.add( bgPlane );
 
-            var geometry = new THREE.PlaneBufferGeometry( this.itemWidth(), this.itemHeight(), 32 );
-            var material = new THREE.MeshBasicMaterial( {
-                color: this.parseColor( color )
-                , side: THREE.DoubleSide
-            } );
-            var plane = new THREE.Mesh( geometry, material );
-            plane.position.x = pos.x;
-            plane.position.y = pos.y;
-            group.add( plane );
+                var rectGeometry = new THREE.PlaneBufferGeometry( this.itemWidth(), this.itemHeight(), 32 );
+                var rectMaterial = new THREE.MeshBasicMaterial( {
+                    color: color
+                    , side: THREE.DoubleSide
+                } );
+                var rectPlane = new THREE.Mesh( rectGeometry, rectMaterial );
+                rectPlane.position.x = pos.x;
+                rectPlane.position.y = pos.y;
+                group.add( rectPlane );
 
-/*
-                let rect = new Konva.Rect( {
-                    x: x
-                    , y: y
-                    , width: this.itemWidth()
-                    , height: this.itemHeight()
-                    , fill: color
+                let textTexture = new TextTexture({
+                  text: label,
+                  fontFamily: 'MicrosoftYaHei',
+                  fontSize: 42,
+                  fontStyle: 'normal',
                 });
-                this.addDestroy( rect  );
+                let textMaterial = new THREE.SpriteMaterial({map: textTexture, color: this.parseColor( this.textColor ) });
+                let textSprite = new THREE.Sprite(textMaterial);
+                textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(10);
 
-                let bg = new Konva.Rect( {
-                    x: x
-                    , y: y
-                    , width: this.columnWidth()
-                    , height: this.rowHeight()
-                    , fill: '#ffffff00'
-                });
-                this.addDestroy( bg );
+                textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
+                textSprite.position.y = pos.y;
 
-                let text = new Konva.Text( {
-                    text: label
-                    , x: x + this.iconSpace + rect.width()
-                    , y: y
-                    , fill: this.textColor
-                    , fontFamily: 'MicrosoftYaHei'
-                    , fontSize: 12
-                });
-                this.addDestroy( text );
+                group.add( textSprite );
 
-                let group  = new Konva.Group();
-                this.addDestroy( group );
-                group.add( bg );
-                group.add( rect );
-                group.add( text );
-
-                let data = {
-                    ele: group
-                    , item: item
-                    , disabled: false
-                    , rect: rect
-                    , bg: bg
-                    , text: text
-                };
-
-                this.group.push( data );
-                group.on( 'click', ()=>{
-                    //console.log( 'click', key, data, group, item );
-                    data.disabled = !data.disabled;
-
-                    if( data.disabled ){
-                        group.opacity( .6 );
-                    }else{
-                        group.opacity( 1 );
-                    }
-
-                    this.stage.add( this.layer );
-
-                    this.onChange && this.onChange( this.group );
-                });
-
-                this.layer.add( group );
-*/
                 this.scene.add( group );
 
             }else{
@@ -232,11 +177,11 @@ export default class Legend extends VisChartBase  {
     }
 
     itemWidth(){
-        return this.data.itemWidth || 5;
+        return geometry3d.to3d( this.data.itemWidth || 5 );
     }
 
     itemHeight(){
-        return this.data.itemHeight || 5;
+        return geometry3d.to3d( this.data.itemHeight || 5 );
     }
 
     columnWidth(){

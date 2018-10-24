@@ -28,6 +28,14 @@ var _utils = require('../../common/utils.js');
 
 var utils = _interopRequireWildcard(_utils);
 
+var _three = require('three.texttexture');
+
+var _three2 = _interopRequireDefault(_three);
+
+var _three3 = require('three.textsprite');
+
+var _three4 = _interopRequireDefault(_three3);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -83,27 +91,6 @@ var Legend = function (_VisChartBase) {
             geometry3d.screenHeight = this.height;
             geometry3d.camera = this.camera;
 
-            //console.log( 'geometry3d', geometry3d );
-            var group = new THREE.Group();
-
-            var sizePos = geometry3d.size2dto3d(490, 100);
-            var pos = geometry3d.pos2dto3d(0, 0);
-
-            var geometry = new THREE.PlaneBufferGeometry(sizePos.x, sizePos.y, 32);
-            var material = new THREE.MeshBasicMaterial({
-                color: this.parseColor(0xffffff),
-                side: THREE.DoubleSide
-            });
-            var plane = new THREE.Mesh(geometry, material);
-            plane.position.x = pos.x + sizePos.x / 2;
-            plane.position.y = pos.y - sizePos.y / 2;
-            /*
-            */
-            group.add(plane);
-            this.scene.add(group);
-            //console.log( pos, sizePos );
-
-
             this.data.data.map(function (item, key) {
                 var x = 0,
                     y = 0,
@@ -129,86 +116,51 @@ var Legend = function (_VisChartBase) {
                 }
 
                 color = _this2.parseColor(color);
-                if (!_this2.inited) {
 
-                    var _pos = geometry3d.pos2dto3d(x, y);
+                if (!_this2.inited) {
+                    var pos = geometry3d.pos2dto3d(x, y);
                     var gpos = geometry3d.pos2dto3d(0, 0);
 
-                    var _group = new THREE.Group();
+                    var group = new THREE.Group();
 
-                    var geometry = new THREE.PlaneBufferGeometry(_this2.itemWidth(), _this2.itemHeight(), 32);
-                    var material = new THREE.MeshBasicMaterial({
-                        color: _this2.parseColor(color),
+                    var bgGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.columnWidth()), _this2.itemHeight(), 32);
+                    var bgMaterial = new THREE.MeshBasicMaterial({
+                        color: _this2.parseColor(0xffffff),
+                        side: THREE.DoubleSide,
+                        opacity: 0,
+                        transparent: true
+                    });
+                    var bgPlane = new THREE.Mesh(bgGeometry, bgMaterial);
+                    bgPlane.position.x = pos.x + geometry3d.to3d(_this2.columnWidth()) / 2;
+                    bgPlane.position.y = pos.y;
+                    group.add(bgPlane);
+
+                    var rectGeometry = new THREE.PlaneBufferGeometry(_this2.itemWidth(), _this2.itemHeight(), 32);
+                    var rectMaterial = new THREE.MeshBasicMaterial({
+                        color: color,
                         side: THREE.DoubleSide
                     });
-                    var plane = new THREE.Mesh(geometry, material);
-                    plane.position.x = _pos.x;
-                    plane.position.y = _pos.y;
-                    _group.add(plane);
+                    var rectPlane = new THREE.Mesh(rectGeometry, rectMaterial);
+                    rectPlane.position.x = pos.x;
+                    rectPlane.position.y = pos.y;
+                    group.add(rectPlane);
 
-                    /*
-                                    let rect = new Konva.Rect( {
-                                        x: x
-                                        , y: y
-                                        , width: this.itemWidth()
-                                        , height: this.itemHeight()
-                                        , fill: color
-                                    });
-                                    this.addDestroy( rect  );
-                    
-                                    let bg = new Konva.Rect( {
-                                        x: x
-                                        , y: y
-                                        , width: this.columnWidth()
-                                        , height: this.rowHeight()
-                                        , fill: '#ffffff00'
-                                    });
-                                    this.addDestroy( bg );
-                    
-                                    let text = new Konva.Text( {
-                                        text: label
-                                        , x: x + this.iconSpace + rect.width()
-                                        , y: y
-                                        , fill: this.textColor
-                                        , fontFamily: 'MicrosoftYaHei'
-                                        , fontSize: 12
-                                    });
-                                    this.addDestroy( text );
-                    
-                                    let group  = new Konva.Group();
-                                    this.addDestroy( group );
-                                    group.add( bg );
-                                    group.add( rect );
-                                    group.add( text );
-                    
-                                    let data = {
-                                        ele: group
-                                        , item: item
-                                        , disabled: false
-                                        , rect: rect
-                                        , bg: bg
-                                        , text: text
-                                    };
-                    
-                                    this.group.push( data );
-                                    group.on( 'click', ()=>{
-                                        //console.log( 'click', key, data, group, item );
-                                        data.disabled = !data.disabled;
-                    
-                                        if( data.disabled ){
-                                            group.opacity( .6 );
-                                        }else{
-                                            group.opacity( 1 );
-                                        }
-                    
-                                        this.stage.add( this.layer );
-                    
-                                        this.onChange && this.onChange( this.group );
-                                    });
-                    
-                                    this.layer.add( group );
-                    */
-                    _this2.scene.add(_group);
+                    var textTexture = new _three2.default({
+                        text: label,
+                        fontFamily: 'MicrosoftYaHei',
+                        fontSize: 42,
+                        fontStyle: 'normal'
+                    });
+                    var textMaterial = new THREE.SpriteMaterial({ map: textTexture, color: _this2.parseColor(_this2.textColor) });
+                    var textSprite = new THREE.Sprite(textMaterial);
+                    textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(10);
+
+                    textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + textSprite.scale.x / 2 - 3;
+                    textSprite.position.y = pos.y;
+
+                    group.add(textSprite);
+
+                    _this2.scene.add(group);
                 } else {
                     /*
                     let curgroup = this.group[key];
@@ -265,12 +217,12 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'itemWidth',
         value: function itemWidth() {
-            return this.data.itemWidth || 5;
+            return geometry3d.to3d(this.data.itemWidth || 5);
         }
     }, {
         key: 'itemHeight',
         value: function itemHeight() {
-            return this.data.itemHeight || 5;
+            return geometry3d.to3d(this.data.itemHeight || 5);
         }
     }, {
         key: 'columnWidth',
