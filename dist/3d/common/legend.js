@@ -217,7 +217,7 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'outerHeight',
         value: function outerHeight() {
-            return this.rowHeight() * this.row() + this.spaceY();
+            return this.rowHeight() * this.row() + this.spaceY() * (this.row() - 1);
         }
     }, {
         key: 'total',

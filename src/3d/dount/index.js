@@ -194,7 +194,7 @@ export default class Dount extends VisChartBase  {
         var line = new MeshLine();
 
         var curve = new THREE.EllipseCurve(
-            0,  0,            // ax, aY
+            0,  this.fixCy(),            // ax, aY
             this.circleRadius,
             this.circleRadius,
             0,  2 * Math.PI,  // aStartAngle, aEndAngle
@@ -206,7 +206,7 @@ export default class Dount extends VisChartBase  {
         var geometryy = new THREE.Geometry().setFromPoints( points );
 
         curve = new THREE.EllipseCurve(
-            0,  0,            // ax, aY
+            0,  this.fixCy(),            // ax, aY
             this.circleRadius,
             this.circleRadius,
             0,  geometry.radians( 10 ),  // aStartAngle, aEndAngle
@@ -274,6 +274,9 @@ export default class Dount extends VisChartBase  {
         circle = new THREE.Line( line.geometry, material );
         circle.renderOrder = -1;
         circle.material.depthTest=false;
+
+        group.position.y = this.fixCy();
+
         group.add( circle );
 
         this.circleLine = group;
@@ -312,6 +315,8 @@ export default class Dount extends VisChartBase  {
             geometryx = new THREE.Geometry();
             line.setGeometry( geometryx );
             mesh = new THREE.Mesh( line.geometry, material );
+            mesh.position.y = this.fixCy();
+
             this.scene.add( mesh );
             this.line.push( mesh );
 
@@ -326,6 +331,8 @@ export default class Dount extends VisChartBase  {
             material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide } );
             arc = new THREE.Mesh( geometryx, material );
             arc.renderOrder = 1;
+
+            arc.position.y = this.fixCy();
 
             this.scene.add( arc );
 
@@ -392,7 +399,7 @@ export default class Dount extends VisChartBase  {
         }
 
         path.lineicon.position.x = path.itemData.lineExpend.x;
-        path.lineicon.position.y = path.itemData.lineExpend.y;
+        path.lineicon.position.y = path.itemData.lineExpend.y + this.fixCy();
     }
 
     addText( path, layer, ix ){
@@ -432,7 +439,7 @@ export default class Dount extends VisChartBase  {
         textPoint = ju.clone( path.itemData.lineEnd );
 
         let textX =  textPoint.x
-            , textY =  textPoint.y
+            , textY =  textPoint.y + this.fixCy()
             , direct = path.itemData.pointDirection.auto()
             ;
         text.position.x = textX;

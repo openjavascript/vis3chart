@@ -1,5 +1,4 @@
 
-import Konva from 'konva';
 import ju from 'json-utilsx';
 import * as geometry from '../../geometry/geometry.js';
 
@@ -33,7 +32,6 @@ export default class PointAt {
     setDebug( stage ){
         this.stage = stage;
 
-        this.layer = new Konva.Layer();
 
         let i = 0;
 
@@ -43,9 +41,6 @@ export default class PointAt {
             let params = ju.clone( item );
             params.fill = this.colors[ i % this.colors.length ];
 
-            let rect = new Konva.Rect( params );
-
-            this.layer.add( rect )
             
             i++;
         }

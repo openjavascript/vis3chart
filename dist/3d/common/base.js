@@ -104,8 +104,6 @@ var ThreeBase = function (_VisChartBase) {
             if (this.images.length) return;
 
             if (this.iconLayer) this.iconLayer.remove();
-            this.iconLayer = new Konva.Layer();
-            this.addDestroy(this.iconLayer);
 
             this.images = [];
             this._images = [];
@@ -179,6 +177,8 @@ var ThreeBase = function (_VisChartBase) {
             }
 
             pivot.scale.set(scale, scale, scale);
+
+            pivot.position.y = this.fixCy();
 
             this.addDestroy(pivot);
 
@@ -268,23 +268,39 @@ var ThreeBase = function (_VisChartBase) {
             return color;
         }
     }, {
-        key: 'pos2dto3d',
-        value: function pos2dto3d(x, y, camera) {
-            var vec = new THREE.Vector3(); // create once and reuse
-            var pos = new THREE.Vector3(); // create once and reuse
-            camera = camera || this.camera;
+        key: 'fixCx',
+        value: function fixCx() {
+            var r = this.cx;
+            return r;
+        }
+    }, {
+        key: 'fixCy',
+        value: function fixCy() {
+            var r = this.cy;
 
-            vec.set(x / this.width * 2 - 1, -(y / this.width) * 2 + 1, 0.5);
+            if (this.legend) {
+                switch (this.legend.direction()) {
+                    case 'bottom':
+                        {
+                            r = (this.height - this.legend.outerHeight() / 2) / 2 - 5;
+                            break;
+                        }
+                }
+            }
 
-            vec.unproject(camera);
-
-            vec.sub(camera.position).normalize();
-
-            var distance = -camera.position.z / vec.z;
-
-            pos.copy(camera.position).add(vec.multiplyScalar(distance));
-
-            return pos;
+            return geometry3d.to3d(this.cy - r);
+        }
+    }, {
+        key: 'fixWidth',
+        value: function fixWidth() {
+            var r = this.width;
+            return r;
+        }
+    }, {
+        key: 'fixHeight',
+        value: function fixHeight() {
+            var r = this.height;
+            return r;
         }
     }]);
 

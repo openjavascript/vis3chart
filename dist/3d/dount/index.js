@@ -250,7 +250,7 @@ var Dount = function (_VisChartBase) {
 
             var line = new _three5.MeshLine();
 
-            var curve = new THREE.EllipseCurve(0, 0, // ax, aY
+            var curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
             this.circleRadius, this.circleRadius, 0, 2 * Math.PI, // aStartAngle, aEndAngle
             false, // aClockwise
             0 // aRotation
@@ -259,7 +259,7 @@ var Dount = function (_VisChartBase) {
             var points = curve.getPoints(200);
             var geometryy = new THREE.Geometry().setFromPoints(points);
 
-            curve = new THREE.EllipseCurve(0, 0, // ax, aY
+            curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
             this.circleRadius, this.circleRadius, 0, geometry.radians(10), // aStartAngle, aEndAngle
             false, // aClockwise
             geometry.radians(.5) // aRotation
@@ -319,6 +319,9 @@ var Dount = function (_VisChartBase) {
             circle = new THREE.Line(line.geometry, material);
             circle.renderOrder = -1;
             circle.material.depthTest = false;
+
+            group.position.y = this.fixCy();
+
             group.add(circle);
 
             this.circleLine = group;
@@ -364,6 +367,8 @@ var Dount = function (_VisChartBase) {
                 geometryx = new THREE.Geometry();
                 line.setGeometry(geometryx);
                 mesh = new THREE.Mesh(line.geometry, material);
+                mesh.position.y = this.fixCy();
+
                 this.scene.add(mesh);
                 this.line.push(mesh);
 
@@ -371,6 +376,8 @@ var Dount = function (_VisChartBase) {
                 material = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
                 arc = new THREE.Mesh(geometryx, material);
                 arc.renderOrder = 1;
+
+                arc.position.y = this.fixCy();
 
                 this.scene.add(arc);
 
@@ -439,7 +446,7 @@ var Dount = function (_VisChartBase) {
             }
 
             path.lineicon.position.x = path.itemData.lineExpend.x;
-            path.lineicon.position.y = path.itemData.lineExpend.y;
+            path.lineicon.position.y = path.itemData.lineExpend.y + this.fixCy();
         }
     }, {
         key: 'addText',
@@ -479,7 +486,7 @@ var Dount = function (_VisChartBase) {
             textPoint = _jsonUtilsx2.default.clone(path.itemData.lineEnd);
 
             var textX = textPoint.x,
-                textY = textPoint.y,
+                textY = textPoint.y + this.fixCy(),
                 direct = path.itemData.pointDirection.auto();
             text.position.x = textX;
             text.position.y = textY;

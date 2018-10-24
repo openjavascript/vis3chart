@@ -181,7 +181,7 @@ export default class Legend extends VisChartBase  {
     }
 
     outerHeight(){
-        return this.rowHeight() * this.row() + this.spaceY();
+        return this.rowHeight() * this.row() + this.spaceY() * ( this.row() - 1) ;
     }
 
     total(){

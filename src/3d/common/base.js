@@ -67,9 +67,7 @@ export default class ThreeBase extends VisChartBase {
         if( this.images.length ) return;
 
         if( this.iconLayer ) this.iconLayer.remove();
-        this.iconLayer = new Konva.Layer();
-        this.addDestroy( this.iconLayer );
-        
+
 
         this.images = [];
         this._images = [];
@@ -156,6 +154,7 @@ export default class ThreeBase extends VisChartBase {
 
         pivot.scale.set( scale, scale, scale );
 
+        pivot.position.y = this.fixCy();
 
         this.addDestroy( pivot );
 
@@ -232,25 +231,36 @@ export default class ThreeBase extends VisChartBase {
 
         return color;
     }
-
-    pos2dto3d( x, y, camera ){
-        var vec = new THREE.Vector3(); // create once and reuse
-        var pos = new THREE.Vector3(); // create once and reuse
-        camera = camera || this.camera;
-
-        vec.set(
-            ( x / this.width ) * 2 - 1,
-            - ( y / this.width ) * 2 + 1,
-            0.5 );
-
-        vec.unproject( camera );
-
-        vec.sub( camera.position ).normalize();
-
-        var distance = - camera.position.z / vec.z;
-
-        pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
-
-        return pos;
+    fixCx(){
+        let r = this.cx;
+        return r;
     }
+
+    fixCy(){
+        let r = this.cy;
+
+        if( this.legend ){
+            switch( this.legend.direction() ){
+                case 'bottom': {
+                    r = ( this.height - this.legend.outerHeight() / 2 ) / 2 - 5;
+                    break;
+                }
+            }
+        }
+
+        return geometry3d.to3d( this.cy - r );
+    }
+
+    fixWidth(){
+        let r = this.width;
+        return r;
+    }
+
+    fixHeight(){
+        let r = this.height;
+        return r;
+    }
+
+
+
 }
