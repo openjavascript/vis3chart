@@ -245,12 +245,13 @@ var Dount = function (_VisChartBase) {
     }, {
         key: 'drawCircle',
         value: function drawCircle() {
+            this.circleRadius = geometry3d.to3d(Math.ceil(this.circlePercent * this.min / 2));
+            console.log(this.circleRadius);
 
             var line = new _three5.MeshLine();
 
             var curve = new THREE.EllipseCurve(0, 0, // ax, aY
-            47, 47, // xRadius, yRadius
-            0, 2 * Math.PI, // aStartAngle, aEndAngle
+            this.circleRadius, this.circleRadius, 0, 2 * Math.PI, // aStartAngle, aEndAngle
             false, // aClockwise
             0 // aRotation
             );
@@ -259,8 +260,7 @@ var Dount = function (_VisChartBase) {
             var geometryy = new THREE.Geometry().setFromPoints(points);
 
             curve = new THREE.EllipseCurve(0, 0, // ax, aY
-            47, 47, // xRadius, yRadius
-            0, geometry.radians(10), // aStartAngle, aEndAngle
+            this.circleRadius, this.circleRadius, 0, geometry.radians(10), // aStartAngle, aEndAngle
             false, // aClockwise
             geometry.radians(.5) // aRotation
             );
@@ -285,6 +285,8 @@ var Dount = function (_VisChartBase) {
     }, {
         key: 'drawCircleLine',
         value: function drawCircleLine() {
+            this.circleLineRadius = geometry3d.to3d(Math.ceil(this.circleLinePercent * this.min / 2));
+
             var material = void 0,
                 geometryItem = void 0,
                 circle = void 0,
@@ -298,7 +300,7 @@ var Dount = function (_VisChartBase) {
                 color: new THREE.Color(this.lineColor),
                 lineWidth: 2
             });
-            geometryItem = new THREE.CircleGeometry(50, 128, geometry.radians(90), geometry.radians(90));
+            geometryItem = new THREE.CircleGeometry(this.circleLineRadius, 128, geometry.radians(90), geometry.radians(90));
             geometryItem.vertices.shift();
             line.setGeometry(geometryItem);
             circle = new THREE.Line(line.geometry, material);
@@ -311,7 +313,7 @@ var Dount = function (_VisChartBase) {
                 color: new THREE.Color(this.lineColor),
                 lineWidth: 2
             });
-            geometryItem = new THREE.CircleGeometry(50, 128, geometry.radians(0), geometry.radians(-90));
+            geometryItem = new THREE.CircleGeometry(this.circleLineRadius, 128, geometry.radians(0), geometry.radians(-90));
             geometryItem.vertices.shift();
             line.setGeometry(geometryItem);
             circle = new THREE.Line(line.geometry, material);

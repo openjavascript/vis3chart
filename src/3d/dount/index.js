@@ -188,12 +188,15 @@ export default class Dount extends VisChartBase  {
     }
 
     drawCircle(){
+        this.circleRadius = geometry3d.to3d( Math.ceil( this.circlePercent * this.min / 2 ) );
+        console.log( this.circleRadius );
 
         var line = new MeshLine();
 
         var curve = new THREE.EllipseCurve(
             0,  0,            // ax, aY
-            47, 47,           // xRadius, yRadius
+            this.circleRadius,
+            this.circleRadius,
             0,  2 * Math.PI,  // aStartAngle, aEndAngle
             false,            // aClockwise
             0                 // aRotation
@@ -204,7 +207,8 @@ export default class Dount extends VisChartBase  {
 
         curve = new THREE.EllipseCurve(
             0,  0,            // ax, aY
-            47, 47,           // xRadius, yRadius
+            this.circleRadius,
+            this.circleRadius,
             0,  geometry.radians( 10 ),  // aStartAngle, aEndAngle
             false,            // aClockwise
             geometry.radians( .5 )                 // aRotation
@@ -230,6 +234,8 @@ export default class Dount extends VisChartBase  {
     }
 
     drawCircleLine(){
+        this.circleLineRadius = geometry3d.to3d( Math.ceil( this.circleLinePercent * this.min / 2 ) ); 
+
         let material,  geometryItem, circle, group, line;
 
         group = new THREE.Group();
@@ -240,7 +246,7 @@ export default class Dount extends VisChartBase  {
             , lineWidth: 2
         } );
         geometryItem = new THREE.CircleGeometry(  
-            50
+            this.circleLineRadius
             , 128
             , geometry.radians( 90 )
             , geometry.radians( 90 )
@@ -258,7 +264,7 @@ export default class Dount extends VisChartBase  {
             , lineWidth: 2
         } );
         geometryItem = new THREE.CircleGeometry(  
-            50
+            this.circleLineRadius
             , 128
             , geometry.radians( 0 )
             , geometry.radians( -90  )
