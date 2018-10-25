@@ -32,6 +32,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var THREE = require('three');
 
+require('../../common/SVGLoader.js');
+
 var ThreeBase = function (_VisChartBase) {
     _inherits(ThreeBase, _VisChartBase);
 

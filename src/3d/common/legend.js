@@ -42,6 +42,13 @@ export default class Legend extends VisChartBase  {
         */
     }
 
+    resize( width, height, data = null, allData = null ){
+        super.resize( width, height, data, allData );
+
+        geometry3d.screenWidth = this.width;
+        geometry3d.screenHeight = this.height;
+    }
+
     init(){
         geometry3d.screenWidth = this.width;
         geometry3d.screenHeight = this.height;
@@ -75,11 +82,11 @@ export default class Legend extends VisChartBase  {
             }
 
             color = this.parseColor( color );
+            let pos = geometry3d.pos2dto3d( 
+                x, y
+            );
 
             if( !this.inited ){
-                let pos = geometry3d.pos2dto3d( 
-                    x, y
-                );
 
                 //console.log( 'x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y );
 
@@ -134,6 +141,7 @@ export default class Legend extends VisChartBase  {
                 group.add( textSprite );
 
                 this.scene.add( group );
+                this.addDestroy( group );
 
                 let data = {
                     ele: group
@@ -142,37 +150,70 @@ export default class Legend extends VisChartBase  {
                     , rect: rectPlane
                     , bg: bgPlane
                     , text: textSprite
+                    , imageAspect: textTexture.imageAspect
                 };
                 this.group.push( data );
                 this.domEvents.addEventListener( group, 'click', ()=>{
                     data.disabled = !data.disabled;
                     if( data.disabled ){
                         //group.opacity( .6 );
-                        rectMaterial.opacity = .6;
-                        textMaterial.opacity = .6;
+                        data.rect.material.opacity = .6;
+                        data.text.material.opacity = .6;
                     }else{
-                        rectMaterial.opacity = 1;
-                        textMaterial.opacity = 1;
+                        data.rect.material.opacity = 1;
+                        data.text.material.opacity = 1;
                     }
                     this.onChange && this.onChange( data );
                 });
             }else{
-                /*
-                let curgroup = this.group[key];
+                let item = this.group[ key ];
 
-                curgroup.rect.x( x );
-                curgroup.rect.y( y );
-                curgroup.rect.width( this.itemWidth() );
-                curgroup.rect.height( this.itemHeight() );
+                let bgPlane = item.bg
+                    , rectPlane = item.rect
+                    , group = item.ele
+                    , textSprite = item.text
+                    ;
 
-                curgroup.bg.x( x );
-                curgroup.bg.y( y );
-                curgroup.bg.width( this.itemWidth() );
-                curgroup.bg.height( this.itemHeight() );
 
-                curgroup.text.x( x + this.iconSpace + curgroup.rect.width( ) );
-                curgroup.text.y( y );
-                */
+                bgPlane.position.x = pos.x + geometry3d.to3d( this.columnWidth() ) / 2;
+                bgPlane.position.y = pos.y;
+
+                var rectGeometry = new THREE.PlaneBufferGeometry( 
+                    geometry3d.to3d( this.itemWidth() )
+                    , geometry3d.to3d( this.itemHeight() )
+                    , 32 );
+                rectPlane.geometry = rectGeometry;
+                rectPlane.needsUpdate = true;
+
+                rectPlane.position.x = pos.x;
+                rectPlane.position.y = pos.y;
+
+
+                item.text.parent.remove( item.text );
+                let fontSize = geometry3d.to3d( 22 );
+                let textTexture = new TextTexture({
+                  text: label,
+                  fontFamily: 'MicrosoftYaHei',
+                  fontSize: fontSize * 2,
+                  fontStyle: 'normal',
+                  transparent: true
+                });
+                let textMaterial = new THREE.SpriteMaterial({map: textTexture, color: this.parseColor( this.textColor ) });
+                textSprite = new THREE.Sprite(textMaterial);
+                item.text = textSprite;
+                textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(fontSize);
+                textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
+                textSprite.position.y = pos.y;
+
+                if( item.disabled ){
+                    //group.opacity( .6 );
+                    textMaterial.opacity = .6;
+                }else{
+                    textMaterial.opacity = 1;
+                }
+
+                group.add( textSprite );
+
             }
         });
         //this.stage.add( this.layer );

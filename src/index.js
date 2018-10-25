@@ -44,6 +44,7 @@ export default class VisThree extends VisChartBase {
             && this.data.legend 
         ){
             this.legend.resize( this.width, this.height );
+
             this.legend.update( this.data.legend );
         }
 
@@ -89,7 +90,7 @@ export default class VisThree extends VisChartBase {
 
             this.domEvents   = new THREEx.DomEvents(this.camera, this.renderer.domElement);
 
-            console.log( this.scene, this.camera );
+            //console.log( this.scene, this.camera );
         }
         this.renderer.setSize( this.width, this.height );
 
@@ -156,6 +157,7 @@ export default class VisThree extends VisChartBase {
             if( this.legend && ignoreLegend ){
                 this.emptyblock = 'kao';
             }else{
+                this.legend && this.legend.destroy();
                 this.legend = new Legend( this.box, this.width, this.height, this.camera );
                 this.legend.setOptions( {
                     renderer: this.renderer
@@ -165,7 +167,6 @@ export default class VisThree extends VisChartBase {
                     , config: this.config
                     , domEvents: this.domEvents
                     , onChange: ( group ) => {
-                        //console.log( 'legend onchange', group );
                         this.initChart();
                     }
                 });
@@ -239,7 +240,7 @@ export default class VisThree extends VisChartBase {
 
         if( this.legend && this.legend.group && this.legend.group.length ){
             this.legend.group.map( ( item, key ) => {
-                console.log( key, item.disabled, item );
+                //console.log( key, item.disabled, item );
                 if( !item.disabled ){
                     tmp.push( data.data[key] );
                 }

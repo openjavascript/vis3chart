@@ -232,6 +232,7 @@ export default class Dount extends VisChartBase  {
         circle.material.depthTest=false;
 
         this.scene.add( circle );
+        this.addDestroy( circle );
 
     }
 
@@ -455,7 +456,7 @@ export default class Dount extends VisChartBase  {
 
         this.lineHeight = geometry3d.to3d( 24 );
         this.lineWidth = geometry3d.to3d( 50 );
-        this.lineLength = geometry3d.to3d( 25 );
+        this.lineLength = geometry3d.to3d( 22 );
 
         return this;
     }
@@ -466,7 +467,6 @@ export default class Dount extends VisChartBase  {
     }
 
     clearItems(){
-        console.log( 'clearItems' );
         this.clearList.map( ( item, key ) => {
             this.dispose( item );
         });
@@ -480,7 +480,7 @@ export default class Dount extends VisChartBase  {
 
         this.data.data.map( ( val, key ) => {
 
-            let fontSize = geometry3d.to3d( 30 );
+            let fontSize = geometry3d.to3d( 26 );
 
             let texture = new TextTexture({
               text: `${val.percent}%`,

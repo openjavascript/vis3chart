@@ -4,6 +4,8 @@ import * as geometry3d from '../../geometry/geometry3d.js';
 
 const THREE = require( 'three' );
 
+require( '../../common/SVGLoader.js' );
+
 import ju from 'json-utilsx';
 
 export default class ThreeBase extends VisChartBase {

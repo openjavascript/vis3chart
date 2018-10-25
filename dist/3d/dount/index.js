@@ -283,6 +283,7 @@ var Dount = function (_VisChartBase) {
             circle.material.depthTest = false;
 
             this.scene.add(circle);
+            this.addDestroy(circle);
         }
     }, {
         key: 'drawCircleLine',
@@ -503,7 +504,7 @@ var Dount = function (_VisChartBase) {
 
             this.lineHeight = geometry3d.to3d(24);
             this.lineWidth = geometry3d.to3d(50);
-            this.lineLength = geometry3d.to3d(25);
+            this.lineLength = geometry3d.to3d(22);
 
             return this;
         }
@@ -518,7 +519,6 @@ var Dount = function (_VisChartBase) {
         value: function clearItems() {
             var _this5 = this;
 
-            console.log('clearItems');
             this.clearList.map(function (item, key) {
                 _this5.dispose(item);
             });
@@ -535,7 +535,7 @@ var Dount = function (_VisChartBase) {
 
             this.data.data.map(function (val, key) {
 
-                var fontSize = geometry3d.to3d(30);
+                var fontSize = geometry3d.to3d(26);
 
                 var texture = new _three2.default({
                     text: val.percent + '%',

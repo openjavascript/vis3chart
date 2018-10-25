@@ -83,6 +83,17 @@ var Legend = function (_VisChartBase) {
             */
         }
     }, {
+        key: 'resize',
+        value: function resize(width, height) {
+            var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+            var allData = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+
+            _get(Legend.prototype.__proto__ || Object.getPrototypeOf(Legend.prototype), 'resize', this).call(this, width, height, data, allData);
+
+            geometry3d.screenWidth = this.width;
+            geometry3d.screenHeight = this.height;
+        }
+    }, {
         key: 'init',
         value: function init() {
             var _this2 = this;
@@ -120,9 +131,9 @@ var Legend = function (_VisChartBase) {
                 }
 
                 color = _this2.parseColor(color);
+                var pos = geometry3d.pos2dto3d(x, y);
 
                 if (!_this2.inited) {
-                    var pos = geometry3d.pos2dto3d(x, y);
 
                     //console.log( 'x', x, 'y', y, 'pos.x', pos.x, 'pos.y', pos.y );
 
@@ -171,6 +182,7 @@ var Legend = function (_VisChartBase) {
                     group.add(textSprite);
 
                     _this2.scene.add(group);
+                    _this2.addDestroy(group);
 
                     var data = {
                         ele: group,
@@ -178,35 +190,64 @@ var Legend = function (_VisChartBase) {
                         disabled: false,
                         rect: rectPlane,
                         bg: bgPlane,
-                        text: textSprite
+                        text: textSprite,
+                        imageAspect: textTexture.imageAspect
                     };
                     _this2.group.push(data);
                     _this2.domEvents.addEventListener(group, 'click', function () {
                         data.disabled = !data.disabled;
                         if (data.disabled) {
                             //group.opacity( .6 );
-                            rectMaterial.opacity = .6;
-                            textMaterial.opacity = .6;
+                            data.rect.material.opacity = .6;
+                            data.text.material.opacity = .6;
                         } else {
-                            rectMaterial.opacity = 1;
-                            textMaterial.opacity = 1;
+                            data.rect.material.opacity = 1;
+                            data.text.material.opacity = 1;
                         }
                         _this2.onChange && _this2.onChange(data);
                     });
                 } else {
-                    /*
-                    let curgroup = this.group[key];
-                     curgroup.rect.x( x );
-                    curgroup.rect.y( y );
-                    curgroup.rect.width( this.itemWidth() );
-                    curgroup.rect.height( this.itemHeight() );
-                     curgroup.bg.x( x );
-                    curgroup.bg.y( y );
-                    curgroup.bg.width( this.itemWidth() );
-                    curgroup.bg.height( this.itemHeight() );
-                     curgroup.text.x( x + this.iconSpace + curgroup.rect.width( ) );
-                    curgroup.text.y( y );
-                    */
+                    var _item = _this2.group[key];
+
+                    var _bgPlane = _item.bg,
+                        _rectPlane = _item.rect,
+                        _group = _item.ele,
+                        _textSprite = _item.text;
+
+                    _bgPlane.position.x = pos.x + geometry3d.to3d(_this2.columnWidth()) / 2;
+                    _bgPlane.position.y = pos.y;
+
+                    var rectGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.itemWidth()), geometry3d.to3d(_this2.itemHeight()), 32);
+                    _rectPlane.geometry = rectGeometry;
+                    _rectPlane.needsUpdate = true;
+
+                    _rectPlane.position.x = pos.x;
+                    _rectPlane.position.y = pos.y;
+
+                    _item.text.parent.remove(_item.text);
+                    var _fontSize = geometry3d.to3d(22);
+                    var _textTexture = new _three2.default({
+                        text: label,
+                        fontFamily: 'MicrosoftYaHei',
+                        fontSize: _fontSize * 2,
+                        fontStyle: 'normal',
+                        transparent: true
+                    });
+                    var _textMaterial = new THREE.SpriteMaterial({ map: _textTexture, color: _this2.parseColor(_this2.textColor) });
+                    _textSprite = new THREE.Sprite(_textMaterial);
+                    _item.text = _textSprite;
+                    _textSprite.scale.setX(_textTexture.imageAspect).multiplyScalar(_fontSize);
+                    _textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + _textSprite.scale.x / 2 - 3;
+                    _textSprite.position.y = pos.y;
+
+                    if (_item.disabled) {
+                        //group.opacity( .6 );
+                        _textMaterial.opacity = .6;
+                    } else {
+                        _textMaterial.opacity = 1;
+                    }
+
+                    _group.add(_textSprite);
                 }
             });
             //this.stage.add( this.layer );
