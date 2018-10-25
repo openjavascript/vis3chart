@@ -180,6 +180,7 @@ var Legend = function (_VisChartBase) {
                         bg: bgPlane,
                         text: textSprite
                     };
+                    _this2.group.push(data);
                     _this2.domEvents.addEventListener(group, 'click', function () {
                         data.disabled = !data.disabled;
                         if (data.disabled) {

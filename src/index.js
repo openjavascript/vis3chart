@@ -222,9 +222,8 @@ export default class VisThree extends VisChartBase {
             if( ins ){
                 this.options && ( ins.setOptions( this.options ) );
 
-                console.log( 'legend data', this.getLegendData( val ) );
-
-                ins.update( this.getLegendData( val ), ju.clone( this.data ) );
+                let fillData = this.getLegendData( val );
+                ins.update( fillData, ju.clone( this.data ) );
 
                 if( !this.ins[key]  ){
                     this.ins[key] = ins;
@@ -239,8 +238,8 @@ export default class VisThree extends VisChartBase {
         let tmp = [];
 
         if( this.legend && this.legend.group && this.legend.group.length ){
-            //console.log( 'getLegendData', this.legend.group, 111111111 );
             this.legend.group.map( ( item, key ) => {
+                console.log( key, item.disabled, item );
                 if( !item.disabled ){
                     tmp.push( data.data[key] );
                 }

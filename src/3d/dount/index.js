@@ -321,6 +321,7 @@ export default class Dount extends VisChartBase  {
 
             this.scene.add( mesh );
             this.line.push( mesh );
+            this.addDestroy( mesh );
 
             geometryx = new THREE.RingGeometry( 
                 this.inRadius
@@ -337,6 +338,7 @@ export default class Dount extends VisChartBase  {
             arc.position.y = this.fixCy();
 
             this.scene.add( arc );
+            this.addDestroy( arc );
 
             tmp = { 
                 arc: arc 
@@ -399,6 +401,7 @@ export default class Dount extends VisChartBase  {
             var circle = new THREE.Mesh( geometry, material );
             path.lineicon = circle;
             this.scene.add( circle );
+            this.addDestroy( circle );
         }
 
         path.lineicon.position.x = path.itemData.lineExpend.x;
@@ -409,6 +412,7 @@ export default class Dount extends VisChartBase  {
         if( !path.text ){
             path.text = this.textar[ key ];
             this.scene.add(path.text);
+            this.addDestroy( path.text  );
         }
 
         let text = path.text;
@@ -464,8 +468,7 @@ export default class Dount extends VisChartBase  {
     clearItems(){
         console.log( 'clearItems' );
         this.clearList.map( ( item, key ) => {
-            console.log( item );
-            //item.dispose();
+            this.dispose( item );
         });
         this.clearList = [];
     }

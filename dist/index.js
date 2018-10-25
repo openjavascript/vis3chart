@@ -256,9 +256,8 @@ var VisThree = function (_VisChartBase) {
                 if (ins) {
                     _this3.options && ins.setOptions(_this3.options);
 
-                    console.log('legend data', _this3.getLegendData(val));
-
-                    ins.update(_this3.getLegendData(val), _jsonUtilsx2.default.clone(_this3.data));
+                    var fillData = _this3.getLegendData(val);
+                    ins.update(fillData, _jsonUtilsx2.default.clone(_this3.data));
 
                     if (!_this3.ins[key]) {
                         _this3.ins[key] = ins;
@@ -274,8 +273,8 @@ var VisThree = function (_VisChartBase) {
             var tmp = [];
 
             if (this.legend && this.legend.group && this.legend.group.length) {
-                //console.log( 'getLegendData', this.legend.group, 111111111 );
                 this.legend.group.map(function (item, key) {
+                    console.log(key, item.disabled, item);
                     if (!item.disabled) {
                         tmp.push(data.data[key]);
                     }

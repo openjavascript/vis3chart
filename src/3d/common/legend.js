@@ -143,6 +143,7 @@ export default class Legend extends VisChartBase  {
                     , bg: bgPlane
                     , text: textSprite
                 };
+                this.group.push( data );
                 this.domEvents.addEventListener( group, 'click', ()=>{
                     data.disabled = !data.disabled;
                     if( data.disabled ){

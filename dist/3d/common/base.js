@@ -302,11 +302,20 @@ var ThreeBase = function (_VisChartBase) {
     }, {
         key: 'dispose',
         value: function dispose(item) {
-            item.material && item.meterial.dispose();
-            item.geometry && item.geometry.dispose();
-            item.texture && item.texture.dispose();
+            /*item.material 
+                && item.parent
+                && item.material.dispose
+                && item.meterial.dispose();
+             item.geometry 
+                && item.parent
+                && item.geometry.dispose
+                && item.geometry.dispose();
+             item.texture 
+                && item.parent
+                && item.texture.dispose
+                && item.texture.dispose();*/
 
-            item.parent && item.parent.remove(item);
+            item.parent && item.parent.remove && item.parent.remove(item);
 
             return this;
         }
