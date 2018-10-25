@@ -215,12 +215,7 @@ export default class ThreeBase extends VisChartBase {
         this.setDestroy();
 
         this.destroyList.map( item => {
-            if( item ){
-                /*
-                item.remove();
-                item.destroy();
-                */
-            }
+            this.dispose( item );
         });
     }
 
@@ -261,6 +256,14 @@ export default class ThreeBase extends VisChartBase {
         return r;
     }
 
+    dispose( item ){
+        item.material && item.meterial.dispose();
+        item.geometry && item.geometry.dispose();
+        item.texture && item.texture.dispose();
 
+        item.parent && item.parent.remove( item );
+
+        return this;
+    }
 
 }

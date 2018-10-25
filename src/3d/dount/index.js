@@ -462,9 +462,10 @@ export default class Dount extends VisChartBase  {
     }
 
     clearItems(){
-        this.clearList.map( item => {
-            item.remove();
-            item.destroy();
+        console.log( 'clearItems' );
+        this.clearList.map( ( item, key ) => {
+            console.log( item );
+            //item.dispose();
         });
         this.clearList = [];
     }

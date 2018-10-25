@@ -247,15 +247,12 @@ var ThreeBase = function (_VisChartBase) {
     }, {
         key: 'destroy',
         value: function destroy() {
+            var _this5 = this;
+
             this.setDestroy();
 
             this.destroyList.map(function (item) {
-                if (item) {
-                    /*
-                    item.remove();
-                    item.destroy();
-                    */
-                }
+                _this5.dispose(item);
             });
         }
     }, {
@@ -301,6 +298,17 @@ var ThreeBase = function (_VisChartBase) {
         value: function fixHeight() {
             var r = this.height;
             return r;
+        }
+    }, {
+        key: 'dispose',
+        value: function dispose(item) {
+            item.material && item.meterial.dispose();
+            item.geometry && item.geometry.dispose();
+            item.texture && item.texture.dispose();
+
+            item.parent && item.parent.remove(item);
+
+            return this;
         }
     }]);
 

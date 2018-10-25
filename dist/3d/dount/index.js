@@ -512,9 +512,10 @@ var Dount = function (_VisChartBase) {
     }, {
         key: 'clearItems',
         value: function clearItems() {
-            this.clearList.map(function (item) {
-                item.remove();
-                item.destroy();
+            console.log('clearItems');
+            this.clearList.map(function (item, key) {
+                console.log(item);
+                //item.dispose();
             });
             this.clearList = [];
         }
