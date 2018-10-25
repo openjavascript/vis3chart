@@ -161,6 +161,8 @@ var VisThree = function (_VisChartBase) {
     }, {
         key: 'update',
         value: function update(data, ignoreLegend) {
+            var _this2 = this;
+
             var redraw = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
             this.data = data;
@@ -194,8 +196,8 @@ var VisThree = function (_VisChartBase) {
                         config: this.config,
                         domEvents: this.domEvents,
                         onChange: function onChange(group) {
-                            console.log('legend onchange', group);
-                            //this.initChart();
+                            //console.log( 'legend onchange', group );
+                            _this2.initChart();
                         }
                     });
                     this.legend.update(this.data.legend);
@@ -207,7 +209,7 @@ var VisThree = function (_VisChartBase) {
     }, {
         key: 'initChart',
         value: function initChart() {
-            var _this2 = this;
+            var _this3 = this;
 
             if (this.ins && this.ins.length && !this.redraw) {
                 this.emptyblock = 'kao';
@@ -222,15 +224,15 @@ var VisThree = function (_VisChartBase) {
                 //console.log( val, constant );
                 var ins = void 0;
 
-                if (_this2.ins && _this2.ins.length && _this2.ins[key] && !_this2.redraw) {
-                    ins = _this2.ins[key];
-                    ins.width = _this2.width;
-                    ins.height = _this2.height;
+                if (_this3.ins && _this3.ins.length && _this3.ins[key] && !_this3.redraw) {
+                    ins = _this3.ins[key];
+                    ins.width = _this3.width;
+                    ins.height = _this3.height;
                 } else {
                     switch (val.type) {
                         case constant.CHART_TYPE.dount:
                             {
-                                ins = new _index2.default(_this2.box, _this2.width, _this2.height, _this2.camera);
+                                ins = new _index2.default(_this3.box, _this3.width, _this3.height, _this3.camera);
                                 break;
                             }
                         /*case constant.CHART_TYPE.gauge: {
@@ -239,24 +241,27 @@ var VisThree = function (_VisChartBase) {
                         }*/
                     }
                     if (ins) {
-                        _this2.legend && ins.setLegend(_this2.legend);
+                        _this3.legend && ins.setLegend(_this3.legend);
                         ins.setOptions({
-                            renderer: _this2.renderer,
-                            scene: _this2.scene,
-                            camera: _this2.camera,
-                            stage: _this2.stage,
-                            config: _this2.config,
-                            domEvents: _this2.domEvents
+                            renderer: _this3.renderer,
+                            scene: _this3.scene,
+                            camera: _this3.camera,
+                            stage: _this3.stage,
+                            config: _this3.config,
+                            domEvents: _this3.domEvents
                         });
                     }
                 }
 
                 if (ins) {
-                    _this2.options && ins.setOptions(_this2.options);
-                    ins.update(_this2.getLegendData(val), _jsonUtilsx2.default.clone(_this2.data));
+                    _this3.options && ins.setOptions(_this3.options);
 
-                    if (!_this2.ins[key]) {
-                        _this2.ins[key] = ins;
+                    console.log('legend data', _this3.getLegendData(val));
+
+                    ins.update(_this3.getLegendData(val), _jsonUtilsx2.default.clone(_this3.data));
+
+                    if (!_this3.ins[key]) {
+                        _this3.ins[key] = ins;
                     }
                 }
             });

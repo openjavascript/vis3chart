@@ -91,7 +91,7 @@ var Legend = function (_VisChartBase) {
             geometry3d.screenHeight = this.height;
             geometry3d.camera = this.camera;
 
-            console.log('text size', geometry3d.to3d(20));
+            //console.log( 'text size', geometry3d.to3d( 20 ) );
 
             this.data.data.map(function (item, key) {
                 var x = 0,

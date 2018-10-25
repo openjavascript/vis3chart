@@ -94,6 +94,25 @@ export default class VisChartBase {
         window.requestAnimationFrame( ()=>{ this.animationBg() } );
     }
 
+    getPrecision( item ){
+        let r = 0;
+
+        if( this.allData && 'precision' in this.allData ){
+            r = this.allData.precision;
+        }
+
+        if( this.data && 'precision' in this.data ){
+            r = this.data.precision;
+        }
+
+        if( item && 'precision' in item ){
+            r = item.precision;
+        }
+
+        r = Math.pow( 10, r );
+
+        return r;
+    }
 
     addImage( imgUrl, width, height, offsetX = 0, offsetY = 0, rotation = 0, isbase64 = false, opt = {} ){
         let rateW = this.min / this.rateWidth

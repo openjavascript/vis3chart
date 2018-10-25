@@ -165,8 +165,8 @@ export default class VisThree extends VisChartBase {
                     , config: this.config
                     , domEvents: this.domEvents
                     , onChange: ( group ) => {
-                        console.log( 'legend onchange', group );
-                        //this.initChart();
+                        //console.log( 'legend onchange', group );
+                        this.initChart();
                     }
                 });
                 this.legend.update( this.data.legend );
@@ -221,6 +221,9 @@ export default class VisThree extends VisChartBase {
 
             if( ins ){
                 this.options && ( ins.setOptions( this.options ) );
+
+                console.log( 'legend data', this.getLegendData( val ) );
+
                 ins.update( this.getLegendData( val ), ju.clone( this.data ) );
 
                 if( !this.ins[key]  ){

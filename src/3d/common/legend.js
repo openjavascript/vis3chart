@@ -47,7 +47,7 @@ export default class Legend extends VisChartBase  {
         geometry3d.screenHeight = this.height;
         geometry3d.camera = this.camera;
 
-        console.log( 'text size', geometry3d.to3d( 20 ) );
+        //console.log( 'text size', geometry3d.to3d( 20 ) );
 
         this.data.data.map( ( item, key ) => {
             var x = 0, y = 0

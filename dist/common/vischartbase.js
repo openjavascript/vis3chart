@@ -107,6 +107,27 @@ var VisChartBase = function () {
             });
         }
     }, {
+        key: 'getPrecision',
+        value: function getPrecision(item) {
+            var r = 0;
+
+            if (this.allData && 'precision' in this.allData) {
+                r = this.allData.precision;
+            }
+
+            if (this.data && 'precision' in this.data) {
+                r = this.data.precision;
+            }
+
+            if (item && 'precision' in item) {
+                r = item.precision;
+            }
+
+            r = Math.pow(10, r);
+
+            return r;
+        }
+    }, {
         key: 'addImage',
         value: function addImage(imgUrl, width, height) {
             var offsetX = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;

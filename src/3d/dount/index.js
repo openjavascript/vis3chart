@@ -102,6 +102,8 @@ export default class Dount extends VisChartBase  {
         if( !ju.jsonInData( this.data, 'data' ) ) return;
 
         this.clearItems();
+        this.calcVal();
+        this.initText();
         this.calcDataPosition();
         this.initDataLayout();
 
@@ -342,6 +344,7 @@ export default class Dount extends VisChartBase  {
                 , itemData: val
                 , line: mesh
                 , mline: line
+                , realIndex: ii
             };
 
             this.path.push( tmp );
@@ -381,15 +384,15 @@ export default class Dount extends VisChartBase  {
                 line.geometry = meshline.geometry;
 
             if( this.lineLengthCount >= this.lineLength ){
-                this.addIcon( path, layer, i );
-                this.addText( path, layer, i );
+                this.addIcon( path, layer, path.realIndex );
+                this.addText( path, layer, path.realIndex );
             }else{
                 window.requestAnimationFrame( ()=>{ this.animationLine() } );
             }
         }
     }
 
-    addIcon( path, layer, ix ){
+    addIcon( path, layer, key ){
         if( !path.lineicon ){
             var geometry = new THREE.CircleGeometry( 3, 32 );
             var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
@@ -402,34 +405,9 @@ export default class Dount extends VisChartBase  {
         path.lineicon.position.y = path.itemData.lineExpend.y + this.fixCy();
     }
 
-    addText( path, layer, ix ){
+    addText( path, layer, key ){
         if( !path.text ){
-            /*let sprite = path.text = new TextSprite({
-              textSize: 12,
-              redrawInterval: 0,
-              texture: {
-                text: `${path.itemData.percent}%`,
-                fontFamily: 'MicrosoftYaHei, Arial, Helvetica, sans-serif'
-              },
-              material: {
-                color: 0xffffff
-              }
-            });*/
-
-
-            let fontSize = geometry3d.to3d( 30 );
-
-            let texture = new TextTexture({
-              text: `${path.itemData.percent}%`,
-              fontFamily: 'MicrosoftYaHei',
-              fontSize: fontSize * 2,
-              fontStyle: 'italic',
-            });
-            let material = new THREE.SpriteMaterial({map: texture, color: this.lineColor });
-            let sprite = path.text = new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-
-            this.clearList.push( path.text );
+            path.text = this.textar[ key ];
             this.scene.add(path.text);
         }
 
@@ -491,7 +469,30 @@ export default class Dount extends VisChartBase  {
         this.clearList = [];
     }
 
-    calcDataPosition() {
+    initText(){
+        this.textar = [];
+
+        this.realLineWidth = this.lineWidth;
+
+        this.data.data.map( ( val, key ) => {
+
+            let fontSize = geometry3d.to3d( 30 );
+
+            let texture = new TextTexture({
+              text: `${val.percent}%`,
+              fontFamily: 'MicrosoftYaHei',
+              fontSize: fontSize * 2,
+              fontStyle: 'italic',
+            });
+            let material = new THREE.SpriteMaterial({map: texture, color: this.lineColor });
+            let sprite =new THREE.Sprite(material);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
+            this.clearList.push( sprite );
+            this.textar.push( sprite );
+        });
+    }
+
+    calcVal(){
         if( !this.data ) return;
 
         let total = 0, tmp = 0;
@@ -503,14 +504,13 @@ export default class Dount extends VisChartBase  {
         this.total = total;
 
         this.data.data.map( ( val ) => {
-            val._percent =  utils.parseFinance( val.value / total );
+            val._percent =  utils.parseFinance( val.value / total, 8 );
             tmp = utils.parseFinance( tmp + val._percent );
             val._totalPercent = tmp;
 
-            val.percent = parseInt( val._percent * 100 );
+            val.percent = parseInt( val._percent * 100 * this.getPrecision( val ) ) / this.getPrecision( val );
 
             val.endAngle = this.totalAngle * val._totalPercent;
-
         });
 
         //修正浮点数精确度
@@ -519,10 +519,16 @@ export default class Dount extends VisChartBase  {
             tmp = tmp - item._percent;
 
             item._percent = 1 - tmp;
-            item.percent = parseInt( item._percent * 100 );
+            item.percent = parseInt( item._percent * 100 * this.getPrecision( item ) ) / this.getPrecision( item );
             item._totalPercent = 1;
             item.endAngle = this.totalAngle;
         }
+
+    }
+
+
+    calcDataPosition() {
+        if( !this.data ) return;
 
         this.lineRange = {
             "1": []
@@ -536,6 +542,15 @@ export default class Dount extends VisChartBase  {
                 val.startAngle = 0;
             }else{
                 val.startAngle = this.data.data[ key - 1].endAngle;
+            }
+
+            //this.lineWidth = geometry3d.to3d( 80 );
+
+            let text = this.textar[ key ];
+            let textWidth = this.lineWidth;
+
+            if( text.scale.x >= textWidth ){
+                textWidth = text.scale.x;
             }
 
             val.midAngle = val.startAngle + ( val.endAngle - val.startAngle ) / 2;
@@ -567,7 +582,7 @@ export default class Dount extends VisChartBase  {
                         val.lineEnd.x = tmpPoint.x;
                     }
 
-                    val.lineExpend.x = val.lineEnd.x - this.lineWidth
+                    val.lineExpend.x = val.lineEnd.x - textWidth;
 
                     break;
                 }
@@ -583,7 +598,7 @@ export default class Dount extends VisChartBase  {
                         val.lineEnd.x = tmpPoint.x;
                     }
 
-                    val.lineExpend.x = val.lineEnd.x + this.lineWidth
+                    val.lineExpend.x = val.lineEnd.x + textWidth;
                     break;
                 }
             }
