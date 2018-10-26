@@ -194,7 +194,7 @@ export default class Legend extends VisChartBase  {
                 let textTexture = new TextTexture({
                   text: label,
                   fontFamily: 'MicrosoftYaHei',
-                  fontSize: fontSize * 2,
+                  fontSize: fontSize * 5,
                   fontStyle: 'normal',
                   transparent: true
                 });

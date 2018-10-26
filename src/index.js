@@ -91,6 +91,9 @@ export default class VisThree extends VisChartBase {
             this.domEvents   = new THREEx.DomEvents(this.camera, this.renderer.domElement);
 
             //console.log( this.scene, this.camera );
+        }else{
+            this.camera.aspect = this.width / this.height;
+            this.camera.updateProjectionMatrix();
         }
         this.renderer.setSize( this.width, this.height );
 

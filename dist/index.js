@@ -124,6 +124,9 @@ var VisThree = function (_VisChartBase) {
                 this.domEvents = new _threexDomevents2.default.DomEvents(this.camera, this.renderer.domElement);
 
                 //console.log( this.scene, this.camera );
+            } else {
+                this.camera.aspect = this.width / this.height;
+                this.camera.updateProjectionMatrix();
             }
             this.renderer.setSize(this.width, this.height);
 

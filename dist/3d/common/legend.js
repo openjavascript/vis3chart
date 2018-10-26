@@ -229,7 +229,7 @@ var Legend = function (_VisChartBase) {
                     var _textTexture = new _three2.default({
                         text: label,
                         fontFamily: 'MicrosoftYaHei',
-                        fontSize: _fontSize * 2,
+                        fontSize: _fontSize * 5,
                         fontStyle: 'normal',
                         transparent: true
                     });

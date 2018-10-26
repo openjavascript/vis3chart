@@ -535,7 +535,7 @@ var Dount = function (_VisChartBase) {
 
             this.data.data.map(function (val, key) {
 
-                var fontSize = geometry3d.to3d(26);
+                var fontSize = geometry3d.to3d(25);
 
                 var texture = new _three2.default({
                     text: val.percent + '%',
