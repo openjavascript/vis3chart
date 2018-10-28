@@ -290,10 +290,12 @@ export default class VisChartBase {
     }
 
     remove() {
+        return this;
     }
 
     setDestroy(){
         this.isDestroy = 1;
+        return this;
     }
 
     destroy(){
@@ -306,13 +308,19 @@ export default class VisChartBase {
                 item.destroy();
             }
         });
+        return this;
     }
 
     addDestroy( ...item ){
         item && item.length && item.map( val => {
             this.destroyList.push( val );
         });
+        return this;
     }
 
+    dispose(){
+        this.destroy();
+        return this;
+    }
 }
 
