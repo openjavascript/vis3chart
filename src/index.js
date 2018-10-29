@@ -5,6 +5,7 @@ import VisChartBase from './3d/common/base.js';
 import Legend from './3d/common/legend.js';
 
 import Dount from './3d/dount/index.js';
+import Gauge from './3d/gauge/index.js';
 
 import ju from 'json-utilsx';
 import * as constant from './common/constant.js';
@@ -205,10 +206,10 @@ export default class VisThree extends VisChartBase {
                         ins = new Dount( this.box, this.width, this.height, this.camera );
                         break;
                     }
-                    /*case constant.CHART_TYPE.gauge: {
-                        ins = new Gauge( this.box, this.width, this.height );
+                    case constant.CHART_TYPE.gauge: {
+                        ins = new Gauge( this.box, this.width, this.height, this.camera );
                         break;
-                    }*/
+                    }
                 }
                 if( ins ){
                     this.legend && ins.setLegend( this.legend );

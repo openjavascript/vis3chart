@@ -20,6 +20,10 @@ var _index = require('./3d/dount/index.js');
 
 var _index2 = _interopRequireDefault(_index);
 
+var _index3 = require('./3d/gauge/index.js');
+
+var _index4 = _interopRequireDefault(_index3);
+
 var _jsonUtilsx = require('json-utilsx');
 
 var _jsonUtilsx2 = _interopRequireDefault(_jsonUtilsx);
@@ -239,10 +243,11 @@ var VisThree = function (_VisChartBase) {
                                 ins = new _index2.default(_this3.box, _this3.width, _this3.height, _this3.camera);
                                 break;
                             }
-                        /*case constant.CHART_TYPE.gauge: {
-                            ins = new Gauge( this.box, this.width, this.height );
-                            break;
-                        }*/
+                        case constant.CHART_TYPE.gauge:
+                            {
+                                ins = new _index4.default(_this3.box, _this3.width, _this3.height, _this3.camera);
+                                break;
+                            }
                     }
                     if (ins) {
                         _this3.legend && ins.setLegend(_this3.legend);
