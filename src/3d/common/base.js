@@ -133,6 +133,7 @@ export default class ThreeBase extends VisChartBase {
                 let geometry = new THREE.ShapeBufferGeometry( shape );
                 let mesh = new THREE.Mesh( geometry, material );
                 group.add( mesh );
+                this.addDestroy( mesh );
             }
         }
 
@@ -148,6 +149,7 @@ export default class ThreeBase extends VisChartBase {
 
         let pivot = new THREE.Object3D();
         pivot.add( group );
+        this.addDestroy( group );
 
         var scale =  geometry3d.to3d( Math.max( item.width, item.height ) ) / Math.max( box.max.x, size.x );
         if( item.opt.scaleOffset ){
@@ -158,9 +160,9 @@ export default class ThreeBase extends VisChartBase {
 
         pivot.position.y = this.fixCy();
 
-        this.addDestroy( pivot );
 
         this.scene.add( pivot );
+        this.addDestroy( pivot );
 
         let data = { ele: pivot, item: item  };
 

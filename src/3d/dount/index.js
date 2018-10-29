@@ -260,6 +260,7 @@ export default class Dount extends VisChartBase  {
         circle.renderOrder = -1;
         circle.material.depthTest=false;
         group.add( circle );
+        this.addDestroy( circle );
 
         line = new MeshLine();
         material = new MeshLineMaterial( { 
@@ -281,6 +282,7 @@ export default class Dount extends VisChartBase  {
         group.position.y = this.fixCy();
 
         group.add( circle );
+        this.addDestroy( circle );
 
         this.circleLine = group;
 
@@ -321,8 +323,8 @@ export default class Dount extends VisChartBase  {
             mesh.position.y = this.fixCy();
 
             this.scene.add( mesh );
-            this.line.push( mesh );
             this.addDestroy( mesh );
+            this.line.push( mesh );
 
             geometryx = new THREE.RingGeometry( 
                 this.inRadius

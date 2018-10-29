@@ -158,6 +158,7 @@ var ThreeBase = function (_VisChartBase) {
                     var geometry = new THREE.ShapeBufferGeometry(shape);
                     var mesh = new THREE.Mesh(geometry, material);
                     group.add(mesh);
+                    this.addDestroy(mesh);
                 }
             }
 
@@ -172,6 +173,7 @@ var ThreeBase = function (_VisChartBase) {
 
             var pivot = new THREE.Object3D();
             pivot.add(group);
+            this.addDestroy(group);
 
             var scale = geometry3d.to3d(Math.max(item.width, item.height)) / Math.max(box.max.x, size.x);
             if (item.opt.scaleOffset) {
@@ -182,9 +184,8 @@ var ThreeBase = function (_VisChartBase) {
 
             pivot.position.y = this.fixCy();
 
-            this.addDestroy(pivot);
-
             this.scene.add(pivot);
+            this.addDestroy(pivot);
 
             var data = { ele: pivot, item: item };
 

@@ -31,8 +31,6 @@ export default class PointAt {
 
     setDebug( stage ){
         this.stage = stage;
-
-
         let i = 0;
 
         for( let key in this.rects ){
@@ -40,12 +38,9 @@ export default class PointAt {
             let item = this.rects[ key ];
             let params = ju.clone( item );
             params.fill = this.colors[ i % this.colors.length ];
-
-            
             i++;
         }
-
-        this.stage.add( this.layer );
+        //this.stage.add( this.layer );
     }
 
     init(){

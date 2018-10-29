@@ -56,7 +56,7 @@ var Legend = function (_VisChartBase) {
 
         var _this = _possibleConstructorReturn(this, (Legend.__proto__ || Object.getPrototypeOf(Legend)).call(this, box, width, height, camera));
 
-        _this.name = 'Legend ' + Date.now();
+        _this.name = 'Legend_' + Date.now();
 
         _this.textColor = 0x24a3ea;
 
@@ -74,13 +74,6 @@ var Legend = function (_VisChartBase) {
         key: 'setStage',
         value: function setStage(stage) {
             _get(Legend.prototype.__proto__ || Object.getPrototypeOf(Legend.prototype), 'setStage', this).call(this, stage);
-
-            /*
-            this.layer = new Konva.Layer({
-            });
-            this.addDestroy( this.layer );
-             stage.add( this.layer );
-            */
         }
     }, {
         key: 'resize',
@@ -150,7 +143,9 @@ var Legend = function (_VisChartBase) {
                     var bgPlane = new THREE.Mesh(bgGeometry, bgMaterial);
                     bgPlane.position.x = pos.x + geometry3d.to3d(_this2.columnWidth()) / 2;
                     bgPlane.position.y = pos.y;
+
                     group.add(bgPlane);
+                    _this2.addDestroy(bgPlane);
 
                     var rectGeometry = new THREE.PlaneBufferGeometry(geometry3d.to3d(_this2.itemWidth()), geometry3d.to3d(_this2.itemHeight()), 32);
                     var rectMaterial = new THREE.MeshBasicMaterial({
@@ -162,6 +157,7 @@ var Legend = function (_VisChartBase) {
                     rectPlane.position.x = pos.x;
                     rectPlane.position.y = pos.y;
                     group.add(rectPlane);
+                    _this2.addDestroy(rectPlane);
 
                     var fontSize = geometry3d.to3d(22);
 
@@ -180,6 +176,7 @@ var Legend = function (_VisChartBase) {
                     textSprite.position.y = pos.y;
 
                     group.add(textSprite);
+                    _this2.addDestroy(textSprite);
 
                     _this2.scene.add(group);
                     _this2.addDestroy(group);
@@ -194,7 +191,7 @@ var Legend = function (_VisChartBase) {
                         imageAspect: textTexture.imageAspect
                     };
                     _this2.group.push(data);
-                    _this2.domEvents.addEventListener(group, 'click', function () {
+                    _this2.domEvents.bind(group, 'click', function () {
                         data.disabled = !data.disabled;
                         if (data.disabled) {
                             //group.opacity( .6 );
@@ -248,6 +245,7 @@ var Legend = function (_VisChartBase) {
                     }
 
                     _group.add(_textSprite);
+                    _this2.addDestroy(_textSprite);
                 }
             });
             //this.stage.add( this.layer );
@@ -336,12 +334,17 @@ var Legend = function (_VisChartBase) {
     }, {
         key: 'destroy',
         value: function destroy() {
+            var _this3 = this;
+
             _get(Legend.prototype.__proto__ || Object.getPrototypeOf(Legend.prototype), 'destroy', this).call(this);
-            //console.log( this.name, 'destroy' );
+            //console.log( this.name, 'destroy', this.group.length );
 
             this.group && this.group.length && this.group.map(function (item) {
                 //if( !item.ele ) return;
                 //item.ele.off( 'click' );
+                //item.ele.removeEventListener('click');
+                _this3.domEvents.unbind(item.ele, 'click');
+                //console.log( 'remove event', Date.now() );
             });
         }
     }]);

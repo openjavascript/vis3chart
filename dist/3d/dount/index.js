@@ -310,6 +310,7 @@ var Dount = function (_VisChartBase) {
             circle.renderOrder = -1;
             circle.material.depthTest = false;
             group.add(circle);
+            this.addDestroy(circle);
 
             line = new _three5.MeshLine();
             material = new _three5.MeshLineMaterial({
@@ -326,6 +327,7 @@ var Dount = function (_VisChartBase) {
             group.position.y = this.fixCy();
 
             group.add(circle);
+            this.addDestroy(circle);
 
             this.circleLine = group;
 
@@ -373,8 +375,8 @@ var Dount = function (_VisChartBase) {
                 mesh.position.y = this.fixCy();
 
                 this.scene.add(mesh);
-                this.line.push(mesh);
                 this.addDestroy(mesh);
+                this.line.push(mesh);
 
                 geometryx = new THREE.RingGeometry(this.inRadius, this.outRadius, 256, 1, geometry.radians(0), geometry.radians(-0.1));
                 material = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });

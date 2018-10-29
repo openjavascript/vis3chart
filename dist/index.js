@@ -195,7 +195,7 @@ var VisThree = function (_VisChartBase) {
                 if (this.legend && ignoreLegend) {
                     this.emptyblock = 'kao';
                 } else {
-                    this.legend && this.legend.destroy();
+                    this.legend && this.legend.destroy() && (this.legent = null);
                     this.legend = new _legend2.default(this.box, this.width, this.height, this.camera);
                     this.legend.setOptions({
                         renderer: this.renderer,
@@ -302,7 +302,7 @@ var VisThree = function (_VisChartBase) {
             this.ins.map(function (item) {
                 item.destroy();
             });
-            this.legend && this.legend.destroy();
+            //this.legend && this.legend.destroy();
 
             this.stage && this.stage.destroy();
             this.stage = null;
@@ -310,7 +310,7 @@ var VisThree = function (_VisChartBase) {
     }, {
         key: 'clearUpdate',
         value: function clearUpdate() {
-            this.legend && !this.ignoreLegend && this.legend.destroy();
+            //this.legend && !this.ignoreLegend && this.legend.destroy();
         }
     }]);
 

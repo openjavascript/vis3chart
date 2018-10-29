@@ -17,7 +17,7 @@ export default class Legend extends VisChartBase  {
     constructor( box, width, height, camera ){
         super( box, width, height, camera );
 
-        this.name = 'Legend ' + Date.now();
+        this.name = 'Legend_' + Date.now();
 
         this.textColor = 0x24a3ea;
 
@@ -32,14 +32,6 @@ export default class Legend extends VisChartBase  {
 
     setStage( stage ){
         super.setStage( stage );
-
-        /*
-        this.layer = new Konva.Layer({
-        });
-        this.addDestroy( this.layer );
-
-        stage.add( this.layer );
-        */
     }
 
     resize( width, height, data = null, allData = null ){
@@ -106,7 +98,9 @@ export default class Legend extends VisChartBase  {
                 var bgPlane = new THREE.Mesh( bgGeometry, bgMaterial );
                 bgPlane.position.x = pos.x + geometry3d.to3d( this.columnWidth() ) / 2;
                 bgPlane.position.y = pos.y;
+                    
                 group.add( bgPlane );
+                this.addDestroy( bgPlane );
 
                 var rectGeometry = new THREE.PlaneBufferGeometry( 
                     geometry3d.to3d( this.itemWidth() )
@@ -121,6 +115,7 @@ export default class Legend extends VisChartBase  {
                 rectPlane.position.x = pos.x;
                 rectPlane.position.y = pos.y;
                 group.add( rectPlane );
+                this.addDestroy( rectPlane );
 
                 let fontSize = geometry3d.to3d( 22 );
 
@@ -139,6 +134,7 @@ export default class Legend extends VisChartBase  {
                 textSprite.position.y = pos.y;
 
                 group.add( textSprite );
+                this.addDestroy( textSprite );
 
                 this.scene.add( group );
                 this.addDestroy( group );
@@ -153,7 +149,7 @@ export default class Legend extends VisChartBase  {
                     , imageAspect: textTexture.imageAspect
                 };
                 this.group.push( data );
-                this.domEvents.addEventListener( group, 'click', ()=>{
+                this.domEvents.bind( group, 'click', ()=>{
                     data.disabled = !data.disabled;
                     if( data.disabled ){
                         //group.opacity( .6 );
@@ -213,6 +209,7 @@ export default class Legend extends VisChartBase  {
                 }
 
                 group.add( textSprite );
+                this.addDestroy( textSprite );
 
             }
         });
@@ -290,13 +287,16 @@ export default class Legend extends VisChartBase  {
 
     destroy(){
         super.destroy();
-        //console.log( this.name, 'destroy' );
+        //console.log( this.name, 'destroy', this.group.length );
 
         this.group 
             && this.group.length 
             && this.group.map( item => {
                 //if( !item.ele ) return;
                 //item.ele.off( 'click' );
+                //item.ele.removeEventListener('click');
+                this.domEvents.unbind( item.ele, 'click' );
+                //console.log( 'remove event', Date.now() );
             });
     }
 

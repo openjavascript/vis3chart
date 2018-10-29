@@ -161,7 +161,7 @@ export default class VisThree extends VisChartBase {
             if( this.legend && ignoreLegend ){
                 this.emptyblock = 'kao';
             }else{
-                this.legend && this.legend.destroy();
+                this.legend && this.legend.destroy() && (this.legent = null);
                 this.legend = new Legend( this.box, this.width, this.height, this.camera );
                 this.legend.setOptions( {
                     renderer: this.renderer
@@ -262,14 +262,14 @@ export default class VisThree extends VisChartBase {
         this.ins.map( ( item ) => {
             item.destroy();
         });
-        this.legend && this.legend.destroy();
+        //this.legend && this.legend.destroy();
 
         this.stage && this.stage.destroy();
         this.stage = null;
     }
 
     clearUpdate(){
-        this.legend && !this.ignoreLegend && this.legend.destroy();
+        //this.legend && !this.ignoreLegend && this.legend.destroy();
     }
 }
 

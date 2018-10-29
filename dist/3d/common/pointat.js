@@ -45,7 +45,6 @@ var PointAt = function () {
         key: 'setDebug',
         value: function setDebug(stage) {
             this.stage = stage;
-
             var i = 0;
 
             for (var key in this.rects) {
@@ -53,11 +52,9 @@ var PointAt = function () {
                 var item = this.rects[key];
                 var params = _jsonUtilsx2.default.clone(item);
                 params.fill = this.colors[i % this.colors.length];
-
                 i++;
             }
-
-            this.stage.add(this.layer);
+            //this.stage.add( this.layer );
         }
     }, {
         key: 'init',
