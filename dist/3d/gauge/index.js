@@ -16,10 +16,6 @@ var _geometry = require('../../geometry/geometry.js');
 
 var geometry = _interopRequireWildcard(_geometry);
 
-var _geometry3d = require('../../geometry/geometry3d.js');
-
-var geometry3d = _interopRequireWildcard(_geometry3d);
-
 var _pointat = require('../common/pointat.js');
 
 var _pointat2 = _interopRequireDefault(_pointat);
@@ -32,21 +28,9 @@ var _utils = require('../../common/utils.js');
 
 var utils = _interopRequireWildcard(_utils);
 
-var _three = require('three.texttexture');
-
-var _three2 = _interopRequireDefault(_three);
-
-var _three3 = require('three.textsprite');
-
-var _three4 = _interopRequireDefault(_three3);
-
-var _three5 = require('three.meshline');
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -54,7 +38,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var THREE = require('three');
+//import RoundStateText from '../icon/roundstatetext.js';
+
 
 var Gauge = function (_VisChartBase) {
     _inherits(Gauge, _VisChartBase);
@@ -64,7 +49,7 @@ var Gauge = function (_VisChartBase) {
 
         var _this = _possibleConstructorReturn(this, (Gauge.__proto__ || Object.getPrototypeOf(Gauge)).call(this, box, width, height, camera));
 
-        _this.name = 'Dount_' + Date.now();
+        _this.name = 'Gauge' + Date.now();
 
         _this._setSize(width, height);
         return _this;
@@ -75,108 +60,299 @@ var Gauge = function (_VisChartBase) {
         value: function _setSize(width, height) {
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), '_setSize', this).call(this, width, height);
 
-            this.outPercent = .53;
-            this.inPercent = .37;
+            this.totalPostfix = '次/时';
 
-            this.circleLinePercent = .34;
-            this.circlePercent = .31;
+            this.offsetCy = 15;
+
+            this.cy += this.offsetCy;
+
+            this.curRate = 0;
+            this.totalNum = 0;
+            this.totalNumStep = 5;
+
+            this.animationStep = 40 * 1;
+
+            this.roundRadiusPercent = .085;
+
+            this.lineColor = '#596ea7';
+
+            this.circleLinePercent = .26;
+            this.circlePercent = .28;
+
             this.circleLineRotation = 0;
             this.circleLineRotationStep = 4;
 
-            this.animationStep = 8;
-            this.angleStep = 5;
+            this.arcLinePercent = .39 / 2;
 
-            this.textHeight = 26;
-            this.lineOffset = 50;
+            this.arcOutPercent = .38 / 2;
+            this.arcInPercent = .305 / 2;
 
-            this.path = [];
-            this.line = [];
+            this.arcLabelLength = 6;
+            this.arcTextLength = 20;
 
-            this.textOffset = 4;
+            this.arcAngle = 280;
+            this.part = 22;
+            this.arcTotal = 1100;
 
-            this.lineColor = 0x24a3ea;
+            this.textOffset = 0;
 
-            this.lineRange = {
-                "1": [],
-                "2": [],
-                "4": [],
-                "8": []
-            };
+            this.arcOffset = 90 + (360 - this.arcAngle) / 2;
+            this.arcOffsetPad = -5;
+            this.partLabel = this.part / 2;
+            this.partAngle = this.arcAngle / this.part;
+            this.partNum = this.arcTotal / this.part;
 
-            this.lineWidth = 32;
-            this.lineSpace = 10;
-            this.lineAngle = 35;
-            this.lineHeight = 15;
-            this.lineCurveLength = 30;
+            this.textOffsetX = -1;
+            this.textOffsetY = -8;
+            this.textLineLength = 6;
 
-            this.loopSort = [4, 8, 1, 2];
+            this.textRectWidthPercent = .5;
+            this.textRectHeightPercent = .11;
 
-            this.clearList = [];
-
-            this.outRadius = 73;
-            this.inRadius = 53;
-
-            this.lineLength = 25;
-            this.lineLengthCount = 1;
-            this.lineLengthStep = .5;
-
-            this.lineLeft = this.fixCx() - this.outRadius - this.lineSpace;
-            this.lineRight = this.fixCx() + this.outRadius + this.lineSpace;
+            this.textRoundPercent = .38;
+            this.textRoundOffsetAngle = 160;
+            this.textRoundPlusAngle = 110;
+            this.textRoundMaxAngle = this.textRoundOffsetAngle + this.textRoundPlusAngle * 2;
+            this.roundStatusRaidus = 30;
+            this.textRoundAngle = [{
+                angle: this.textRoundOffsetAngle,
+                text: '低',
+                point: {},
+                min: 0,
+                max: 100,
+                radius: this.roundStatusRaidus,
+                lineColor: this.lineColor
+            }, {
+                angle: this.textRoundOffsetAngle + this.textRoundPlusAngle,
+                text: '中',
+                point: {},
+                min: 101,
+                max: 500,
+                radius: this.roundStatusRaidus,
+                lineColor: this.lineColor
+            }, {
+                angle: this.textRoundOffsetAngle + this.textRoundPlusAngle * 2,
+                text: '高',
+                point: {},
+                min: 501,
+                max: Math.pow(10, 10),
+                radius: this.roundStatusRaidus,
+                lineColor: this.lineColor
+            }];
 
             this.init();
         }
     }, {
+        key: 'getAttackRateAngle',
+        value: function getAttackRateAngle() {
+            var r = 0;
+
+            r = this.arcOffset + this.arcAngle * this.getAttackRatePercent();
+
+            return r;
+        }
+    }, {
+        key: 'getAttackRatePercent',
+        value: function getAttackRatePercent() {
+            var r = 0,
+                tmp = void 0;
+            if (this.curRate) {
+                tmp = this.curRate;
+                if (tmp > this.arcTotal) {
+                    tmp = this.arcTotal;
+                }
+
+                r = tmp / this.arcTotal;
+            }
+            return r;
+        }
+    }, {
+        key: 'getAttackText',
+        value: function getAttackText() {
+            var _this2 = this;
+
+            var text = '低';
+
+            if (this.curRate) {
+                this.textRoundAngle.map(function (val) {
+                    if (_this2.curRate >= val.min && _this2.curRate <= val.max) {
+                        text = val.text;
+                    }
+                });
+            }
+
+            return text + '\u9891\n\u653B\u51FB';
+        }
+    }, {
         key: 'init',
         value: function init() {
-            geometry3d.screenWidth = this.width;
-            geometry3d.screenHeight = this.height;
-            geometry3d.camera = this.camera;
+            var _this3 = this;
 
-            this.calcLayoutPosition();
-            return this;
+            this.textRoundRadius = this.width * this.textRoundPercent * this.sizeRate;
+
+            this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
+
+            this.arcInRadius = this.width * this.arcInPercent * this.sizeRate;
+            this.arcOutRadius = this.width * this.arcOutPercent * this.sizeRate;
+
+            this.arcLineRaidus = Math.ceil(this.arcLinePercent * this.max) * this.sizeRate;
+
+            this.textWidth = this.textRectWidthPercent * this.width;
+            this.textHeight = 38 * this.sizeRate;
+            this.textX = this.cx - this.textWidth / 2;
+            this.textY = this.cy + this.arcLineRaidus + this.arcTextLength / 2 + 2;
+
+            this.textRoundAngle.map(function (val, key) {
+                var point = geometry.distanceAngleToPoint(_this3.textRoundRadius, val.angle);
+                val.point = geometry.pointPlus(point, _this3.cpoint);
+                val.point.y += _this3.offsetCy;
+            });
+
+            this.arcPartLineAr = [];
+            this.arcOutlinePartAr = [];
+            this.textAr = [];
+            for (var i = 0; i <= this.part; i++) {
+                var start = void 0,
+                    end = void 0,
+                    angle = void 0;
+                angle = i * this.partAngle + this.arcOffset;
+
+                if (i && i < this.part) {
+                    start = geometry.distanceAngleToPoint(this.arcInRadius, angle);
+                    end = geometry.distanceAngleToPoint(this.arcOutRadius, angle);
+
+                    this.arcPartLineAr.push('M');
+                    this.arcPartLineAr.push([start.x, start.y].join(','));
+                    this.arcPartLineAr.push('L');
+                    this.arcPartLineAr.push([end.x, end.y].join(','));
+                }
+
+                start = geometry.distanceAngleToPoint(this.arcLineRaidus, angle);
+                end = geometry.distanceAngleToPoint(this.arcLineRaidus + this.arcLabelLength, angle);
+
+                this.arcOutlinePartAr.push('M');
+                this.arcOutlinePartAr.push([start.x, start.y].join(','));
+                this.arcOutlinePartAr.push('L');
+                this.arcOutlinePartAr.push([end.x, end.y].join(','));
+
+                if (!(i * this.partNum % 100) || i === 0) {
+                    var angleOffset = 8,
+                        lengthOffset = 0,
+                        rotationOffset = 0;
+
+                    if (i === 0) {
+                        angleOffset = 1;
+                    }
+
+                    if (i >= 19) {
+                        angleOffset = 14;
+                        rotationOffset = 9;
+                    }
+                    if (i >= 21) {
+                        angleOffset = 18;
+                    }
+                    var text = {
+                        text: i * this.partNum,
+                        angle: angle - angleOffset,
+                        point: geometry.distanceAngleToPoint(this.arcLineRaidus + this.arcTextLength + lengthOffset, angle - angleOffset),
+                        rotationOffset: rotationOffset
+                    };
+                    text.textPoint = new _pointat2.default(this.width, this.height, geometry.pointPlus(text.point, this.cpoint));
+
+                    this.textAr.push(text);
+                }
+            }
         }
+    }, {
+        key: 'initRoundText',
+        value: function initRoundText() {
+            this.textRoundAngle.map(function (val) {
+
+                /*
+                if( !val.ins ){
+                    val.ins = new RoundStateText( this.box, this.width, this.height );
+                    val.ins.setOptions( Object.assign( val, {
+                        stage: this.stage
+                        , layer: this.layoutLayer
+                        , data: this.data
+                        , allData: this.allData
+                    }) );
+                    val.ins.init( );
+                }
+                val.ins.update( this.curRate );
+                */
+
+            });
+        }
+        /*
+        {
+        "series": [
+            {
+                "type": "gauge",
+                "data": [
+                    {
+                        "value": 200,
+                        "total": 134567,
+                        "name": "完成率"
+                    }
+                ]
+            }
+        ]
+        }
+        */
+
     }, {
         key: 'update',
         value: function update(data, allData) {
+            var _this4 = this;
+
+            this.stage.removeChildren();
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'update', this).call(this, data, allData);
-            //console.log( THREE );
 
-            this.data = data;
-            this.allData = allData;
+            //console.log( 123, data );
 
-            this.countAngle = 0;
-            this.isDone = 0;
-            this.lineLengthCount = 0;
+            if (data && data.data && data.data.length) {
+                data.data.map(function (val) {
+                    _this4.curRate = val.value;
+                    _this4.totalNum = val.total;
+                });
+            }
 
-            if (!_jsonUtilsx2.default.jsonInData(this.data, 'data')) return;
+            /*
+            this.curRate = 600;
+            this.totalNum = 234567;
+            */
 
-            this.clearItems();
-            this.calcVal();
-            this.initText();
-            this.calcDataPosition();
             this.initDataLayout();
 
-            //console.log( 'dount update', this.data, this, utils );
+            //console.log( 'gauge update', this.getAttackRateAngle() )
+            this.angle = this.arcOffset + this.arcOffsetPad;
+            this.animationAngle = this.getAttackRateAngle() + this.arcOffsetPad;
+            //console.log( this.angle, this.animationAngle );
 
-            this.animation();
+            this.updateWedge();
+
+            if (this.curRate) {
+                this.rateStep = Math.floor(this.curRate / (this.animationStep * 2));
+                !this.inited && this.animation();
+            }
+            if (this.totalNum) {
+                this.totalNumStep = Math.floor(this.totalNum / this.animationStep);
+                this.totalNumStep < 1 && (this.totalNumStep = 1);
+                this.totalNumCount = 0;
+                this.animationText();
+            }
+
             !this.inited && this.animationCircleLine();
 
             this.inited = 1;
-
-            return this;
-        }
-    }, {
-        key: 'reset',
-        value: function reset() {
-            this.path.map(function (val) {
-                val.pathData = [];
-            });
         }
     }, {
         key: 'animationCircleLine',
         value: function animationCircleLine() {
-            var _this2 = this;
+            var _this5 = this;
 
+            //console.log( 'animationCircleLine' );
             if (this.isDestroy) return;
             if (!this.circleLine) return;
 
@@ -184,571 +360,448 @@ var Gauge = function (_VisChartBase) {
                 return;
             }
 
-            this.circleLine.rotation.z -= .03;
+            this.circleLineRotation += this.circleLineRotationStep;
+
+            this.circleLine.rotation(this.circleLineRotation);
+            this.stage.add(this.layoutLayer);
 
             window.requestAnimationFrame(function () {
-                _this2.animationCircleLine();
+                _this5.animationCircleLine();
             });
         }
     }, {
-        key: 'animation',
-        value: function animation() {
-            var _this3 = this;
+        key: 'animationText',
+        value: function animationText() {
+            var _this6 = this;
 
             if (this.isDestroy) return;
-            if (this.isDone) return;
 
-            var tmp = void 0,
-                tmppoint = void 0,
-                step = this.angleStep;
+            if (this.totalNumCount >= this.totalNum) return;
+            this.totalNumCount += this.totalNumStep;
 
-            this.countAngle -= this.animationStep;
+            if (this.totalNumCount >= this.totalNum || !this.isAnimation()) {
+                this.totalNumCount = this.totalNum;
+            };
 
-            if (!this.isSeriesAnimation()) {
-                this.countAngle = this.totalAngle;
-            }
+            this.totalText.text(this.totalNumCount);
+            this.totalTextPostfix.x(this.totalText.textWidth + 5);
 
-            if (this.countAngle <= this.totalAngle || !this.isAnimation()) {
-                this.countAngle = this.totalAngle;
-                this.isDone = 1;
-            }
+            this.totalTextGroup.x((this.width - this.totalTextPostfix.textWidth - this.totalText.textWidth - 5) / 2);
 
-            this.reset();
-
-            for (var i = this.path.length - 1; i >= 0; i--) {
-                //for( let i = 0; i < this.path.length; i++ ){
-                //let i = 2;
-                var item = this.path[i];
-
-                var tmpAngle = this.countAngle;
-
-                if (tmpAngle <= item.itemData.endAngle) {
-                    tmpAngle = item.itemData.endAngle;
-                }
-
-                if (tmpAngle > item.itemData.startAngle) continue;
-
-                var geometryx = new THREE.RingGeometry(this.inRadius, this.outRadius, 256, 1, geometry.radians(0), geometry.radians(tmpAngle));
-
-                item.arc.geometry.dispose();
-                item.arc.geometry = geometryx;
-            }
+            this.layoutLayer.add(this.totalTextGroup);
 
             window.requestAnimationFrame(function () {
-                _this3.animation();
+                _this6.animationText();
             });
+        }
+    }, {
+        key: 'drawText',
+        value: function drawText() {
+            /*
+                    this.totalTextGroup = new Konva.Group();
+                    this.addDestroy( this.totalTextGroup );
+            
+                    let params = {
+                        text: 0 + ''
+                        , fontSize: 30 * this.sizeRate
+                        , fontFamily: 'Agency FB'
+                        , fill: '#ffffff'
+                        , fontStyle: 'italic'
+                        , letterSpacing: 1.5
+                    }, tmp = ju.clone( params );
+                    tmp.text = this.totalNum;
+            
+                    this.totalText = new Konva.Text( params );
+                    this.addDestroy( this.totalText );
+            
+                    let params1 = {
+                        text: this.totalPostfix
+                        , x: this.totalText.textWidth + 5
+                        , fontSize: 12 * this.sizeRate
+                        , fontFamily: 'MicrosoftYaHei'
+                        , fill: '#ffffff'
+                        , fontStyle: 'italic'
+                        , letterSpacing: 1.5
+                    };
+            
+                    this.totalTextPostfix = new Konva.Text( params1 );
+                    this.totalTextPostfix.y( this.totalText.textHeight - this.totalTextPostfix.textHeight - 4 );
+                    this.addDestroy( this.totalTextPostfix );
+            
+                    this.totalTextGroup.add( this.totalText );
+                    this.totalTextGroup.add( this.totalTextPostfix );
+            
+                    //console.log( this.totalTextGroup, this.totalTextGroup.getClipWidth(), this.totalTextGroup.width(), this.totalTextGroup.size()  );
+            
+                    //this.totalTextGroup.x( this.cx - this.totalTextGroup.width / 2 );
+                    this.totalTextGroup.y( this.textY);
+                    this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+            
+                    this.tmpTotalText = new Konva.Text( tmp );
+                    this.addDestroy( this.tmpTotalText );
+            
+            */
+        }
+    }, {
+        key: 'drawTextRect',
+        value: function drawTextRect() {
 
-            if (this.isDone) {
-                window.requestAnimationFrame(function () {
-                    _this3.animationLine();
-                });
+            var textWidth = this.tmpTotalText.textWidth + 30 + this.totalTextPostfix.textWidth + 5,
+                textX = 0,
+                textY = 0;
+
+            if (textWidth < 170) {
+                textWidth = 170;
             }
+            textX = this.cx - textWidth / 2 + 2;;
+
+            textY = this.textY - (this.textHeight - this.totalText.textHeight) / 2;
+            /*
+                    this.textRect = new Konva.Rect( {
+                        fill: '#596ea7'
+                        , stroke: '#ffffff00'
+                        , strokeWidth: 0
+                        , opacity: .3
+                        , width: textWidth
+                        , height: this.textHeight
+                        , x: textX
+                        , y: textY
+                    });
+                    this.addDestroy( this.textRect );
+            
+                    let points = [];
+                    points.push( 'M', [ textX, textY + this.textLineLength ].join(',') );
+                    points.push( 'L', [ textX, textY ].join(',') );
+                    points.push( 'L', [ textX + this.textLineLength, textY ].join(',') );
+            
+                    points.push( 'M', [ textX + textWidth - this.textLineLength, textY ].join(',') );
+                    points.push( 'L', [ textX + textWidth, textY ].join(',') );
+                    points.push( 'L', [ textX + textWidth, textY + this.textLineLength ].join(',') );
+            
+                    points.push( 'M', [ textX + textWidth, textY + this.textHeight - this.textLineLength ].join(',') );
+                    points.push( 'L', [ textX + textWidth, textY + this.textHeight ].join(',') );
+                    points.push( 'L', [ textX + textWidth - this.textLineLength, textY + this.textHeight ].join(',') );
+            
+                    points.push( 'M', [ textX + this.textLineLength, textY + this.textHeight ].join(',') );
+                    points.push( 'L', [ textX, textY + this.textHeight ].join(',') );
+                    points.push( 'L', [ textX, textY + this.textHeight - this.textLineLength ].join(',') );
+            
+                    this.textLinePath = new Konva.Path( {
+                        data: points.join('')
+                        , stroke: this.lineColor
+                        , strokeWidth: 1
+                    });
+                    this.addDestroy( this.textLinePath );
+            
+                    this.layoutLayer.add( this.textLinePath );
+                    this.layoutLayer.add( this.textRect );
+                    //this.layoutLayer.add( this.totalText );
+                    this.layoutLayer.add( this.totalTextGroup );*/
         }
     }, {
-        key: 'drawCircle',
-        value: function drawCircle() {
-            this.circleRadius = geometry3d.to3d(Math.ceil(this.circlePercent * this.min / 2));
-            //console.log( this.circleRadius );
+        key: 'drawArcText',
+        value: function drawArcText() {
+            if (!(this.textAr && this.textAr.length)) return;
 
-            var line = new _three5.MeshLine();
-
-            var curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
-            this.circleRadius, this.circleRadius, 0, 2 * Math.PI, // aStartAngle, aEndAngle
-            false, // aClockwise
-            0 // aRotation
-            );
-
-            var points = curve.getPoints(200);
-            var geometryy = new THREE.Geometry().setFromPoints(points);
-
-            curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
-            this.circleRadius, this.circleRadius, 0, geometry.radians(10), // aStartAngle, aEndAngle
-            false, // aClockwise
-            geometry.radians(.5) // aRotation
-            );
-
-            points = [].concat(_toConsumableArray(points), _toConsumableArray(curve.getPoints(50)));
-
-            geometryy = new THREE.Geometry().setFromPoints(points);
-
-            line.setGeometry(geometryy);
-            var material = new _three5.MeshLineMaterial({
-                color: new THREE.Color(this.lineColor),
-                lineWidth: 2
+            this.textAr.map(function (val) {
+                /*let text = new Konva.Text( {
+                    x: val.point.x + this.cx
+                    , y: val.point.y + this.cy
+                    , text: val.text + ''
+                    , fontSize: 11 * this.sizeRate
+                    //, rotation: val.angle
+                    , fontFamily: 'MicrosoftYaHei'
+                    , fill: this.lineColor
+                });
+                this.addDestroy( text );
+                 text.rotation( val.angle + 90 + ( val.rotationOffset || 0 ) );
+                 this.layoutLayer.add( text );*/
             });
-
-            var circle = new THREE.Mesh(line.geometry, material);
-
-            circle.renderOrder = -1;
-            circle.material.depthTest = false;
-
-            this.scene.add(circle);
-            this.addDestroy(circle);
         }
     }, {
-        key: 'drawCircleLine',
-        value: function drawCircleLine() {
-            this.circleLineRadius = geometry3d.to3d(Math.ceil(this.circleLinePercent * this.min / 2));
+        key: 'drawArcLine',
+        value: function drawArcLine() {
 
-            var material = void 0,
-                geometryItem = void 0,
-                circle = void 0,
-                group = void 0,
-                line = void 0;
+            var points = [];
+            points.push('M');
+            for (var i = this.arcOffset; i <= this.arcOffset + this.arcAngle; i += 0.5) {
+                var tmp = geometry.distanceAngleToPoint(this.arcLineRaidus, i);
+                points.push([tmp.x, tmp.y].join(',') + ',');
+                if (i == 90) {
+                    points.push('L');
+                }
+            }
+            /*
+                    this.arcLine = new Konva.Path( {
+                        data: points.join('')
+                        , x: this.cx
+                        , y: this.cy
+                        , stroke: this.lineColor
+                        , strokeWidth: 1
+                        , fill: '#ffffff00'
+                    });
+                    this.addDestroy( this.arcLine );
+            
+                    this.arcPartLine = new Konva.Path( {
+                        data: this.arcPartLineAr.join('')
+                        , x: this.cx
+                        , y: this.cy
+                        , stroke: '#00000088'
+                        , strokeWidth: 1
+                        , fill: '#ffffff00'
+                    });
+                    this.addDestroy( this.arcPartLine );
+            
+                    this.arcOutlinePart = new Konva.Path( {
+                        data: this.arcOutlinePartAr.join('')
+                        , x: this.cx
+                        , y: this.cy
+                        , stroke: this.lineColor
+                        , strokeWidth: 1
+                        , fill: '#ffffff00'
+                    });
+                    this.addDestroy( this.arcOutlinePart );
+            
+                    this.layoutLayer.add( this.arcLine );
+                    this.layoutLayer.add( this.arcPartLine );
+                    this.layoutLayer.add( this.arcOutlinePart );
+            */
+        }
+    }, {
+        key: 'drawArc',
+        value: function drawArc() {
 
-            group = new THREE.Group();
-
-            line = new _three5.MeshLine();
-            material = new _three5.MeshLineMaterial({
-                color: new THREE.Color(this.lineColor),
-                lineWidth: 2
-            });
-            geometryItem = new THREE.CircleGeometry(this.circleLineRadius, 128, geometry.radians(90), geometry.radians(90));
-            geometryItem.vertices.shift();
-            line.setGeometry(geometryItem);
-            circle = new THREE.Line(line.geometry, material);
-            circle.renderOrder = -1;
-            circle.material.depthTest = false;
-            group.add(circle);
-
-            line = new _three5.MeshLine();
-            material = new _three5.MeshLineMaterial({
-                color: new THREE.Color(this.lineColor),
-                lineWidth: 2
-            });
-            geometryItem = new THREE.CircleGeometry(this.circleLineRadius, 128, geometry.radians(0), geometry.radians(-90));
-            geometryItem.vertices.shift();
-            line.setGeometry(geometryItem);
-            circle = new THREE.Line(line.geometry, material);
-            circle.renderOrder = -1;
-            circle.material.depthTest = false;
-
-            group.position.y = this.fixCy();
-
-            group.add(circle);
-
-            this.circleLine = group;
-
-            this.scene.add(group);
-            this.addDestroy(group);
+            var params = {
+                x: this.cx,
+                y: this.cy,
+                innerRadius: this.arcInRadius,
+                outerRadius: this.arcOutRadius,
+                angle: this.arcAngle
+                //, fill: 'red'
+                , stroke: '#ffffff00',
+                strokeWidth: 0,
+                rotation: this.arcOffset,
+                fillLinearGradientStartPoint: { x: -50, y: -50 },
+                fillLinearGradientEndPoint: { x: 50, y: 50 },
+                fillLinearGradientColorStops: [0, '#ff9000', .5, '#64b185', 1, '#5a78ca']
+            };
+            /*
+            this.arc = new Konva.Arc( params );
+            this.addDestroy( this.arc );
+             this.layoutLayer.add( this.arc );
+            */
         }
     }, {
         key: 'initDataLayout',
         value: function initDataLayout() {
 
-            this.drawCircle();
-            this.drawCircleLine();
-
-            this.path = [];
-            this.line = [];
-
-            for (var ii = this.data.data.length - 1; ii >= 0; ii--) {
-                var val = this.data.data[ii],
-                    key = ii;
-                var pathindex = this.data.data.length - 1 - ii;
-
-                var color = this.colors[key % this.colors.length];
-
-                if (_jsonUtilsx2.default.jsonInData(val, 'itemStyle.color')) {
-                    //path.fill( val.itemStyle.color );
-                    color = val.itemStyle.color;
-                }
-                color = this.parseColor(color);
-
-                var line = void 0,
-                    material = void 0,
-                    geometryx = void 0,
-                    mesh = void 0,
-                    arc = void 0,
-                    tmp = void 0;
-
-                line = new _three5.MeshLine();
-                material = new _three5.MeshLineMaterial({
-                    color: new THREE.Color(0xffffff),
-                    lineWidth: 2
-                });
-                geometryx = new THREE.Geometry();
-                line.setGeometry(geometryx);
-                mesh = new THREE.Mesh(line.geometry, material);
-                mesh.position.y = this.fixCy();
-
-                this.scene.add(mesh);
-                this.line.push(mesh);
-                this.addDestroy(mesh);
-
-                geometryx = new THREE.RingGeometry(this.inRadius, this.outRadius, 256, 1, geometry.radians(0), geometry.radians(-0.1));
-                material = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
-                arc = new THREE.Mesh(geometryx, material);
-                arc.renderOrder = 1;
-
-                arc.position.y = this.fixCy();
-
-                this.scene.add(arc);
-                this.addDestroy(arc);
-
-                tmp = {
-                    arc: arc,
-                    pathData: [],
-                    itemData: val,
-                    line: mesh,
-                    mline: line,
-                    realIndex: ii
-                };
-
-                this.path.push(tmp);
-            };
-
-            return this;
-        }
-    }, {
-        key: 'animationLine',
-        value: function animationLine() {
-            var _this4 = this;
-
-            if (this.lineLengthCount >= this.lineLength) {
-                return;
-            }
-            this.lineLengthCount = this.lineLength;
-
-            this.lineLengthCount += this.lineLengthStep;
-
-            if (this.lineLengthCount >= this.lineLength || !this.isAnimation()) {
-                this.lineLengthCount = this.lineLength;
-            }
-            for (var i = 0; i < this.path.length; i++) {
-                var path = this.path[i];
-                var layer = this.arcLayer;
-
-                var lineEnd = path.itemData.lineEnd;
-                var lineExpend = path.itemData.lineExpend;
-
-                var line = this.line[i];
-
-                var meshline = new _three5.MeshLine();
-                var geometryx = new THREE.Geometry();
-                geometryx.vertices.push(new THREE.Vector3(path.itemData.lineStart.x, path.itemData.lineStart.y, 0), new THREE.Vector3(lineEnd.x, lineEnd.y, 0), new THREE.Vector3(lineExpend.x, lineExpend.y, 0));
-                meshline.setGeometry(geometryx);
-                line.geometry = meshline.geometry;
-
-                if (this.lineLengthCount >= this.lineLength) {
-                    this.addIcon(path, layer, path.realIndex);
-                    this.addText(path, layer, path.realIndex);
-                } else {
-                    window.requestAnimationFrame(function () {
-                        _this4.animationLine();
-                    });
-                }
-            }
-        }
-    }, {
-        key: 'addIcon',
-        value: function addIcon(path, layer, key) {
-            if (!path.lineicon) {
-                var geometry = new THREE.CircleGeometry(3, 32);
-                var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                var circle = new THREE.Mesh(geometry, material);
-                path.lineicon = circle;
-                this.scene.add(circle);
-                this.addDestroy(circle);
-            }
-
-            path.lineicon.position.x = path.itemData.lineExpend.x;
-            path.lineicon.position.y = path.itemData.lineExpend.y + this.fixCy();
-        }
-    }, {
-        key: 'addText',
-        value: function addText(path, layer, key) {
-            if (!path.text) {
-                path.text = this.textar[key];
-                this.scene.add(path.text);
-                this.addDestroy(path.text);
-            }
-
-            var text = path.text;
-
-            var textPoint = path.itemData.textPoint,
-                angleDirect = path.itemData.pointDirection.autoAngle();
-
-            textPoint = _jsonUtilsx2.default.clone(path.itemData.lineEnd);
-
-            var textX = textPoint.x,
-                textY = textPoint.y + this.fixCy(),
-                direct = path.itemData.pointDirection.auto();
-            text.position.x = textX;
-            text.position.y = textY;
-
-            var position = new THREE.Vector3();
-            position.setFromMatrixPosition(text.matrixWorld);
-
-            text.position.y = textY + text.scale.y / 2 - geometry3d.to3d(3);
-
-            switch (angleDirect) {
-                case 8:
-                case 1:
-                    {
-                        text.position.x = textX - text.scale.x / 2 + 2;
-                        break;
-                    }
-                default:
-                    {
-                        text.position.x = textX + text.scale.x / 2 - 2;
-                        break;
-                    }
-            }
-        }
-    }, {
-        key: 'calcLayoutPosition',
-        value: function calcLayoutPosition() {
-            this.inRadius = geometry3d.to3d(Math.ceil(this.inPercent * this.min / 2));
-            this.outRadius = geometry3d.to3d(Math.ceil(this.outPercent * this.min / 2));
-
-            this.lineHeight = geometry3d.to3d(24);
-            this.lineWidth = geometry3d.to3d(50);
-            this.lineLength = geometry3d.to3d(22);
-
-            return this;
-        }
-    }, {
-        key: 'destroy',
-        value: function destroy() {
-            this.clearItems();
-            _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'destroy', this).call(this);
-        }
-    }, {
-        key: 'clearItems',
-        value: function clearItems() {
-            var _this5 = this;
-
-            this.clearList.map(function (item, key) {
-                _this5.dispose(item);
+            if (!this.inited) {}
+            /*
+            this.layer = new Konva.Layer();
+            this.addDestroy(this.layer );
+            
+            this.layoutLayer = new Konva.Layer();
+            this.addDestroy( this.layoutLayer );
+             this.roundLine = new Konva.Circle( {
+                x: this.cx
+                , y: this.cy
+                , radius: this.roundRadius
+                , stroke: this.lineColor
+                , strokeWidth: 2.5
+                , fill: 'rgba( 0, 0, 0, .5 )'
             });
-            this.clearList = [];
+            this.addDestroy( this.roundLine );
+            */
+
+            /*
+                    if( !this.inited ){
+                        this.percentText = new Konva.Text( {
+                            x: this.cx
+                            , y: this.cy
+                            , text: this.getAttackText()
+                            , fontSize: 18 * this.sizeRate
+                            , fontFamily: 'HuXiaoBoKuHei'
+                            , fill: '#ffffff'
+                            , fontStyle: 'italic'
+                        });
+                        this.addDestroy( this.percentText );
+                    }
+                    this.percentText.text( this.getAttackText() );
+                    this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
+                    this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
+            */
+            /*
+                   if( !this.inited ){
+                       let wedge = new Konva.Wedge({
+                          x: 0,
+                          y: -3,
+                          radius: 10,
+                          angle: 20,
+                          fill: '#ff5a00',
+                          stroke: '#ff5a00',
+                          strokeWidth: 1,
+                          rotation: 90
+                        });
+                        this.addDestroy( wedge );
+            
+                       let wedge1 = new Konva.Wedge({
+                          x: 0,
+                          y: -3,
+                          radius: 10,
+                          angle: 20,
+                          fill: '#973500',
+                          stroke: '#973500',
+                          strokeWidth: 1,
+                          rotation: 65
+                        });
+                        this.addDestroy( wedge1 );
+            
+                        let group = new Konva.Group({
+                            x: this.cx
+                            , y: this.cy
+                        });
+                        this.addDestroy( group );
+            
+                        group.add( wedge1 );
+                        group.add( wedge );
+            
+                        this.group = group;
+                    }
+            
+            
+                    this.initRoundText();
+            
+                    if( !this.inited ){
+                        this.angle = this.arcOffset - 2;
+                       
+                        this.layer.add( this.group );
+                        this.layer.add( this.roundLine );
+                        this.layer.add( this.percentText );
+                        //this.layer.add( this.percentSymbolText );
+            
+            
+                        this.drawCircle();
+                        this.drawCircleLine();
+                        this.drawArc();
+                        this.drawArcLine();
+                        this.drawArcText();
+                        this.drawText();
+                        this.drawTextRect();
+                    }
+            
+            
+                    this.stage.add( this.layer );
+                    this.stage.add( this.layoutLayer );
+            */
         }
     }, {
-        key: 'initText',
-        value: function initText() {
-            var _this6 = this;
-
-            this.textar = [];
-
-            this.realLineWidth = this.lineWidth;
-
-            this.data.data.map(function (val, key) {
-
-                var fontSize = geometry3d.to3d(25);
-                var texture = new _three2.default({
-                    text: val.percent + '%',
-                    fontFamily: 'MicrosoftYaHei',
-                    //fontSize: fontSize * 2,
-                    fontSize: fontSize * 2,
-                    fontStyle: 'italic'
-                });
-                var material = new THREE.SpriteMaterial({ map: texture, color: _this6.lineColor });
-                var sprite = new THREE.Sprite(material);
-                sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-                _this6.clearList.push(sprite);
-                _this6.textar.push(sprite);
-            });
-        }
-    }, {
-        key: 'calcVal',
-        value: function calcVal() {
+        key: 'animation',
+        value: function animation() {
             var _this7 = this;
 
-            if (!this.data) return;
+            //console.log( this.angle, this.animationAngle );
+            if (this.isDestroy) return;
+            if (this.angle > this.animationAngle) return;
 
-            var total = 0,
-                tmp = 0;
+            this.angle += this.rateStep;
 
-            this.data.data.map(function (val) {
-                //console.log( val );
-                total += val.value;
+            if (this.angle >= this.animationAngle || !this.isAnimation()) {
+                this.angle = this.animationAngle;
+            };
+
+            this.updateWedge();
+
+            this.stage.add(this.layer);
+
+            window.requestAnimationFrame(function () {
+                _this7.animation();
             });
-            this.total = total;
-
-            this.data.data.map(function (val) {
-                val._percent = utils.parseFinance(val.value / total, 8);
-                tmp = utils.parseFinance(tmp + val._percent);
-                val._totalPercent = tmp;
-
-                val.percent = parseInt(val._percent * 100 * _this7.getPrecision(val)) / _this7.getPrecision(val);
-
-                val.endAngle = _this7.totalAngle * val._totalPercent;
-            });
-
-            //修正浮点数精确度
-            if (this.data.data.length) {
-                var item = this.data.data[this.data.data.length - 1];
-                tmp = tmp - item._percent;
-
-                item._percent = 1 - tmp;
-                item.percent = parseInt(item._percent * 100 * this.getPrecision(item)) / this.getPrecision(item);
-                item._totalPercent = 1;
-                item.endAngle = this.totalAngle;
-            }
+        }
+    }, {
+        key: 'updateWedge',
+        value: function updateWedge() {
+            var point = geometry.distanceAngleToPoint(this.roundRadius + 6, this.angle);
+            this.group.x(this.cx + point.x);
+            this.group.y(this.cy + point.y);
+            this.group.rotation(this.angle + 90);
+            this.group.rotation(this.angle + 90);
+            this.stage.add(this.layer);
         }
     }, {
         key: 'calcDataPosition',
-        value: function calcDataPosition() {
-            var _this8 = this;
+        value: function calcDataPosition() {}
+    }, {
+        key: 'animationLine',
+        value: function animationLine() {}
+    }, {
+        key: 'addIcon',
+        value: function addIcon(path, layer) {}
+    }, {
+        key: 'addText',
+        value: function addText(path, layer) {}
+    }, {
+        key: 'calcLayoutPosition',
+        value: function calcLayoutPosition() {}
+    }, {
+        key: 'drawCircle',
+        value: function drawCircle() {
+            this.circleRadius = Math.ceil(this.circlePercent * this.max / 2) * this.sizeRate;
+            /*
+                    this.circle = new Konva.Circle( {
+                        x: this.cx
+                        , y: this.cy
+                        , radius: this.circleRadius
+                        , stroke: this.lineColor
+                        , strokeWidth: 1
+                        , fill: '#ffffff00'
+                    });
+                    this.addDestroy( this.circle );
+                    this.layoutLayer.add( this.circle );*/
+        }
+    }, {
+        key: 'drawCircleLine',
+        value: function drawCircleLine() {
+            this.circleLineRadius = Math.ceil(this.circleLinePercent * this.max / 2) * this.sizeRate;
 
-            if (!this.data) return;
-
-            this.lineRange = {
-                "1": [],
-                "2": [],
-                "4": [],
-                "8": []
-                //计算开始角度, 计算指示线的2端
-            };this.data.data.map(function (val, key) {
-                if (!key) {
-                    val.startAngle = 0;
-                } else {
-                    val.startAngle = _this8.data.data[key - 1].endAngle;
+            var points = [];
+            points.push('M');
+            for (var i = 90; i <= 180; i++) {
+                var tmp = geometry.distanceAngleToPoint(this.circleLineRadius, i + 90);
+                points.push([tmp.x, tmp.y].join(',') + ',');
+                if (i == 90) {
+                    points.push('L');
                 }
-
-                //this.lineWidth = geometry3d.to3d( 80 );
-
-                var text = _this8.textar[key];
-                var textWidth = _this8.lineWidth;
-
-                if (text.scale.x >= textWidth) {
-                    textWidth = text.scale.x;
+            }
+            points.push('M');
+            for (var _i = 270; _i <= 360; _i++) {
+                var _tmp = geometry.distanceAngleToPoint(this.circleLineRadius, _i + 90);
+                points.push([_tmp.x, _tmp.y].join(',') + ',');
+                if (_i == 270) {
+                    points.push('L');
                 }
-
-                val.midAngle = val.startAngle + (val.endAngle - val.startAngle) / 2;
-
-                val.lineStart = geometry.distanceAngleToPoint(_this8.outRadius - 2, val.midAngle);
-                val.lineEnd = geometry.distanceAngleToPoint(_this8.outRadius + _this8.lineLength, val.midAngle);
-
-                val.textPoint = geometry.distanceAngleToPoint(_this8.outRadius + _this8.lineLength, val.midAngle);
-
-                val.pointDirection = new _pointat2.default(_this8.fixWidth(), _this8.fixHeight(), geometry.pointPlus(val.textPoint, _this8.cpoint));
-                var lineAngle = val.pointDirection.autoAngle();
-                val.lineExpend = _jsonUtilsx2.default.clone(val.lineEnd);
-
-                //console.log( 'lineAngle', lineAngle,  val.midAngle );
-
-                switch (lineAngle) {
-                    case 1:
-                    case 8:
-                        {
-                            //val.lineEnd.x = this.lineLeft;
-                            val.lineEnd.x = -(_this8.outRadius + _this8.lineSpace);
-
-                            var tmp = geometry.pointDistance(val.lineStart, val.lineEnd);
-                            if (tmp > _this8.lineCurveLength) {
-                                var tmpAngle = geometry.pointAngle(val.lineStart, val.lineEnd),
-                                    tmpPoint = geometry.distanceAngleToPoint(_this8.lineCurveLength, tmpAngle);
-                                tmpPoint = geometry.pointPlus(tmpPoint, val.lineStart);
-
-                                val.lineEnd.x = tmpPoint.x;
-                            }
-
-                            val.lineExpend.x = val.lineEnd.x - textWidth;
-
-                            break;
-                        }
-                    default:
-                        {
-                            val.lineEnd.x = _this8.outRadius + _this8.lineSpace;
-                            var _tmp = geometry.pointDistance(val.lineStart, val.lineEnd);
-                            if (_tmp > _this8.lineCurveLength) {
-                                var _tmpAngle = geometry.pointAngle(val.lineStart, val.lineEnd),
-                                    _tmpPoint = geometry.distanceAngleToPoint(_this8.lineCurveLength, _tmpAngle);
-                                _tmpPoint = geometry.pointPlus(_tmpPoint, val.lineStart);
-
-                                val.lineEnd.x = _tmpPoint.x;
-                            }
-
-                            val.lineExpend.x = val.lineEnd.x + textWidth;
-                            break;
-                        }
-                }
-
-                _this8.lineRange[lineAngle].push(val);
-            });
-
-            this.loopSort.map(function (key) {
-                var item = _this8.lineRange[key];
-                if (!(item && item.length && item.length > 1)) return;
-                var needFix = void 0;
-                for (var i = 1; i < item.length; i++) {
-                    var pre = item[i - 1],
-                        cur = item[i];
-                    if (Math.abs(cur.lineEnd.y - pre.lineEnd.y) < _this8.lineHeight) {
-                        needFix = 1;
-                        break;
-                    }
-                }
-                switch (key) {
-                    case 4:
-                        {
-                            var tmpY = 0;
-                            for (var _i = item.length - 2; _i >= 0; _i--) {
-                                var _pre = item[_i + 1],
-                                    _cur = item[_i];
-                                if (Math.abs(_pre.lineEnd.y - _cur.lineEnd.y) < _this8.lineHeight || _cur.lineEnd.y <= _pre.lineEnd.y) {
-                                    tmpY = _pre.lineEnd.y + _this8.lineHeight;
-                                    _cur.lineEnd.y = tmpY;
-                                    _cur.lineExpend.y = tmpY;
-                                }
-                            }
-                            break;
-                        }
-
-                    case 1:
-                        {
-                            var _tmpY = item[0].lineEnd.y;
-                            for (var _i2 = item.length - 2; _i2 >= 0; _i2--) {
-                                var _pre2 = item[_i2 + 1],
-                                    _cur2 = item[_i2];
-                                if (Math.abs(_pre2.lineEnd.y - _cur2.lineEnd.y) < _this8.lineHeight || _cur2.lineEnd.y >= _pre2.lineEnd.y) {
-                                    _tmpY = _pre2.lineEnd.y - _this8.lineHeight;
-                                    _cur2.lineEnd.y = _tmpY;
-                                    _cur2.lineExpend.y = _tmpY;
-                                }
-                            }
-                            break;
-                        }
-                    case 2:
-                        {
-                            var _tmpY2 = item[0].lineEnd.y;
-                            for (var _i3 = 1; _i3 < item.length; _i3++) {
-                                var _pre3 = item[_i3 - 1],
-                                    _cur3 = item[_i3],
-                                    zero = item[0];
-
-                                if (Math.abs(_pre3.lineEnd.y + _this8.fixCy()) < _this8.lineHeight) {
-                                    _pre3.lineExpend.y = _pre3.lineEnd.y = _pre3.lineExpend.y + _this8.lineHeight;
-                                }
-                                if (Math.abs(_pre3.lineEnd.y - _cur3.lineEnd.y) < _this8.lineHeight || _cur3.lineEnd.y >= _pre3.lineEnd.y) {
-
-                                    _tmpY2 = _pre3.lineEnd.y - _this8.lineHeight;
-                                    _cur3.lineEnd.y = _tmpY2;
-                                    _cur3.lineExpend.y = _tmpY2;
-                                }
-                            }
-
-                            break;
-                        }
-
-                    case 8:
-                        {
-                            var _tmpY3 = 0;
-                            for (var _i4 = 1; _i4 < item.length; _i4++) {
-                                var _pre4 = item[_i4 - 1],
-                                    _cur4 = item[_i4];
-                                if (Math.abs(_pre4.lineEnd.y - _cur4.lineEnd.y) < _this8.lineHeight || _cur4.lineEnd.y <= _pre4.lineEnd.y) {
-                                    _tmpY3 = _pre4.lineEnd.y + _this8.lineHeight;
-                                    _cur4.lineEnd.y = _tmpY3;
-                                    _cur4.lineExpend.y = _cur4.lineEnd.y;
-                                }
-                            }
-
-                            break;
-                        }
-                }
+            }
+            /*
+                    this.circleLine = new Konva.Path( {
+                        data: points.join('')
+                        , x: this.cx
+                        , y: this.cy
+                        , stroke: this.lineColor
+                        , strokeWidth: 1.5
+                        , fill: '#ffffff00'
+                    });
+                    this.addDestroy( this.circleLine );
+            
+                    this.layoutLayer.add( this.circleLine );*/
+        }
+    }, {
+        key: 'reset',
+        value: function reset() {}
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'destroy', this).call(this);
+            this.textRoundAngle.map(function (val) {
+                if (val.ins) val.ins.destroy();
             });
         }
     }]);

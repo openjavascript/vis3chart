@@ -1,7 +1,6 @@
 
 import VisChartBase from '../common/base.js';
 import * as geometry from '../../geometry/geometry.js';
-import * as geometry3d from '../../geometry/geometry3d.js';
 
 import PointAt from '../common/pointat.js';
 
@@ -9,18 +8,14 @@ import ju from 'json-utilsx';
 
 import * as utils from '../../common/utils.js';
 
-const THREE = require( 'three' );
-
-import TextTexture from 'three.texttexture';
-import TextSprite from 'three.textsprite';
-
-import {MeshLine, MeshLineMaterial} from 'three.meshline'
+//import RoundStateText from '../icon/roundstatetext.js';
 
 
 export default class Gauge extends VisChartBase  {
     constructor( box, width, height, camera ){
         super( box, width, height, camera );
-        this.name = 'Dount_' + Date.now();
+
+        this.name = 'Gauge' + Date.now();
 
         this._setSize( width, height );
     }
@@ -28,660 +23,721 @@ export default class Gauge extends VisChartBase  {
     _setSize( width, height ){
         super._setSize( width, height );
 
-        this.outPercent = .53;
-        this.inPercent = .37;
+        this.totalPostfix = '次/时';
 
-        this.circleLinePercent = .34;
-        this.circlePercent = .31;
+        this.offsetCy = 15;
+
+        this.cy += this.offsetCy;
+
+        this.curRate = 0;
+        this.totalNum = 0;
+        this.totalNumStep = 5;
+
+        this.animationStep = 40 * 1;
+
+        this.roundRadiusPercent = .085;
+
+        this.lineColor = '#596ea7';
+
+        this.circleLinePercent = .26;
+        this.circlePercent = .28;
+
         this.circleLineRotation = 0;
         this.circleLineRotationStep = 4;
 
-        this.animationStep = 8;
-        this.angleStep = 5;
+        this.arcLinePercent = .39 / 2;
 
-        this.textHeight = 26;
-        this.lineOffset = 50;
+        this.arcOutPercent = .38 / 2;
+        this.arcInPercent = .305 / 2;
 
-        this.path = [];
-        this.line = [];
+        this.arcLabelLength = 6;
+        this.arcTextLength = 20;
 
-        this.textOffset = 4;
+        this.arcAngle = 280;
+        this.part = 22;
+        this.arcTotal = 1100;
 
-        this.lineColor = 0x24a3ea;
+        this.textOffset = 0;
 
-        this.lineRange = {
-            "1": []
-            , "2": []
-            , "4": []
-            , "8": []
-        };
+        this.arcOffset = 90 + ( 360 - this.arcAngle ) / 2;
+        this.arcOffsetPad = -5;
+        this.partLabel = this.part / 2;
+        this.partAngle = ( this.arcAngle ) / this.part;
+        this.partNum = this.arcTotal / this.part;
 
-        this.lineWidth = 32;
-        this.lineSpace = 10;
-        this.lineAngle = 35;
-        this.lineHeight = 15;
-        this.lineCurveLength = 30;
+        this.textOffsetX = -1;
+        this.textOffsetY = -8;
+        this.textLineLength = 6;
 
-        this.loopSort = [ 4, 8, 1, 2 ];
+        this.textRectWidthPercent = .5;
+        this.textRectHeightPercent = .11;
 
-        this.clearList = [];
-
-        this.outRadius = 73
-        this.inRadius = 53;
-
-        this.lineLength = 25;
-        this.lineLengthCount = 1;
-        this.lineLengthStep = .5;
-
-        this.lineLeft = this.fixCx() - this.outRadius - this.lineSpace;
-        this.lineRight = this.fixCx() + this.outRadius + this.lineSpace;
+        this.textRoundPercent = .38;
+        this.textRoundOffsetAngle = 160;
+        this.textRoundPlusAngle = 110;
+        this.textRoundMaxAngle = this.textRoundOffsetAngle + this.textRoundPlusAngle * 2;
+        this.roundStatusRaidus = 30;
+        this.textRoundAngle = [ 
+            {
+                angle: this.textRoundOffsetAngle
+                , text: '低'
+                , point: {}
+                , min: 0
+                , max: 100
+                , radius: this.roundStatusRaidus
+                , lineColor: this.lineColor
+            } 
+            ,{ 
+                angle: this.textRoundOffsetAngle + this.textRoundPlusAngle
+                , text: '中'
+                , point: {}
+                , min: 101
+                , max: 500
+                , radius: this.roundStatusRaidus
+                , lineColor: this.lineColor
+            }
+            , {
+                angle: this.textRoundOffsetAngle + this.textRoundPlusAngle * 2
+                , text: '高'
+                , point: {}
+                , min: 501
+                , max: Math.pow( 10, 10 )
+                , radius: this.roundStatusRaidus
+                , lineColor: this.lineColor
+            }
+        ];
 
         this.init();
+
+    }
+
+    getAttackRateAngle(){
+        let r = 0;
+
+        r = this.arcOffset + ( this.arcAngle ) * this.getAttackRatePercent();
+
+        return r;
+    }
+
+    getAttackRatePercent(){
+        let r = 0, tmp;
+        if( this.curRate ){
+            tmp = this.curRate;
+            if( tmp > this.arcTotal ){
+                tmp = this.arcTotal;
+            }
+            
+            r = tmp / this.arcTotal;
+        }
+        return r;
+    }
+
+    getAttackText(){
+        let text = '低';
+
+        if( this.curRate ){
+            this.textRoundAngle.map( ( val ) => {
+                if( this.curRate >= val.min && this.curRate <= val.max ){
+                    text = val.text;
+                }
+            });
+        }
+
+        return `${text}频\n攻击`;
     }
 
     init(){
-        geometry3d.screenWidth = this.width;
-        geometry3d.screenHeight = this.height;
-        geometry3d.camera = this.camera;
+        this.textRoundRadius = this.width * this.textRoundPercent * this.sizeRate;
 
-        this.calcLayoutPosition();
-        return this;
+        this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
+
+        this.arcInRadius = this.width * this.arcInPercent * this.sizeRate;
+        this.arcOutRadius = this.width * this.arcOutPercent * this.sizeRate;
+
+        this.arcLineRaidus = Math.ceil( this.arcLinePercent * this.max ) * this.sizeRate
+
+        this.textWidth = this.textRectWidthPercent * this.width ;
+        this.textHeight = 38 * this.sizeRate;
+        this.textX = this.cx - this.textWidth / 2; 
+        this.textY = this.cy + this.arcLineRaidus + this.arcTextLength / 2 + 2;
+
+        this.textRoundAngle.map( ( val, key ) => {
+            let point = geometry.distanceAngleToPoint( this.textRoundRadius, val.angle )
+            val.point = geometry.pointPlus( point, this.cpoint );
+            val.point.y += this.offsetCy;
+        });
+
+        this.arcPartLineAr = [];
+        this.arcOutlinePartAr = [];
+        this.textAr = [];
+        for( let i = 0; i <= this.part; i++ ){
+            let start, end, angle;
+            angle = i * this.partAngle + this.arcOffset;
+
+            if( i && i < this.part ){
+                start = geometry.distanceAngleToPoint( this.arcInRadius, angle );
+                end = geometry.distanceAngleToPoint( this.arcOutRadius, angle );
+
+                this.arcPartLineAr.push( 'M' );
+                this.arcPartLineAr.push( [ start.x, start.y ].join(',') );
+                this.arcPartLineAr.push( 'L' );
+                this.arcPartLineAr.push( [ end.x, end.y ].join(',') );
+            }
+
+            start = geometry.distanceAngleToPoint( this.arcLineRaidus, angle );
+            end = geometry.distanceAngleToPoint( this.arcLineRaidus + this.arcLabelLength, angle );
+
+            this.arcOutlinePartAr.push( 'M' );
+            this.arcOutlinePartAr.push( [ start.x, start.y ].join(',') );
+            this.arcOutlinePartAr.push( 'L' );
+            this.arcOutlinePartAr.push( [ end.x, end.y ].join(',') );
+            
+            if( !(i * this.partNum % 100) || i === 0 ){
+                let angleOffset = 8, lengthOffset = 0, rotationOffset = 0;
+
+                if( i === 0 ){
+                    angleOffset = 1;
+                }
+
+                if( i >= 19 ){
+                    angleOffset = 14;
+                    rotationOffset = 9;
+                }
+                if( i >= 21 ){
+                    angleOffset = 18;
+                }
+                let text = {
+                    text: i * this.partNum
+                    , angle: angle - angleOffset
+                    , point: geometry.distanceAngleToPoint( this.arcLineRaidus + this.arcTextLength + lengthOffset, angle - angleOffset )
+                    , rotationOffset: rotationOffset
+                };
+                text.textPoint = new PointAt( this.width, this.height, geometry.pointPlus( text.point, this.cpoint) );
+
+                this.textAr.push( text );
+            }
+
+        }
     }
 
+    initRoundText(){
+        this.textRoundAngle.map( ( val ) => {
+
+            /*
+            if( !val.ins ){
+                val.ins = new RoundStateText( this.box, this.width, this.height );
+                val.ins.setOptions( Object.assign( val, {
+                    stage: this.stage
+                    , layer: this.layoutLayer
+                    , data: this.data
+                    , allData: this.allData
+                }) );
+                val.ins.init( );
+            }
+            val.ins.update( this.curRate );
+            */
+
+        });
+    }
+    /*
+{
+    "series": [
+        {
+            "type": "gauge",
+            "data": [
+                {
+                    "value": 200,
+                    "total": 134567,
+                    "name": "完成率"
+                }
+            ]
+        }
+    ]
+}
+    */
     update( data, allData ){
+        this.stage.removeChildren();
         super.update( data, allData );
-        //console.log( THREE );
 
-        this.data = data;
-        this.allData = allData;
+        //console.log( 123, data );
 
-        this.countAngle = 0;
-        this.isDone = 0;
-        this.lineLengthCount = 0;
+        if( (data && data.data && data.data.length) ){
+            data.data.map( val => {
+                this.curRate = val.value;
+                this.totalNum = val.total
+            });
+        }
 
-        if( !ju.jsonInData( this.data, 'data' ) ) return;
+        /*
+        this.curRate = 600;
+        this.totalNum = 234567;
+        */
 
-        this.clearItems();
-        this.calcVal();
-        this.initText();
-        this.calcDataPosition();
         this.initDataLayout();
 
-        //console.log( 'dount update', this.data, this, utils );
+        //console.log( 'gauge update', this.getAttackRateAngle() )
+        this.angle = this.arcOffset + this.arcOffsetPad;
+        this.animationAngle =  this.getAttackRateAngle() + this.arcOffsetPad;
+        //console.log( this.angle, this.animationAngle );
 
-        this.animation();
+        this.updateWedge();
+
+        if( this.curRate ){
+            this.rateStep = Math.floor( this.curRate / ( this.animationStep * 2 ) )
+            !this.inited && this.animation();
+        }
+        if( this.totalNum ){
+            this.totalNumStep = Math.floor( this.totalNum / this.animationStep );
+            this.totalNumStep < 1 && ( this.totalNumStep = 1 );
+            this.totalNumCount = 0;
+            this.animationText();
+        }
+
         !this.inited && this.animationCircleLine();
 
         this.inited = 1;
-
-        return this;
-    }
-
-    reset(){
-        this.path.map( ( val ) => {
-            val.pathData = [];
-        });
     }
 
     animationCircleLine(){
+        //console.log( 'animationCircleLine' );
         if( this.isDestroy ) return;
         if( !this.circleLine ) return;
 
         if( !this.isAnimation() ){
             return;
         }
+        
+        this.circleLineRotation += this.circleLineRotationStep; 
 
-        this.circleLine.rotation.z -= .03;
+        this.circleLine.rotation( this.circleLineRotation );
+        this.stage.add( this.layoutLayer );
 
         window.requestAnimationFrame( ()=>{ this.animationCircleLine() } );
     }
 
-    animation(){
-
+    animationText(){
         if( this.isDestroy ) return;
-        if( this.isDone ) return;
 
-        let tmp, tmppoint, step = this.angleStep;
+        if( this.totalNumCount >= this.totalNum ) return;
+        this.totalNumCount += this.totalNumStep;
 
-        this.countAngle -= this.animationStep;
+        if( this.totalNumCount >= this.totalNum || !this.isAnimation() ) {
+            this.totalNumCount = this.totalNum;
+        };
 
-        if( !this.isSeriesAnimation() ){
-            this.countAngle = this.totalAngle;
+        this.totalText.text( this.totalNumCount );
+        this.totalTextPostfix.x( this.totalText.textWidth + 5 );
+
+        this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+
+        this.layoutLayer.add( this.totalTextGroup );
+
+        window.requestAnimationFrame( ()=>{ this.animationText() } );
+    }
+
+    drawText(){
+/*
+        this.totalTextGroup = new Konva.Group();
+        this.addDestroy( this.totalTextGroup );
+
+        let params = {
+            text: 0 + ''
+            , fontSize: 30 * this.sizeRate
+            , fontFamily: 'Agency FB'
+            , fill: '#ffffff'
+            , fontStyle: 'italic'
+            , letterSpacing: 1.5
+        }, tmp = ju.clone( params );
+        tmp.text = this.totalNum;
+
+        this.totalText = new Konva.Text( params );
+        this.addDestroy( this.totalText );
+
+        let params1 = {
+            text: this.totalPostfix
+            , x: this.totalText.textWidth + 5
+            , fontSize: 12 * this.sizeRate
+            , fontFamily: 'MicrosoftYaHei'
+            , fill: '#ffffff'
+            , fontStyle: 'italic'
+            , letterSpacing: 1.5
+        };
+
+        this.totalTextPostfix = new Konva.Text( params1 );
+        this.totalTextPostfix.y( this.totalText.textHeight - this.totalTextPostfix.textHeight - 4 );
+        this.addDestroy( this.totalTextPostfix );
+
+        this.totalTextGroup.add( this.totalText );
+        this.totalTextGroup.add( this.totalTextPostfix );
+
+        //console.log( this.totalTextGroup, this.totalTextGroup.getClipWidth(), this.totalTextGroup.width(), this.totalTextGroup.size()  );
+
+        //this.totalTextGroup.x( this.cx - this.totalTextGroup.width / 2 );
+        this.totalTextGroup.y( this.textY);
+        this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+
+        this.tmpTotalText = new Konva.Text( tmp );
+        this.addDestroy( this.tmpTotalText );
+
+*/
+    }
+    drawTextRect(){
+
+        let textWidth =  this.tmpTotalText.textWidth + 30 + this.totalTextPostfix.textWidth + 5
+            , textX = 0
+            , textY = 0
+            ;
+
+        if( textWidth < 170 ){
+            textWidth = 170;
         }
+        textX = this.cx - textWidth / 2 + 2;;
 
-        if( this.countAngle <= this.totalAngle || !this.isAnimation() ){
-            this.countAngle = this.totalAngle;
-            this.isDone = 1;
-        }
+        textY = this.textY - ( this.textHeight - this.totalText.textHeight ) / 2;
+/*
+        this.textRect = new Konva.Rect( {
+            fill: '#596ea7'
+            , stroke: '#ffffff00'
+            , strokeWidth: 0
+            , opacity: .3
+            , width: textWidth
+            , height: this.textHeight
+            , x: textX
+            , y: textY
+        });
+        this.addDestroy( this.textRect );
 
-        this.reset();
+        let points = [];
+        points.push( 'M', [ textX, textY + this.textLineLength ].join(',') );
+        points.push( 'L', [ textX, textY ].join(',') );
+        points.push( 'L', [ textX + this.textLineLength, textY ].join(',') );
 
-        for( let i = this.path.length - 1; i >= 0; i-- ){
-        //for( let i = 0; i < this.path.length; i++ ){
-            //let i = 2;
-            let item = this.path[ i ];
+        points.push( 'M', [ textX + textWidth - this.textLineLength, textY ].join(',') );
+        points.push( 'L', [ textX + textWidth, textY ].join(',') );
+        points.push( 'L', [ textX + textWidth, textY + this.textLineLength ].join(',') );
 
-            let tmpAngle = this.countAngle;
+        points.push( 'M', [ textX + textWidth, textY + this.textHeight - this.textLineLength ].join(',') );
+        points.push( 'L', [ textX + textWidth, textY + this.textHeight ].join(',') );
+        points.push( 'L', [ textX + textWidth - this.textLineLength, textY + this.textHeight ].join(',') );
 
-            if( tmpAngle <= item.itemData.endAngle ){
-                tmpAngle = item.itemData.endAngle;
+        points.push( 'M', [ textX + this.textLineLength, textY + this.textHeight ].join(',') );
+        points.push( 'L', [ textX, textY + this.textHeight ].join(',') );
+        points.push( 'L', [ textX, textY + this.textHeight - this.textLineLength ].join(',') );
+
+        this.textLinePath = new Konva.Path( {
+            data: points.join('')
+            , stroke: this.lineColor
+            , strokeWidth: 1
+        });
+        this.addDestroy( this.textLinePath );
+
+        this.layoutLayer.add( this.textLinePath );
+        this.layoutLayer.add( this.textRect );
+        //this.layoutLayer.add( this.totalText );
+        this.layoutLayer.add( this.totalTextGroup );*/
+    }
+
+    drawArcText() {
+        if( !( this.textAr && this.textAr.length ) ) return;
+
+        this.textAr.map( ( val ) => {
+            /*let text = new Konva.Text( {
+                x: val.point.x + this.cx
+                , y: val.point.y + this.cy
+                , text: val.text + ''
+                , fontSize: 11 * this.sizeRate
+                //, rotation: val.angle
+                , fontFamily: 'MicrosoftYaHei'
+                , fill: this.lineColor
+            });
+            this.addDestroy( text );
+
+            text.rotation( val.angle + 90 + ( val.rotationOffset || 0 ) );
+
+            this.layoutLayer.add( text );*/
+        });
+    }
+
+    drawArcLine(){
+
+        let points = [];
+            points.push( 'M' );
+        for( let i = this.arcOffset; i <= ( this.arcOffset + this.arcAngle ); i+=0.5 ){
+            let tmp = geometry.distanceAngleToPoint( this.arcLineRaidus, i );
+            points.push( [ tmp.x, tmp.y ] .join(',') + ','  );
+            if( i == 90 ){
+                points.push( 'L' );
             }
-
-            if( tmpAngle > item.itemData.startAngle ) continue;
-
-            let geometryx = new THREE.RingGeometry( 
-                this.inRadius
-                , this.outRadius
-                , 256 
-                , 1
-                , geometry.radians( 0 )
-                , geometry.radians( tmpAngle )
-            );
-
-            item.arc.geometry.dispose();
-            item.arc.geometry = geometryx;
         }
+/*
+        this.arcLine = new Konva.Path( {
+            data: points.join('')
+            , x: this.cx
+            , y: this.cy
+            , stroke: this.lineColor
+            , strokeWidth: 1
+            , fill: '#ffffff00'
+        });
+        this.addDestroy( this.arcLine );
 
-        window.requestAnimationFrame( ()=>{ this.animation() } );
+        this.arcPartLine = new Konva.Path( {
+            data: this.arcPartLineAr.join('')
+            , x: this.cx
+            , y: this.cy
+            , stroke: '#00000088'
+            , strokeWidth: 1
+            , fill: '#ffffff00'
+        });
+        this.addDestroy( this.arcPartLine );
 
-        if( this.isDone ){
-            window.requestAnimationFrame( ()=>{ this.animationLine() } );
-        }
-    }
+        this.arcOutlinePart = new Konva.Path( {
+            data: this.arcOutlinePartAr.join('')
+            , x: this.cx
+            , y: this.cy
+            , stroke: this.lineColor
+            , strokeWidth: 1
+            , fill: '#ffffff00'
+        });
+        this.addDestroy( this.arcOutlinePart );
 
-    drawCircle(){
-        this.circleRadius = geometry3d.to3d( Math.ceil( this.circlePercent * this.min / 2 ) );
-        //console.log( this.circleRadius );
-
-        var line = new MeshLine();
-
-        var curve = new THREE.EllipseCurve(
-            0,  this.fixCy(),            // ax, aY
-            this.circleRadius,
-            this.circleRadius,
-            0,  2 * Math.PI,  // aStartAngle, aEndAngle
-            false,            // aClockwise
-            0                 // aRotation
-        );
-
-        var points = curve.getPoints( 200 );
-        var geometryy = new THREE.Geometry().setFromPoints( points );
-
-        curve = new THREE.EllipseCurve(
-            0,  this.fixCy(),            // ax, aY
-            this.circleRadius,
-            this.circleRadius,
-            0,  geometry.radians( 10 ),  // aStartAngle, aEndAngle
-            false,            // aClockwise
-            geometry.radians( .5 )                 // aRotation
-        );
-
-        points = [ ...points, ...curve.getPoints(  50 ) ] ;
-
-        geometryy = new THREE.Geometry().setFromPoints( points );
-
-        line.setGeometry( geometryy );
-        var material = new MeshLineMaterial( { 
-            color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
-        } );
-
-        var circle = new THREE.Mesh( line.geometry, material );
-
-        circle.renderOrder = -1;
-        circle.material.depthTest=false;
-
-        this.scene.add( circle );
-        this.addDestroy( circle );
+        this.layoutLayer.add( this.arcLine );
+        this.layoutLayer.add( this.arcPartLine );
+        this.layoutLayer.add( this.arcOutlinePart );
+*/
 
     }
 
-    drawCircleLine(){
-        this.circleLineRadius = geometry3d.to3d( Math.ceil( this.circleLinePercent * this.min / 2 ) ); 
+    drawArc(){
 
-        let material,  geometryItem, circle, group, line;
+        let params = {
+            x: this.cx
+            , y: this.cy
+            , innerRadius: this.arcInRadius
+            , outerRadius: this.arcOutRadius
+            , angle: this.arcAngle
+            //, fill: 'red'
+            , stroke: '#ffffff00'
+            , strokeWidth: 0
+            , rotation: this.arcOffset
+            , fillLinearGradientStartPoint: { x : -50, y : -50}
+            , fillLinearGradientEndPoint: { x : 50, y : 50}
+            , fillLinearGradientColorStops: 
+            [ 
+                0, '#ff9000'
+                , .5, '#64b185'
+                , 1, '#5a78ca'
+            ]
+        };
+        /*
+        this.arc = new Konva.Arc( params );
+        this.addDestroy( this.arc );
 
-        group = new THREE.Group();
-
-        line = new MeshLine();
-        material = new MeshLineMaterial( { 
-            color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
-        } );
-        geometryItem = new THREE.CircleGeometry(  
-            this.circleLineRadius
-            , 128
-            , geometry.radians( 90 )
-            , geometry.radians( 90 )
-        );
-        geometryItem.vertices.shift();
-        line.setGeometry( geometryItem );
-        circle = new THREE.Line( line.geometry, material );
-        circle.renderOrder = -1;
-        circle.material.depthTest=false;
-        group.add( circle );
-
-        line = new MeshLine();
-        material = new MeshLineMaterial( { 
-            color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
-        } );
-        geometryItem = new THREE.CircleGeometry(  
-            this.circleLineRadius
-            , 128
-            , geometry.radians( 0 )
-            , geometry.radians( -90  )
-        );
-        geometryItem.vertices.shift();
-        line.setGeometry( geometryItem );
-        circle = new THREE.Line( line.geometry, material );
-        circle.renderOrder = -1;
-        circle.material.depthTest=false;
-
-        group.position.y = this.fixCy();
-
-        group.add( circle );
-
-        this.circleLine = group;
-
-        this.scene.add( group );
-        this.addDestroy( group );
+        this.layoutLayer.add( this.arc );
+        */
     }
 
     initDataLayout(){
 
-        this.drawCircle();
-        this.drawCircleLine();
+        if( !this.inited ){
+            /*
+            this.layer = new Konva.Layer();
+            this.addDestroy(this.layer );
+            
+            this.layoutLayer = new Konva.Layer();
+            this.addDestroy( this.layoutLayer );
 
-        this.path = [];
-        this.line = [];
-
-        for( let ii = this.data.data.length - 1; ii >= 0; ii-- ){
-            let val = this.data.data[ii], key = ii;
-            let pathindex = this.data.data.length - 1 - ii;
-
-            let color = this.colors[ key % this.colors.length];
-
-            if( ju.jsonInData( val, 'itemStyle.color' ) ){
-                //path.fill( val.itemStyle.color );
-                color = val.itemStyle.color;
-            }
-            color = this.parseColor( color );
-
-            let line, material, geometryx, mesh, arc, tmp; 
-
-            line = new MeshLine();
-            material = new MeshLineMaterial({
-                color: new THREE.Color( 0xffffff )
-                , lineWidth: 2
+            this.roundLine = new Konva.Circle( {
+                x: this.cx
+                , y: this.cy
+                , radius: this.roundRadius
+                , stroke: this.lineColor
+                , strokeWidth: 2.5
+                , fill: 'rgba( 0, 0, 0, .5 )'
             });
-            geometryx = new THREE.Geometry();
-            line.setGeometry( geometryx );
-            mesh = new THREE.Mesh( line.geometry, material );
-            mesh.position.y = this.fixCy();
+            this.addDestroy( this.roundLine );
+            */
+        }
+/*
+        if( !this.inited ){
+            this.percentText = new Konva.Text( {
+                x: this.cx
+                , y: this.cy
+                , text: this.getAttackText()
+                , fontSize: 18 * this.sizeRate
+                , fontFamily: 'HuXiaoBoKuHei'
+                , fill: '#ffffff'
+                , fontStyle: 'italic'
+            });
+            this.addDestroy( this.percentText );
+        }
+        this.percentText.text( this.getAttackText() );
+        this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
+        this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
+*/
+/*
+       if( !this.inited ){
+           let wedge = new Konva.Wedge({
+              x: 0,
+              y: -3,
+              radius: 10,
+              angle: 20,
+              fill: '#ff5a00',
+              stroke: '#ff5a00',
+              strokeWidth: 1,
+              rotation: 90
+            });
+            this.addDestroy( wedge );
 
-            this.scene.add( mesh );
-            this.line.push( mesh );
-            this.addDestroy( mesh );
+           let wedge1 = new Konva.Wedge({
+              x: 0,
+              y: -3,
+              radius: 10,
+              angle: 20,
+              fill: '#973500',
+              stroke: '#973500',
+              strokeWidth: 1,
+              rotation: 65
+            });
+            this.addDestroy( wedge1 );
 
-            geometryx = new THREE.RingGeometry( 
-                this.inRadius
-                , this.outRadius
-                , 256 
-                , 1
-                , geometry.radians( 0 )
-                , geometry.radians( -0.1 )
-            );
-            material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide } );
-            arc = new THREE.Mesh( geometryx, material );
-            arc.renderOrder = 1;
+            let group = new Konva.Group({
+                x: this.cx
+                , y: this.cy
+            });
+            this.addDestroy( group );
 
-            arc.position.y = this.fixCy();
+            group.add( wedge1 );
+            group.add( wedge );
 
-            this.scene.add( arc );
-            this.addDestroy( arc );
+            this.group = group;
+        }
 
-            tmp = { 
-                arc: arc 
-                , pathData: [] 
-                , itemData: val
-                , line: mesh
-                , mline: line
-                , realIndex: ii
-            };
 
-            this.path.push( tmp );
+        this.initRoundText();
+
+        if( !this.inited ){
+            this.angle = this.arcOffset - 2;
+           
+            this.layer.add( this.group );
+            this.layer.add( this.roundLine );
+            this.layer.add( this.percentText );
+            //this.layer.add( this.percentSymbolText );
+
+
+            this.drawCircle();
+            this.drawCircleLine();
+            this.drawArc();
+            this.drawArcLine();
+            this.drawArcText();
+            this.drawText();
+            this.drawTextRect();
+        }
+
+
+        this.stage.add( this.layer );
+        this.stage.add( this.layoutLayer );
+*/
+    }
+    animation(){
+        //console.log( this.angle, this.animationAngle );
+        if( this.isDestroy ) return;
+        if( this.angle > this.animationAngle ) return;
+
+        this.angle += this.rateStep;
+
+        if( this.angle >= this.animationAngle || !this.isAnimation() ) {
+            this.angle = this.animationAngle;
         };
 
-        return this;
+        this.updateWedge();
+
+        this.stage.add( this.layer );
+
+        window.requestAnimationFrame( ()=>{ this.animation() } );
     }
+
+    updateWedge(){
+        let point = geometry.distanceAngleToPoint(  this.roundRadius + 6, this.angle )
+        this.group.x( this.cx + point.x );
+        this.group.y( this.cy + point.y );
+        this.group.rotation( this.angle + 90 );
+        this.group.rotation( this.angle + 90 );
+        this.stage.add( this.layer );
+    }
+
+    calcDataPosition() {
+    }
+
     animationLine(){
-
-        if( this.lineLengthCount >= this.lineLength ){
-            return;
-        }
-        this.lineLengthCount = this.lineLength;
-
-        this.lineLengthCount += this.lineLengthStep;
-
-        if( this.lineLengthCount >= this.lineLength || !this.isAnimation()  ){
-            this.lineLengthCount = this.lineLength;
-        }
-        for( let i = 0; i < this.path.length; i++ ){
-            let path = this.path[i];
-            let layer = this.arcLayer;
-
-            let lineEnd = path.itemData.lineEnd;
-            let lineExpend = path.itemData.lineExpend;
-
-            let line = this.line[ i ];
-
-            var meshline = new MeshLine();
-            let geometryx = new THREE.Geometry();
-                geometryx.vertices.push( 
-                    new THREE.Vector3( path.itemData.lineStart.x, path.itemData.lineStart.y, 0)
-                    , new THREE.Vector3( lineEnd.x, lineEnd.y, 0)
-                    , new THREE.Vector3( lineExpend.x,lineExpend.y, 0)
-                );
-                meshline.setGeometry( geometryx );
-                line.geometry = meshline.geometry;
-
-            if( this.lineLengthCount >= this.lineLength ){
-                this.addIcon( path, layer, path.realIndex );
-                this.addText( path, layer, path.realIndex );
-            }else{
-                window.requestAnimationFrame( ()=>{ this.animationLine() } );
-            }
-        }
     }
 
-    addIcon( path, layer, key ){
-        if( !path.lineicon ){
-            var geometry = new THREE.CircleGeometry( 3, 32 );
-            var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-            var circle = new THREE.Mesh( geometry, material );
-            path.lineicon = circle;
-            this.scene.add( circle );
-            this.addDestroy( circle );
-        }
-
-        path.lineicon.position.x = path.itemData.lineExpend.x;
-        path.lineicon.position.y = path.itemData.lineExpend.y + this.fixCy();
+    addIcon( path, layer ){
     }
 
-    addText( path, layer, key ){
-        if( !path.text ){
-            path.text = this.textar[ key ];
-            this.scene.add(path.text);
-            this.addDestroy( path.text  );
-        }
+    addText( path, layer ){
 
-        let text = path.text;
-
-        let textPoint = path.itemData.textPoint
-            , angleDirect = path.itemData.pointDirection.autoAngle()
-            ;
-
-        textPoint = ju.clone( path.itemData.lineEnd );
-
-        let textX =  textPoint.x
-            , textY =  textPoint.y + this.fixCy()
-            , direct = path.itemData.pointDirection.auto()
-            ;
-        text.position.x = textX;
-        text.position.y = textY;
-
-
-        var position = new THREE.Vector3();
-        position.setFromMatrixPosition( text.matrixWorld );
-
-        text.position.y = textY + text.scale.y / 2 - geometry3d.to3d( 3 );
-
-        switch( angleDirect ){
-            case 8:
-            case 1: {
-                text.position.x = textX - text.scale.x / 2 + 2;
-                break;
-            }
-            default: {
-                text.position.x = textX + text.scale.x / 2 - 2;
-                break;
-            }
-        }
     }
 
     calcLayoutPosition() {
-        this.inRadius = geometry3d.to3d( Math.ceil( this.inPercent * this.min / 2 ) );
-        this.outRadius =  geometry3d.to3d( Math.ceil( this.outPercent * this.min / 2 ) );
+    }
+    drawCircle(){
+        this.circleRadius = Math.ceil( this.circlePercent * this.max / 2 ) * this.sizeRate;
+/*
+        this.circle = new Konva.Circle( {
+            x: this.cx
+            , y: this.cy
+            , radius: this.circleRadius
+            , stroke: this.lineColor
+            , strokeWidth: 1
+            , fill: '#ffffff00'
+        });
+        this.addDestroy( this.circle );
+        this.layoutLayer.add( this.circle );*/
+    }
 
-        this.lineHeight = geometry3d.to3d( 24 );
-        this.lineWidth = geometry3d.to3d( 50 );
-        this.lineLength = geometry3d.to3d( 22 );
+    drawCircleLine(){
+        this.circleLineRadius = Math.ceil( this.circleLinePercent * this.max / 2 ) * this.sizeRate;
 
-        return this;
+        let points = [];
+            points.push( 'M' );
+        for( let i = 90; i <= 180; i++ ){
+            let tmp = geometry.distanceAngleToPoint( this.circleLineRadius, i + 90 );
+            points.push( [ tmp.x, tmp.y ] .join(',') + ','  );
+            if( i == 90 ){
+                points.push( 'L' );
+            }
+        }
+        points.push( 'M');
+        for( let i = 270; i <= 360; i++ ){
+            let tmp = geometry.distanceAngleToPoint( this.circleLineRadius, i + 90 );
+            points.push( [ tmp.x, tmp.y ] .join(',') + ','  );
+            if( i == 270 ){
+                points.push( 'L' );
+            }
+        }
+/*
+        this.circleLine = new Konva.Path( {
+            data: points.join('')
+            , x: this.cx
+            , y: this.cy
+            , stroke: this.lineColor
+            , strokeWidth: 1.5
+            , fill: '#ffffff00'
+        });
+        this.addDestroy( this.circleLine );
+
+        this.layoutLayer.add( this.circleLine );*/
+    }
+
+    reset(){
     }
 
     destroy(){
-        this.clearItems();
         super.destroy();
-    }
-
-    clearItems(){
-        this.clearList.map( ( item, key ) => {
-            this.dispose( item );
-        });
-        this.clearList = [];
-    }
-
-    initText(){
-        this.textar = [];
-
-        this.realLineWidth = this.lineWidth;
-
-        this.data.data.map( ( val, key ) => {
-
-            let fontSize = geometry3d.to3d( 25 );
-            let texture = new TextTexture({
-              text: `${val.percent}%`,
-              fontFamily: 'MicrosoftYaHei',
-              //fontSize: fontSize * 2,
-              fontSize: fontSize * 2,
-              fontStyle: 'italic',
-            });
-            let material = new THREE.SpriteMaterial({map: texture, color: this.lineColor });
-            let sprite =new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-            this.clearList.push( sprite );
-            this.textar.push( sprite );
-        });
-    }
-
-    calcVal(){
-        if( !this.data ) return;
-
-        let total = 0, tmp = 0;
-
-        this.data.data.map( ( val ) => {
-            //console.log( val );
-            total += val.value;
-        });
-        this.total = total;
-
-        this.data.data.map( ( val ) => {
-            val._percent =  utils.parseFinance( val.value / total, 8 );
-            tmp = utils.parseFinance( tmp + val._percent );
-            val._totalPercent = tmp;
-
-            val.percent = parseInt( val._percent * 100 * this.getPrecision( val ) ) / this.getPrecision( val );
-
-            val.endAngle = this.totalAngle * val._totalPercent;
+        this.textRoundAngle.map( ( val ) => {
+            if( val.ins ) val.ins.destroy();
         });
 
-        //修正浮点数精确度
-        if( this.data.data.length ){
-            let item = this.data.data[ this.data.data.length - 1];
-            tmp = tmp - item._percent;
-
-            item._percent = 1 - tmp;
-            item.percent = parseInt( item._percent * 100 * this.getPrecision( item ) ) / this.getPrecision( item );
-            item._totalPercent = 1;
-            item.endAngle = this.totalAngle;
-        }
-
     }
-
-
-    calcDataPosition() {
-        if( !this.data ) return;
-
-        this.lineRange = {
-            "1": []
-            , "2": []
-            , "4": []
-            , "8": []
-        }
-        //计算开始角度, 计算指示线的2端
-        this.data.data.map( ( val, key ) => {
-            if( !key ) {
-                val.startAngle = 0;
-            }else{
-                val.startAngle = this.data.data[ key - 1].endAngle;
-            }
-
-            //this.lineWidth = geometry3d.to3d( 80 );
-
-            let text = this.textar[ key ];
-            let textWidth = this.lineWidth;
-
-            if( text.scale.x >= textWidth ){
-                textWidth = text.scale.x;
-            }
-
-            val.midAngle = val.startAngle + ( val.endAngle - val.startAngle ) / 2;
-
-            val.lineStart = geometry.distanceAngleToPoint( this.outRadius - 2, val.midAngle );
-            val.lineEnd = geometry.distanceAngleToPoint( this.outRadius + this.lineLength, val.midAngle );
-
-            val.textPoint = geometry.distanceAngleToPoint( this.outRadius + this.lineLength, val.midAngle );
-
-            val.pointDirection = new PointAt( this.fixWidth(), this.fixHeight(), geometry.pointPlus( val.textPoint, this.cpoint) );
-            let lineAngle = val.pointDirection.autoAngle();
-            val.lineExpend = ju.clone( val.lineEnd )
-
-            //console.log( 'lineAngle', lineAngle,  val.midAngle );
-
-            switch( lineAngle ){
-                case 1:
-                case 8: {
-                    //val.lineEnd.x = this.lineLeft;
-                    val.lineEnd.x = -( this.outRadius + this.lineSpace );
-
-                    let tmp = geometry.pointDistance( val.lineStart, val.lineEnd );
-                    if( tmp > this.lineCurveLength ){
-                        let tmpAngle = geometry.pointAngle( val.lineStart, val.lineEnd )
-                            , tmpPoint = geometry.distanceAngleToPoint( this.lineCurveLength, tmpAngle )
-                            ;
-                            tmpPoint = geometry.pointPlus( tmpPoint, val.lineStart );
-
-                        val.lineEnd.x = tmpPoint.x;
-                    }
-
-                    val.lineExpend.x = val.lineEnd.x - textWidth;
-
-                    break;
-                }
-                default: {
-                    val.lineEnd.x = this.outRadius + this.lineSpace;
-                    let tmp = geometry.pointDistance( val.lineStart, val.lineEnd );
-                    if( tmp > this.lineCurveLength ){
-                        let tmpAngle = geometry.pointAngle( val.lineStart, val.lineEnd )
-                            , tmpPoint = geometry.distanceAngleToPoint( this.lineCurveLength, tmpAngle )
-                            ;
-                            tmpPoint = geometry.pointPlus( tmpPoint, val.lineStart );
-
-                        val.lineEnd.x = tmpPoint.x;
-                    }
-
-                    val.lineExpend.x = val.lineEnd.x + textWidth;
-                    break;
-                }
-            }
-
-            this.lineRange[ lineAngle ].push( val );
-        })
-
-        this.loopSort.map( key => {
-            let item = this.lineRange[ key ];
-            if( !( item && item.length && item.length > 1 ) ) return;
-            let needFix;
-            for( let i = 1; i < item.length; i++ ){
-                let pre = item[ i - 1], cur = item[ i ];
-                if( Math.abs( cur.lineEnd.y - pre.lineEnd.y ) < this.lineHeight ){
-                    needFix = 1;
-                    break;
-                }
-            }
-            switch( key ){
-                case 4: {
-                    let tmpY = 0;
-                    for( let i = item.length - 2; i >= 0 ; i-- ){
-                        let pre = item[ i + 1], cur = item[ i ];
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y <= pre.lineEnd.y ){
-                            tmpY = pre.lineEnd.y + this.lineHeight;
-                            cur.lineEnd.y = tmpY;
-                            cur.lineExpend.y = tmpY;
-                        }
-                    }
-                    break;
-                }
-
-                case 1: {
-                    let tmpY = item[ 0 ].lineEnd.y;
-                    for( let i = item.length - 2; i >= 0; i-- ){
-                        let pre = item[ i + 1], cur = item[ i ];
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight || cur.lineEnd.y >= pre.lineEnd.y ){
-                            tmpY = pre.lineEnd.y - this.lineHeight;
-                            cur.lineEnd.y = tmpY;
-                            cur.lineExpend.y = tmpY;
-                        }
-                    }
-                    break;
-                }
-                case 2: {
-                    let tmpY = item[ 0 ].lineEnd.y;
-                    for( let i = 1; i < item.length; i++ ){
-                        let pre = item[ i - 1], cur = item[ i ], zero = item[0];
-
-                        if( Math.abs( pre.lineEnd.y + this.fixCy() ) < this.lineHeight ){
-                            pre.lineExpend.y = pre.lineEnd.y =  pre.lineExpend.y + this.lineHeight;
-                        }
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight   || cur.lineEnd.y >= pre.lineEnd.y  ){
-
-                            tmpY = pre.lineEnd.y - this.lineHeight;
-                            cur.lineEnd.y = tmpY;
-                            cur.lineExpend.y = tmpY;
-                        }
-                    }
-
-                    break;
-                }
-
-                case 8: {
-                    let tmpY = 0;
-                    for( let i = 1; i < item.length ; i++ ){
-                        let pre = item[ i - 1], cur = item[ i ];
-                        if( Math.abs( pre.lineEnd.y - cur.lineEnd.y ) < this.lineHeight  || cur.lineEnd.y <= pre.lineEnd.y ){
-                            tmpY = pre.lineEnd.y + this.lineHeight;
-                            cur.lineEnd.y = tmpY;
-                            cur.lineExpend.y = cur.lineEnd.y;
-                        }
-                    }
-
-                    break;
-                }
-            }
-        });
-    }
-
 
 }
