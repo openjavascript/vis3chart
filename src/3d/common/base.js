@@ -261,20 +261,23 @@ export default class ThreeBase extends VisChartBase {
     }
 
     dispose( item ){
-        /*item.material 
-            && item.parent
-            && item.material.dispose
-            && item.meterial.dispose();
 
-        item.geometry 
-            && item.parent
-            && item.geometry.dispose
-            && item.geometry.dispose();
+        try{ 
+            item.geometry 
+                && item.parent
+                && item.geometry.dispose
+                && item.geometry.dispose();
 
-        item.texture 
-            && item.parent
-            && item.texture.dispose
-            && item.texture.dispose();*/
+            item.material 
+                && item.parent
+                && item.material.dispose
+                && item.material.dispose();
+
+            item.texture 
+                && item.parent
+                && item.texture.dispose
+                && item.texture.dispose();
+        }catch( ex ){};
 
         item.parent 
             && item.parent.remove
