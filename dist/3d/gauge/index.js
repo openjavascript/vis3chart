@@ -623,7 +623,7 @@ var Gauge = function (_VisChartBase) {
 
             geometryx = new THREE.RingGeometry(this.arcInRadius, this.arcOutRadius, 256, 1, geometry.radians(-50), geometry.radians(280));
 
-            var texture = new THREE.Texture(this.generateTexture());
+            var texture = new THREE.Texture(this.generateGradientTexture());
             texture.needsUpdate = true; // important!
 
             material = new THREE.MeshBasicMaterial({ /*color: color,*/map: texture, side: THREE.DoubleSide, transparent: true });
@@ -637,10 +637,10 @@ var Gauge = function (_VisChartBase) {
             this.addDestroy(arc);
         }
     }, {
-        key: 'generateTexture',
-        value: function generateTexture() {
+        key: 'generateGradientTexture',
+        value: function generateGradientTexture() {
 
-            var size = this.arcOutRadius * 2;
+            var size = geometry3d.resizeToBit(this.width * this.arcOutPercent * this.sizeRate * 2);
 
             // create canvas
             var canvas = document.createElement('canvas');

@@ -8,6 +8,7 @@ exports.size2dto3d = size2dto3d;
 exports.to3d = to3d;
 exports.to3dx = to3dx;
 exports.to3dy = to3dy;
+exports.resizeToBit = resizeToBit;
 
 var THREE = require('three');
 
@@ -86,4 +87,28 @@ function to3dy(y, screenWidth, screenHeight, camera) {
     var distance = -camera.position.z / vec.z;
     pos.copy(camera.position).add(vec.multiplyScalar(distance));
     return pos.x;
+}
+
+function resizeToBit(size) {
+    var max = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 15;
+
+    var r = size;
+    var rangeCount = 1;
+    for (var i = 0; i < max; i++) {
+        var cur = rangeCount,
+            next = rangeCount * 2;
+
+        if (size >= cur && size <= next) {
+            if (size >= cur + cur / 2) {
+                r = next;
+            } else {
+                r = cur;
+            }
+            break;
+        }
+
+        rangeCount *= 2;
+    }
+
+    return r;
 }

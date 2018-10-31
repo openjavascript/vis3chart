@@ -87,6 +87,23 @@ export function to3dy( y, screenWidth, screenHeight, camera ){
     return pos.x;
 }
 
+export function resizeToBit( size, max = 15 ){
+    let r = size;
+    let rangeCount = 1;
+    for( let i = 0; i < max; i++ ){
+        let cur = rangeCount, next = rangeCount * 2;
 
+        if( size >= cur && size <= next ){
+            if( size >= (cur + cur / 2) ){
+                r = next;
+            }else{
+                r = cur;
+            }
+            break;
+        }
 
+        rangeCount *= 2;
+    }
 
+    return r;
+}
