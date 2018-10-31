@@ -560,40 +560,6 @@ export default class Gauge extends VisChartBase  {
     initDataLayout(){
 
         /*
-        if( !this.inited ){
-            
-            this.layer = new Konva.Layer();
-            this.addDestroy(this.layer );
-            
-            this.layoutLayer = new Konva.Layer();
-            this.addDestroy( this.layoutLayer );
-
-            this.roundLine = new Konva.Circle( {
-                x: this.cx
-                , y: this.cy
-                , radius: this.roundRadius
-                , stroke: this.lineColor
-                , strokeWidth: 2.5
-                , fill: 'rgba( 0, 0, 0, .5 )'
-            });
-            this.addDestroy( this.roundLine );
-        }
-
-        if( !this.inited ){
-            this.percentText = new Konva.Text( {
-                x: this.cx
-                , y: this.cy
-                , text: this.getAttackText()
-                , fontSize: 18 * this.sizeRate
-                , fontFamily: 'HuXiaoBoKuHei'
-                , fill: '#ffffff'
-                , fontStyle: 'italic'
-            });
-            this.addDestroy( this.percentText );
-        }
-        this.percentText.text( this.getAttackText() );
-        this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
-        this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
 
        if( !this.inited ){
            let wedge = new Konva.Wedge({
@@ -653,6 +619,7 @@ export default class Gauge extends VisChartBase  {
             this.drawTextRect();
             */
             this.drawInnerCircle();
+            this.drawInnerText();
             this.drawCircle();
             this.drawCircleLine();
         }
@@ -703,6 +670,43 @@ export default class Gauge extends VisChartBase  {
 
     calcLayoutPosition() {
     }
+
+    drawInnerText(){
+        if( !this.inited ){
+            let fontSize = geometry3d.to3d( 50 );
+            let texture = new TextTexture({
+              text: this.getAttackText(),
+              fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
+              fontSize: fontSize * 2,
+              fontStyle: 'italic',
+            });
+            let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
+            let sprite =new THREE.Sprite(material);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
+            this.percentText = sprite;
+
+            this.stage.add( this.percentText  );
+        }
+
+        /*
+            this.percentText = new Konva.Text( {
+                x: this.cx
+                , y: this.cy
+                , text: this.getAttackText()
+                , fontSize: 18 * this.sizeRate
+                , fontFamily: 'HuXiaoBoKuHei'
+                , fill: '#ffffff'
+                , fontStyle: 'italic'
+            });
+            this.addDestroy( this.percentText );
+        }
+        this.percentText.text( this.getAttackText() );
+        this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
+        this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
+        */
+
+    }
+
     drawInnerCircle(){
         this.innerCircleRadius = geometry3d.to3d( this.roundRadius );
         //console.log( 'innerCircleRadius', this.roundRadius, this.innerCircleRadius );
@@ -738,7 +742,7 @@ export default class Gauge extends VisChartBase  {
         line.setGeometry( geometryy );
         var material = new MeshLineMaterial( { 
             color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
+            , lineWidth: 3
         } );
 
         var circle = new THREE.Mesh( line.geometry, material );
