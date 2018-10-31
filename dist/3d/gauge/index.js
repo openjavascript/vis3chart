@@ -209,8 +209,8 @@ var Gauge = function (_VisChartBase) {
 
             this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
 
-            this.arcInRadius = this.width * this.arcInPercent * this.sizeRate;
-            this.arcOutRadius = this.width * this.arcOutPercent * this.sizeRate;
+            this.arcInRadius = geometry3d.to3d(this.width * this.arcInPercent * this.sizeRate);
+            this.arcOutRadius = geometry3d.to3d(this.width * this.arcOutPercent * this.sizeRate);
 
             this.arcLineRaidus = Math.ceil(this.arcLinePercent * this.max) * this.sizeRate;
 
@@ -587,25 +587,62 @@ var Gauge = function (_VisChartBase) {
         key: 'drawArc',
         value: function drawArc() {
 
-            var params = {
-                x: this.cx,
-                y: this.cy,
-                innerRadius: this.arcInRadius,
-                outerRadius: this.arcOutRadius,
-                angle: this.arcAngle
-                //, fill: 'red'
-                , stroke: '#ffffff00',
-                strokeWidth: 0,
-                rotation: this.arcOffset,
-                fillLinearGradientStartPoint: { x: -50, y: -50 },
-                fillLinearGradientEndPoint: { x: 50, y: 50 },
-                fillLinearGradientColorStops: [0, '#ff9000', .5, '#64b185', 1, '#5a78ca']
-            };
             /*
-            this.arc = new Konva.Arc( params );
-            this.addDestroy( this.arc );
-             this.layoutLayer.add( this.arc );
+            let params = {
+                x: this.cx
+                , y: this.cy
+                , innerRadius: this.arcInRadius
+                , outerRadius: this.arcOutRadius
+                , angle: this.arcAngle
+                //, fill: 'red'
+                , stroke: '#ffffff00'
+                , strokeWidth: 0
+                , rotation: this.arcOffset
+                , fillLinearGradientStartPoint: { x : -50, y : -50}
+                , fillLinearGradientEndPoint: { x : 50, y : 50}
+                , fillLinearGradientColorStops: 
+                [ 
+                    0, '#ff9000'
+                    , .5, '#64b185'
+                    , 1, '#5a78ca'
+                ]
+            };
             */
+
+            console.log(this.arcInRadius, this.arcOutRadius);
+
+            var line = void 0,
+                material = void 0,
+                geometryx = void 0,
+                mesh = void 0,
+                arc = void 0,
+                tmp = void 0,
+                color = void 0;
+
+            color = 0xffffff;
+
+            geometryx = new THREE.RingGeometry(this.arcInRadius, this.arcOutRadius, 256, 1, geometry.radians(-50), geometry.radians(280));
+
+            var p1 = new THREE.Vector3(),
+                p2 = new THREE.Vector3(),
+                p3 = new THREE.Vector3();
+            p1.set(-this.arcOutRadius, 0, this.arcOutRadius);
+            p2.set(this.arcOutRadius, 0, -this.arcOutRadius);
+
+            geometryx.vertices.push(p1);
+            geometryx.vertices.push(p2);
+
+            geometryx.colors.push(0xff9000, 0x64b185);
+
+            material = new THREE.MeshBasicMaterial({ /*color: color,*/side: THREE.DoubleSide });
+            arc = new THREE.Mesh(geometryx, material);
+            //arc.rotation.z = geometry.radians( -80 );
+            //arc.renderOrder = 1;
+
+            arc.position.y = this.fixCy();
+
+            this.scene.add(arc);
+            this.addDestroy(arc);
         }
     }, {
         key: 'initDataLayout',
@@ -654,12 +691,12 @@ var Gauge = function (_VisChartBase) {
                 this.layer.add( this.roundLine );
                 this.layer.add( this.percentText );
                 //this.layer.add( this.percentSymbolText );
-                 this.drawArc();
-                this.drawArcLine();
+                 this.drawArcLine();
                 this.drawArcText();
                 this.drawText();
                 this.drawTextRect();
                 */
+                this.drawArc();
                 this.drawInnerCircle();
                 this.drawInnerText();
                 this.drawCircle();

@@ -159,8 +159,8 @@ export default class Gauge extends VisChartBase  {
 
         this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
 
-        this.arcInRadius = this.width * this.arcInPercent * this.sizeRate;
-        this.arcOutRadius = this.width * this.arcOutPercent * this.sizeRate;
+        this.arcInRadius = geometry3d.to3d( this.width * this.arcInPercent * this.sizeRate );
+        this.arcOutRadius = geometry3d.to3d( this.width * this.arcOutPercent * this.sizeRate );
 
         this.arcLineRaidus = Math.ceil( this.arcLinePercent * this.max ) * this.sizeRate
 
@@ -529,6 +529,7 @@ export default class Gauge extends VisChartBase  {
 
     drawArc(){
 
+        /*
         let params = {
             x: this.cx
             , y: this.cy
@@ -548,12 +549,45 @@ export default class Gauge extends VisChartBase  {
                 , 1, '#5a78ca'
             ]
         };
-        /*
-        this.arc = new Konva.Arc( params );
-        this.addDestroy( this.arc );
-
-        this.layoutLayer.add( this.arc );
         */
+
+        console.log( this.arcInRadius, this.arcOutRadius );
+
+        let line, material, geometryx, mesh, arc, tmp, color; 
+
+            color = 0xffffff;
+
+            geometryx = new THREE.RingGeometry( 
+                this.arcInRadius
+                , this.arcOutRadius
+                , 256 
+                , 1
+                , geometry.radians( -50 )
+                , geometry.radians( 280 )
+            );
+
+        let p1 = new THREE.Vector3()
+            , p2 = new THREE.Vector3()
+            , p3 = new THREE.Vector3()
+            ;
+            p1.set( -this.arcOutRadius, 0, this.arcOutRadius );
+            p2.set( this.arcOutRadius, 0, -this.arcOutRadius );
+
+            geometryx.vertices.push( p1 );
+            geometryx.vertices.push( p2 );
+
+            geometryx.colors.push( 0xff9000, 0x64b185 );
+
+            material = new THREE.MeshBasicMaterial( { /*color: color,*/ side: THREE.DoubleSide } );
+            arc = new THREE.Mesh( geometryx, material );
+            //arc.rotation.z = geometry.radians( -80 );
+            //arc.renderOrder = 1;
+
+            arc.position.y = this.fixCy();
+
+            this.scene.add( arc );
+            this.addDestroy( arc );
+
     }
 
 
@@ -612,12 +646,12 @@ export default class Gauge extends VisChartBase  {
             this.layer.add( this.percentText );
             //this.layer.add( this.percentSymbolText );
 
-            this.drawArc();
             this.drawArcLine();
             this.drawArcText();
             this.drawText();
             this.drawTextRect();
             */
+            this.drawArc();
             this.drawInnerCircle();
             this.drawInnerText();
             this.drawCircle();
