@@ -566,19 +566,10 @@ export default class Gauge extends VisChartBase  {
                 , geometry.radians( 280 )
             );
 
-        let p1 = new THREE.Vector3()
-            , p2 = new THREE.Vector3()
-            , p3 = new THREE.Vector3()
-            ;
-            p1.set( -this.arcOutRadius, 0, this.arcOutRadius );
-            p2.set( this.arcOutRadius, 0, -this.arcOutRadius );
+        var texture = new THREE.Texture( this.generateTexture() );
+            texture.needsUpdate = true; // important!
 
-            geometryx.vertices.push( p1 );
-            geometryx.vertices.push( p2 );
-
-            geometryx.colors.push( 0xff9000, 0x64b185 );
-
-            material = new THREE.MeshBasicMaterial( { /*color: color,*/ side: THREE.DoubleSide } );
+            material = new THREE.MeshBasicMaterial( { /*color: color,*/ map: texture, side: THREE.DoubleSide, transparent: true } );
             arc = new THREE.Mesh( geometryx, material );
             //arc.rotation.z = geometry.radians( -80 );
             //arc.renderOrder = 1;
@@ -590,6 +581,28 @@ export default class Gauge extends VisChartBase  {
 
     }
 
+    generateTexture() {
+
+        var size = this.arcOutRadius * 2;
+
+        // create canvas
+        var canvas = document.createElement( 'canvas' );
+        canvas.width = size;
+        canvas.height = size;
+
+        // get context
+        var context = canvas.getContext( '2d' );
+
+        // draw gradient
+        context.rect( -size / 2,  - size / 2, size + size / 2, size + size / 2 );
+        var gradient = context.createLinearGradient( 0, 0, size, size );
+        gradient.addColorStop(0, '#5a78ca'); 
+        gradient.addColorStop(0.5, '#64b185');
+        gradient.addColorStop(1, '#ff9000'); 
+        context.fillStyle = gradient;
+        context.fill();
+        return canvas;
+    }
 
     initDataLayout(){
 
