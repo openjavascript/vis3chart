@@ -90,8 +90,6 @@ export default class ThreeBase extends VisChartBase {
             });
         }
 
-        console.log( 'load images', Date.now(), this.images );
-
         this.images.map( ( item, key ) => {
             item.opt = item.opt || {};
             if( item.opt.issvgstring ){
@@ -160,7 +158,6 @@ export default class ThreeBase extends VisChartBase {
         pivot.scale.set( scale, scale, scale );
 
         pivot.position.y = this.fixCy();
-
 
         this.scene.add( pivot );
         this.addDestroy( pivot );

@@ -1,12 +1,21 @@
 
 import VisChartBase from '../common/base.js';
 import * as geometry from '../../geometry/geometry.js';
+import * as geometry3d from '../../geometry/geometry3d.js';
 
 import PointAt from '../common/pointat.js';
 
 import ju from 'json-utilsx';
 
 import * as utils from '../../common/utils.js';
+
+const THREE = require( 'three' );
+
+import TextTexture from 'three.texttexture';
+import TextSprite from 'three.textsprite';
+
+import {MeshLine, MeshLineMaterial} from 'three.meshline'
+
 
 //import RoundStateText from '../icon/roundstatetext.js';
 
@@ -303,18 +312,14 @@ export default class Gauge extends VisChartBase  {
     }
 
     animationCircleLine(){
-        //console.log( 'animationCircleLine' );
         if( this.isDestroy ) return;
         if( !this.circleLine ) return;
 
         if( !this.isAnimation() ){
             return;
         }
-        
-        this.circleLineRotation += this.circleLineRotationStep; 
 
-        this.circleLine.rotation( this.circleLineRotation );
-        this.stage.add( this.layoutLayer );
+        this.circleLine.rotation.z -= .03;
 
         window.requestAnimationFrame( ()=>{ this.animationCircleLine() } );
     }
@@ -551,6 +556,7 @@ export default class Gauge extends VisChartBase  {
         */
     }
 
+
     initDataLayout(){
 
         /*
@@ -629,7 +635,10 @@ export default class Gauge extends VisChartBase  {
 
         this.initRoundText();
 
+        */
+
         if( !this.inited ){
+            /*
             this.angle = this.arcOffset - 2;
            
             this.layer.add( this.group );
@@ -637,20 +646,17 @@ export default class Gauge extends VisChartBase  {
             this.layer.add( this.percentText );
             //this.layer.add( this.percentSymbolText );
 
-
-            this.drawCircle();
-            this.drawCircleLine();
             this.drawArc();
             this.drawArcLine();
             this.drawArcText();
             this.drawText();
             this.drawTextRect();
+            */
+            this.drawInnerCircle();
+            this.drawCircle();
+            this.drawCircleLine();
         }
 
-
-        this.stage.add( this.layer );
-        this.stage.add( this.layoutLayer );
-        */
 
     }
     animation(){
@@ -697,57 +703,153 @@ export default class Gauge extends VisChartBase  {
 
     calcLayoutPosition() {
     }
-    drawCircle(){
-        this.circleRadius = Math.ceil( this.circlePercent * this.max / 2 ) * this.sizeRate;
+    drawInnerCircle(){
+        this.innerCircleRadius = geometry3d.to3d( this.roundRadius );
+        //console.log( 'innerCircleRadius', this.roundRadius, this.innerCircleRadius );
+        //console.log( this.circleRadius );
 
-        /*
-        this.circle = new Konva.Circle( {
-            x: this.cx
-            , y: this.cy
-            , radius: this.circleRadius
-            , stroke: this.lineColor
-            , strokeWidth: 1
-            , fill: '#ffffff00'
-        });
-        this.addDestroy( this.circle );
-        this.layoutLayer.add( this.circle );
-        */
+        var line = new MeshLine();
+
+        var curve = new THREE.EllipseCurve(
+            0,  this.fixCy(),            // ax, aY
+            this.innerCircleRadius,
+            this.innerCircleRadius,
+            0,  2 * Math.PI,  // aStartAngle, aEndAngle
+            false,            // aClockwise
+            0                 // aRotation
+        );
+
+        var points = curve.getPoints( 200 );
+        var geometryy = new THREE.Geometry().setFromPoints( points );
+
+        curve = new THREE.EllipseCurve(
+            0,  this.fixCy(),            // ax, aY
+            this.innerCircleRadius,
+            this.innerCircleRadius,
+            0,  geometry.radians( 10 ),  // aStartAngle, aEndAngle
+            false,            // aClockwise
+            geometry.radians( .5 )                 // aRotation
+        );
+
+        points = [ ...points, ...curve.getPoints(  50 ) ] ;
+
+        geometryy = new THREE.Geometry().setFromPoints( points );
+
+        line.setGeometry( geometryy );
+        var material = new MeshLineMaterial( { 
+            color: new THREE.Color( this.lineColor )  
+            , lineWidth: 2
+        } );
+
+        var circle = new THREE.Mesh( line.geometry, material );
+
+        circle.renderOrder = -1;
+        circle.material.depthTest=false;
+
+        this.scene.add( circle );
+        this.addDestroy( circle );
+
+    }
+
+    drawCircle(){
+        this.circleRadius = geometry3d.to3d( Math.ceil( this.circlePercent * this.max / 2 ) * this.sizeRate );
+        //console.log( this.circleRadius );
+
+        var line = new MeshLine();
+
+        var curve = new THREE.EllipseCurve(
+            0,  this.fixCy(),            // ax, aY
+            this.circleRadius,
+            this.circleRadius,
+            0,  2 * Math.PI,  // aStartAngle, aEndAngle
+            false,            // aClockwise
+            0                 // aRotation
+        );
+
+        var points = curve.getPoints( 200 );
+        var geometryy = new THREE.Geometry().setFromPoints( points );
+
+        curve = new THREE.EllipseCurve(
+            0,  this.fixCy(),            // ax, aY
+            this.circleRadius,
+            this.circleRadius,
+            0,  geometry.radians( 10 ),  // aStartAngle, aEndAngle
+            false,            // aClockwise
+            geometry.radians( .5 )                 // aRotation
+        );
+
+        points = [ ...points, ...curve.getPoints(  50 ) ] ;
+
+        geometryy = new THREE.Geometry().setFromPoints( points );
+
+        line.setGeometry( geometryy );
+        var material = new MeshLineMaterial( { 
+            color: new THREE.Color( this.lineColor )  
+            , lineWidth: 2
+        } );
+
+        var circle = new THREE.Mesh( line.geometry, material );
+
+        circle.renderOrder = -1;
+        circle.material.depthTest=false;
+
+        this.scene.add( circle );
+        this.addDestroy( circle );
+
     }
 
     drawCircleLine(){
-        this.circleLineRadius = Math.ceil( this.circleLinePercent * this.max / 2 ) * this.sizeRate;
+        this.circleLineRadius = geometry3d.to3d( Math.ceil( this.circleLinePercent * this.max / 2 ) ); 
 
-        let points = [];
-            points.push( 'M' );
-        for( let i = 90; i <= 180; i++ ){
-            let tmp = geometry.distanceAngleToPoint( this.circleLineRadius, i + 90 );
-            points.push( [ tmp.x, tmp.y ] .join(',') + ','  );
-            if( i == 90 ){
-                points.push( 'L' );
-            }
-        }
-        points.push( 'M');
-        for( let i = 270; i <= 360; i++ ){
-            let tmp = geometry.distanceAngleToPoint( this.circleLineRadius, i + 90 );
-            points.push( [ tmp.x, tmp.y ] .join(',') + ','  );
-            if( i == 270 ){
-                points.push( 'L' );
-            }
-        }
+        let material,  geometryItem, circle, group, line;
 
-        /*
-        this.circleLine = new Konva.Path( {
-            data: points.join('')
-            , x: this.cx
-            , y: this.cy
-            , stroke: this.lineColor
-            , strokeWidth: 1.5
-            , fill: '#ffffff00'
-        });
-        this.addDestroy( this.circleLine );
+        group = new THREE.Group();
 
-        this.layoutLayer.add( this.circleLine );
-        */
+        line = new MeshLine();
+        material = new MeshLineMaterial( { 
+            color: new THREE.Color( this.lineColor )  
+            , lineWidth: 2
+        } );
+        geometryItem = new THREE.CircleGeometry(  
+            this.circleLineRadius
+            , 128
+            , geometry.radians( 90 )
+            , geometry.radians( 90 )
+        );
+        geometryItem.vertices.shift();
+        line.setGeometry( geometryItem );
+        circle = new THREE.Line( line.geometry, material );
+        circle.renderOrder = -1;
+        circle.material.depthTest=false;
+        group.add( circle );
+        this.addDestroy( circle );
+
+        line = new MeshLine();
+        material = new MeshLineMaterial( { 
+            color: new THREE.Color( this.lineColor )  
+            , lineWidth: 2
+        } );
+        geometryItem = new THREE.CircleGeometry(  
+            this.circleLineRadius
+            , 128
+            , geometry.radians( 0 )
+            , geometry.radians( -90  )
+        );
+        geometryItem.vertices.shift();
+        line.setGeometry( geometryItem );
+        circle = new THREE.Line( line.geometry, material );
+        circle.renderOrder = -1;
+        circle.material.depthTest=false;
+
+        group.position.y = this.fixCy();
+
+        group.add( circle );
+        this.addDestroy( circle );
+
+        this.circleLine = group;
+
+        this.scene.add( group );
+        this.addDestroy( group );
     }
 
     reset(){

@@ -16,6 +16,10 @@ var _geometry = require('../../geometry/geometry.js');
 
 var geometry = _interopRequireWildcard(_geometry);
 
+var _geometry3d = require('../../geometry/geometry3d.js');
+
+var geometry3d = _interopRequireWildcard(_geometry3d);
+
 var _pointat = require('../common/pointat.js');
 
 var _pointat2 = _interopRequireDefault(_pointat);
@@ -28,15 +32,29 @@ var _utils = require('../../common/utils.js');
 
 var utils = _interopRequireWildcard(_utils);
 
+var _three = require('three.texttexture');
+
+var _three2 = _interopRequireDefault(_three);
+
+var _three3 = require('three.textsprite');
+
+var _three4 = _interopRequireDefault(_three3);
+
+var _three5 = require('three.meshline');
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var THREE = require('three');
 
 //import RoundStateText from '../icon/roundstatetext.js';
 
@@ -356,7 +374,6 @@ var Gauge = function (_VisChartBase) {
         value: function animationCircleLine() {
             var _this6 = this;
 
-            //console.log( 'animationCircleLine' );
             if (this.isDestroy) return;
             if (!this.circleLine) return;
 
@@ -364,10 +381,7 @@ var Gauge = function (_VisChartBase) {
                 return;
             }
 
-            this.circleLineRotation += this.circleLineRotationStep;
-
-            this.circleLine.rotation(this.circleLineRotation);
-            this.stage.add(this.layoutLayer);
+            this.circleLine.rotation.z -= .03;
 
             window.requestAnimationFrame(function () {
                 _this6.animationCircleLine();
@@ -663,25 +677,25 @@ var Gauge = function (_VisChartBase) {
                  this.group = group;
             }
               this.initRoundText();
-             if( !this.inited ){
+             */
+
+            if (!this.inited) {
+                /*
                 this.angle = this.arcOffset - 2;
-               
-                this.layer.add( this.group );
+                            this.layer.add( this.group );
                 this.layer.add( this.roundLine );
                 this.layer.add( this.percentText );
                 //this.layer.add( this.percentSymbolText );
-                  this.drawCircle();
-                this.drawCircleLine();
-                this.drawArc();
+                 this.drawArc();
                 this.drawArcLine();
                 this.drawArcText();
                 this.drawText();
                 this.drawTextRect();
+                */
+                this.drawInnerCircle();
+                this.drawCircle();
+                this.drawCircleLine();
             }
-              this.stage.add( this.layer );
-            this.stage.add( this.layoutLayer );
-            */
-
         }
     }, {
         key: 'animation',
@@ -734,58 +748,136 @@ var Gauge = function (_VisChartBase) {
         key: 'calcLayoutPosition',
         value: function calcLayoutPosition() {}
     }, {
+        key: 'drawInnerCircle',
+        value: function drawInnerCircle() {
+            this.innerCircleRadius = geometry3d.to3d(this.roundRadius);
+            //console.log( 'innerCircleRadius', this.roundRadius, this.innerCircleRadius );
+            //console.log( this.circleRadius );
+
+            var line = new _three5.MeshLine();
+
+            var curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
+            this.innerCircleRadius, this.innerCircleRadius, 0, 2 * Math.PI, // aStartAngle, aEndAngle
+            false, // aClockwise
+            0 // aRotation
+            );
+
+            var points = curve.getPoints(200);
+            var geometryy = new THREE.Geometry().setFromPoints(points);
+
+            curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
+            this.innerCircleRadius, this.innerCircleRadius, 0, geometry.radians(10), // aStartAngle, aEndAngle
+            false, // aClockwise
+            geometry.radians(.5) // aRotation
+            );
+
+            points = [].concat(_toConsumableArray(points), _toConsumableArray(curve.getPoints(50)));
+
+            geometryy = new THREE.Geometry().setFromPoints(points);
+
+            line.setGeometry(geometryy);
+            var material = new _three5.MeshLineMaterial({
+                color: new THREE.Color(this.lineColor),
+                lineWidth: 2
+            });
+
+            var circle = new THREE.Mesh(line.geometry, material);
+
+            circle.renderOrder = -1;
+            circle.material.depthTest = false;
+
+            this.scene.add(circle);
+            this.addDestroy(circle);
+        }
+    }, {
         key: 'drawCircle',
         value: function drawCircle() {
-            this.circleRadius = Math.ceil(this.circlePercent * this.max / 2) * this.sizeRate;
+            this.circleRadius = geometry3d.to3d(Math.ceil(this.circlePercent * this.max / 2) * this.sizeRate);
+            //console.log( this.circleRadius );
 
-            /*
-            this.circle = new Konva.Circle( {
-                x: this.cx
-                , y: this.cy
-                , radius: this.circleRadius
-                , stroke: this.lineColor
-                , strokeWidth: 1
-                , fill: '#ffffff00'
+            var line = new _three5.MeshLine();
+
+            var curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
+            this.circleRadius, this.circleRadius, 0, 2 * Math.PI, // aStartAngle, aEndAngle
+            false, // aClockwise
+            0 // aRotation
+            );
+
+            var points = curve.getPoints(200);
+            var geometryy = new THREE.Geometry().setFromPoints(points);
+
+            curve = new THREE.EllipseCurve(0, this.fixCy(), // ax, aY
+            this.circleRadius, this.circleRadius, 0, geometry.radians(10), // aStartAngle, aEndAngle
+            false, // aClockwise
+            geometry.radians(.5) // aRotation
+            );
+
+            points = [].concat(_toConsumableArray(points), _toConsumableArray(curve.getPoints(50)));
+
+            geometryy = new THREE.Geometry().setFromPoints(points);
+
+            line.setGeometry(geometryy);
+            var material = new _three5.MeshLineMaterial({
+                color: new THREE.Color(this.lineColor),
+                lineWidth: 2
             });
-            this.addDestroy( this.circle );
-            this.layoutLayer.add( this.circle );
-            */
+
+            var circle = new THREE.Mesh(line.geometry, material);
+
+            circle.renderOrder = -1;
+            circle.material.depthTest = false;
+
+            this.scene.add(circle);
+            this.addDestroy(circle);
         }
     }, {
         key: 'drawCircleLine',
         value: function drawCircleLine() {
-            this.circleLineRadius = Math.ceil(this.circleLinePercent * this.max / 2) * this.sizeRate;
+            this.circleLineRadius = geometry3d.to3d(Math.ceil(this.circleLinePercent * this.max / 2));
 
-            var points = [];
-            points.push('M');
-            for (var i = 90; i <= 180; i++) {
-                var tmp = geometry.distanceAngleToPoint(this.circleLineRadius, i + 90);
-                points.push([tmp.x, tmp.y].join(',') + ',');
-                if (i == 90) {
-                    points.push('L');
-                }
-            }
-            points.push('M');
-            for (var _i = 270; _i <= 360; _i++) {
-                var _tmp = geometry.distanceAngleToPoint(this.circleLineRadius, _i + 90);
-                points.push([_tmp.x, _tmp.y].join(',') + ',');
-                if (_i == 270) {
-                    points.push('L');
-                }
-            }
+            var material = void 0,
+                geometryItem = void 0,
+                circle = void 0,
+                group = void 0,
+                line = void 0;
 
-            /*
-            this.circleLine = new Konva.Path( {
-                data: points.join('')
-                , x: this.cx
-                , y: this.cy
-                , stroke: this.lineColor
-                , strokeWidth: 1.5
-                , fill: '#ffffff00'
+            group = new THREE.Group();
+
+            line = new _three5.MeshLine();
+            material = new _three5.MeshLineMaterial({
+                color: new THREE.Color(this.lineColor),
+                lineWidth: 2
             });
-            this.addDestroy( this.circleLine );
-             this.layoutLayer.add( this.circleLine );
-            */
+            geometryItem = new THREE.CircleGeometry(this.circleLineRadius, 128, geometry.radians(90), geometry.radians(90));
+            geometryItem.vertices.shift();
+            line.setGeometry(geometryItem);
+            circle = new THREE.Line(line.geometry, material);
+            circle.renderOrder = -1;
+            circle.material.depthTest = false;
+            group.add(circle);
+            this.addDestroy(circle);
+
+            line = new _three5.MeshLine();
+            material = new _three5.MeshLineMaterial({
+                color: new THREE.Color(this.lineColor),
+                lineWidth: 2
+            });
+            geometryItem = new THREE.CircleGeometry(this.circleLineRadius, 128, geometry.radians(0), geometry.radians(-90));
+            geometryItem.vertices.shift();
+            line.setGeometry(geometryItem);
+            circle = new THREE.Line(line.geometry, material);
+            circle.renderOrder = -1;
+            circle.material.depthTest = false;
+
+            group.position.y = this.fixCy();
+
+            group.add(circle);
+            this.addDestroy(circle);
+
+            this.circleLine = group;
+
+            this.scene.add(group);
+            this.addDestroy(group);
         }
     }, {
         key: 'reset',
