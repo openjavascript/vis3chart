@@ -609,7 +609,7 @@ var Gauge = function (_VisChartBase) {
             };
             */
 
-            console.log(this.arcInRadius, this.arcOutRadius);
+            //console.log( this.arcInRadius, this.arcOutRadius );
 
             var line = void 0,
                 material = void 0,

@@ -551,7 +551,7 @@ export default class Gauge extends VisChartBase  {
         };
         */
 
-        console.log( this.arcInRadius, this.arcOutRadius );
+        //console.log( this.arcInRadius, this.arcOutRadius );
 
         let line, material, geometryx, mesh, arc, tmp, color; 
 
