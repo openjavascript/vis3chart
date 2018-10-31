@@ -40,14 +40,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 //import RoundStateText from '../icon/roundstatetext.js';
 
-
 var Gauge = function (_VisChartBase) {
     _inherits(Gauge, _VisChartBase);
 
-    function Gauge(box, width, height, camera) {
+    function Gauge(box, width, height) {
         _classCallCheck(this, Gauge);
 
-        var _this = _possibleConstructorReturn(this, (Gauge.__proto__ || Object.getPrototypeOf(Gauge)).call(this, box, width, height, camera));
+        var _this = _possibleConstructorReturn(this, (Gauge.__proto__ || Object.getPrototypeOf(Gauge)).call(this, box, width, height));
 
         _this.name = 'Gauge' + Date.now();
 
@@ -266,22 +265,21 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'initRoundText',
         value: function initRoundText() {
+            var _this4 = this;
+
             this.textRoundAngle.map(function (val) {
 
-                /*
-                if( !val.ins ){
-                    val.ins = new RoundStateText( this.box, this.width, this.height );
-                    val.ins.setOptions( Object.assign( val, {
-                        stage: this.stage
-                        , layer: this.layoutLayer
-                        , data: this.data
-                        , allData: this.allData
-                    }) );
-                    val.ins.init( );
+                if (!val.ins) {
+                    val.ins = new RoundStateText(_this4.box, _this4.width, _this4.height);
+                    val.ins.setOptions(Object.assign(val, {
+                        stage: _this4.stage,
+                        layer: _this4.layoutLayer,
+                        data: _this4.data,
+                        allData: _this4.allData
+                    }));
+                    val.ins.init();
                 }
-                val.ins.update( this.curRate );
-                */
-
+                val.ins.update(_this4.curRate);
             });
         }
         /*
@@ -304,17 +302,17 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'update',
         value: function update(data, allData) {
-            var _this4 = this;
+            var _this5 = this;
 
-            this.stage.removeChildren();
+            //this.stage.removeChildren();
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'update', this).call(this, data, allData);
 
             //console.log( 123, data );
 
             if (data && data.data && data.data.length) {
                 data.data.map(function (val) {
-                    _this4.curRate = val.value;
-                    _this4.totalNum = val.total;
+                    _this5.curRate = val.value;
+                    _this5.totalNum = val.total;
                 });
             }
 
@@ -336,11 +334,17 @@ var Gauge = function (_VisChartBase) {
                 this.rateStep = Math.floor(this.curRate / (this.animationStep * 2));
                 !this.inited && this.animation();
             }
-            if (this.totalNum) {
+            if (parseInt(this.totalNum)) {
                 this.totalNumStep = Math.floor(this.totalNum / this.animationStep);
                 this.totalNumStep < 1 && (this.totalNumStep = 1);
                 this.totalNumCount = 0;
                 this.animationText();
+            } else {
+                /*
+                this.totalText.text( this.totalNum + '' );
+                this.totalTextPostfix.x( this.totalText.textWidth + 5 );
+                this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+                */
             }
 
             !this.inited && this.animationCircleLine();
@@ -350,7 +354,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'animationCircleLine',
         value: function animationCircleLine() {
-            var _this5 = this;
+            var _this6 = this;
 
             //console.log( 'animationCircleLine' );
             if (this.isDestroy) return;
@@ -366,81 +370,76 @@ var Gauge = function (_VisChartBase) {
             this.stage.add(this.layoutLayer);
 
             window.requestAnimationFrame(function () {
-                _this5.animationCircleLine();
+                _this6.animationCircleLine();
             });
         }
     }, {
         key: 'animationText',
         value: function animationText() {
-            var _this6 = this;
+            var _this7 = this;
 
             if (this.isDestroy) return;
 
-            if (this.totalNumCount >= this.totalNum) return;
+            if (this.totalNumCount >= this.totalNum) {
+                return;
+            }
             this.totalNumCount += this.totalNumStep;
 
             if (this.totalNumCount >= this.totalNum || !this.isAnimation()) {
                 this.totalNumCount = this.totalNum;
             };
 
-            this.totalText.text(this.totalNumCount);
-            this.totalTextPostfix.x(this.totalText.textWidth + 5);
-
-            this.totalTextGroup.x((this.width - this.totalTextPostfix.textWidth - this.totalText.textWidth - 5) / 2);
-
-            this.layoutLayer.add(this.totalTextGroup);
+            /*
+            this.totalText.text( this.totalNumCount );
+            this.totalTextPostfix.x( this.totalText.textWidth + 5 );
+             this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+             this.layoutLayer.add( this.totalTextGroup );
+            */
 
             window.requestAnimationFrame(function () {
-                _this6.animationText();
+                _this7.animationText();
             });
         }
     }, {
         key: 'drawText',
         value: function drawText() {
+
             /*
-                    this.totalTextGroup = new Konva.Group();
-                    this.addDestroy( this.totalTextGroup );
-            
-                    let params = {
-                        text: 0 + ''
-                        , fontSize: 30 * this.sizeRate
-                        , fontFamily: 'Agency FB'
-                        , fill: '#ffffff'
-                        , fontStyle: 'italic'
-                        , letterSpacing: 1.5
-                    }, tmp = ju.clone( params );
-                    tmp.text = this.totalNum;
-            
-                    this.totalText = new Konva.Text( params );
-                    this.addDestroy( this.totalText );
-            
-                    let params1 = {
-                        text: this.totalPostfix
-                        , x: this.totalText.textWidth + 5
-                        , fontSize: 12 * this.sizeRate
-                        , fontFamily: 'MicrosoftYaHei'
-                        , fill: '#ffffff'
-                        , fontStyle: 'italic'
-                        , letterSpacing: 1.5
-                    };
-            
-                    this.totalTextPostfix = new Konva.Text( params1 );
-                    this.totalTextPostfix.y( this.totalText.textHeight - this.totalTextPostfix.textHeight - 4 );
-                    this.addDestroy( this.totalTextPostfix );
-            
-                    this.totalTextGroup.add( this.totalText );
-                    this.totalTextGroup.add( this.totalTextPostfix );
-            
-                    //console.log( this.totalTextGroup, this.totalTextGroup.getClipWidth(), this.totalTextGroup.width(), this.totalTextGroup.size()  );
-            
-                    //this.totalTextGroup.x( this.cx - this.totalTextGroup.width / 2 );
-                    this.totalTextGroup.y( this.textY);
-                    this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
-            
-                    this.tmpTotalText = new Konva.Text( tmp );
-                    this.addDestroy( this.tmpTotalText );
-            
+            this.totalTextGroup = new Konva.Group();
+            this.addDestroy( this.totalTextGroup );
+             let params = {
+                text: 0 + ''
+                , fontSize: 30 * this.sizeRate
+                , fontFamily: 'Agency FB'
+                , fill: '#ffffff'
+                , fontStyle: 'italic'
+                , letterSpacing: 1.5
+            }, tmp = ju.clone( params );
+            tmp.text = this.totalNum;
+             this.totalText = new Konva.Text( params );
+            this.addDestroy( this.totalText );
+             let params1 = {
+                text: this.totalPostfix
+                , x: this.totalText.textWidth + 5
+                , fontSize: 12 * this.sizeRate
+                , fontFamily: 'MicrosoftYaHei'
+                , fill: '#ffffff'
+                , fontStyle: 'italic'
+                , letterSpacing: 1.5
+            };
+             this.totalTextPostfix = new Konva.Text( params1 );
+            this.totalTextPostfix.y( this.totalText.textHeight - this.totalTextPostfix.textHeight - 4 );
+            this.addDestroy( this.totalTextPostfix );
+             this.totalTextGroup.add( this.totalText );
+            this.totalTextGroup.add( this.totalTextPostfix );
+             //console.log( this.totalTextGroup, this.totalTextGroup.getClipWidth(), this.totalTextGroup.width(), this.totalTextGroup.size()  );
+             //this.totalTextGroup.x( this.cx - this.totalTextGroup.width / 2 );
+            this.totalTextGroup.y( this.textY);
+            this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+             this.tmpTotalText = new Konva.Text( tmp );
+            this.addDestroy( this.tmpTotalText );
             */
+
         }
     }, {
         key: 'drawTextRect',
@@ -456,47 +455,50 @@ var Gauge = function (_VisChartBase) {
             textX = this.cx - textWidth / 2 + 2;;
 
             textY = this.textY - (this.textHeight - this.totalText.textHeight) / 2;
+
             /*
-                    this.textRect = new Konva.Rect( {
-                        fill: '#596ea7'
-                        , stroke: '#ffffff00'
-                        , strokeWidth: 0
-                        , opacity: .3
-                        , width: textWidth
-                        , height: this.textHeight
-                        , x: textX
-                        , y: textY
-                    });
-                    this.addDestroy( this.textRect );
-            
-                    let points = [];
-                    points.push( 'M', [ textX, textY + this.textLineLength ].join(',') );
-                    points.push( 'L', [ textX, textY ].join(',') );
-                    points.push( 'L', [ textX + this.textLineLength, textY ].join(',') );
-            
-                    points.push( 'M', [ textX + textWidth - this.textLineLength, textY ].join(',') );
-                    points.push( 'L', [ textX + textWidth, textY ].join(',') );
-                    points.push( 'L', [ textX + textWidth, textY + this.textLineLength ].join(',') );
-            
-                    points.push( 'M', [ textX + textWidth, textY + this.textHeight - this.textLineLength ].join(',') );
-                    points.push( 'L', [ textX + textWidth, textY + this.textHeight ].join(',') );
-                    points.push( 'L', [ textX + textWidth - this.textLineLength, textY + this.textHeight ].join(',') );
-            
-                    points.push( 'M', [ textX + this.textLineLength, textY + this.textHeight ].join(',') );
-                    points.push( 'L', [ textX, textY + this.textHeight ].join(',') );
-                    points.push( 'L', [ textX, textY + this.textHeight - this.textLineLength ].join(',') );
-            
-                    this.textLinePath = new Konva.Path( {
-                        data: points.join('')
-                        , stroke: this.lineColor
-                        , strokeWidth: 1
-                    });
-                    this.addDestroy( this.textLinePath );
-            
-                    this.layoutLayer.add( this.textLinePath );
-                    this.layoutLayer.add( this.textRect );
-                    //this.layoutLayer.add( this.totalText );
-                    this.layoutLayer.add( this.totalTextGroup );*/
+            this.textRect = new Konva.Rect( {
+                fill: '#596ea7'
+                , stroke: '#ffffff00'
+                , strokeWidth: 0
+                , opacity: .3
+                , width: textWidth
+                , height: this.textHeight
+                , x: textX
+                , y: textY
+            });
+            this.addDestroy( this.textRect );
+            */
+
+            var points = [];
+            points.push('M', [textX, textY + this.textLineLength].join(','));
+            points.push('L', [textX, textY].join(','));
+            points.push('L', [textX + this.textLineLength, textY].join(','));
+
+            points.push('M', [textX + textWidth - this.textLineLength, textY].join(','));
+            points.push('L', [textX + textWidth, textY].join(','));
+            points.push('L', [textX + textWidth, textY + this.textLineLength].join(','));
+
+            points.push('M', [textX + textWidth, textY + this.textHeight - this.textLineLength].join(','));
+            points.push('L', [textX + textWidth, textY + this.textHeight].join(','));
+            points.push('L', [textX + textWidth - this.textLineLength, textY + this.textHeight].join(','));
+
+            points.push('M', [textX + this.textLineLength, textY + this.textHeight].join(','));
+            points.push('L', [textX, textY + this.textHeight].join(','));
+            points.push('L', [textX, textY + this.textHeight - this.textLineLength].join(','));
+
+            /*
+            this.textLinePath = new Konva.Path( {
+                data: points.join('')
+                , stroke: this.lineColor
+                , strokeWidth: 1
+            });
+            this.addDestroy( this.textLinePath );
+             this.layoutLayer.add( this.textLinePath );
+            this.layoutLayer.add( this.textRect );
+            //this.layoutLayer.add( this.totalText );
+            this.layoutLayer.add( this.totalTextGroup );
+            */
         }
     }, {
         key: 'drawArcText',
@@ -504,7 +506,8 @@ var Gauge = function (_VisChartBase) {
             if (!(this.textAr && this.textAr.length)) return;
 
             this.textAr.map(function (val) {
-                /*let text = new Konva.Text( {
+                /*
+                let text = new Konva.Text( {
                     x: val.point.x + this.cx
                     , y: val.point.y + this.cy
                     , text: val.text + ''
@@ -515,7 +518,8 @@ var Gauge = function (_VisChartBase) {
                 });
                 this.addDestroy( text );
                  text.rotation( val.angle + 90 + ( val.rotationOffset || 0 ) );
-                 this.layoutLayer.add( text );*/
+                 this.layoutLayer.add( text );
+                */
             });
         }
     }, {
@@ -531,40 +535,38 @@ var Gauge = function (_VisChartBase) {
                     points.push('L');
                 }
             }
+
             /*
-                    this.arcLine = new Konva.Path( {
-                        data: points.join('')
-                        , x: this.cx
-                        , y: this.cy
-                        , stroke: this.lineColor
-                        , strokeWidth: 1
-                        , fill: '#ffffff00'
-                    });
-                    this.addDestroy( this.arcLine );
-            
-                    this.arcPartLine = new Konva.Path( {
-                        data: this.arcPartLineAr.join('')
-                        , x: this.cx
-                        , y: this.cy
-                        , stroke: '#00000088'
-                        , strokeWidth: 1
-                        , fill: '#ffffff00'
-                    });
-                    this.addDestroy( this.arcPartLine );
-            
-                    this.arcOutlinePart = new Konva.Path( {
-                        data: this.arcOutlinePartAr.join('')
-                        , x: this.cx
-                        , y: this.cy
-                        , stroke: this.lineColor
-                        , strokeWidth: 1
-                        , fill: '#ffffff00'
-                    });
-                    this.addDestroy( this.arcOutlinePart );
-            
-                    this.layoutLayer.add( this.arcLine );
-                    this.layoutLayer.add( this.arcPartLine );
-                    this.layoutLayer.add( this.arcOutlinePart );
+            this.arcLine = new Konva.Path( {
+                data: points.join('')
+                , x: this.cx
+                , y: this.cy
+                , stroke: this.lineColor
+                , strokeWidth: 1
+                , fill: '#ffffff00'
+            });
+            this.addDestroy( this.arcLine );
+             this.arcPartLine = new Konva.Path( {
+                data: this.arcPartLineAr.join('')
+                , x: this.cx
+                , y: this.cy
+                , stroke: '#00000088'
+                , strokeWidth: 1
+                , fill: '#ffffff00'
+            });
+            this.addDestroy( this.arcPartLine );
+             this.arcOutlinePart = new Konva.Path( {
+                data: this.arcOutlinePartAr.join('')
+                , x: this.cx
+                , y: this.cy
+                , stroke: this.lineColor
+                , strokeWidth: 1
+                , fill: '#ffffff00'
+            });
+            this.addDestroy( this.arcOutlinePart );
+             this.layoutLayer.add( this.arcLine );
+            this.layoutLayer.add( this.arcPartLine );
+            this.layoutLayer.add( this.arcOutlinePart );
             */
         }
     }, {
@@ -595,109 +597,96 @@ var Gauge = function (_VisChartBase) {
         key: 'initDataLayout',
         value: function initDataLayout() {
 
-            if (!this.inited) {}
             /*
-            this.layer = new Konva.Layer();
-            this.addDestroy(this.layer );
-            
-            this.layoutLayer = new Konva.Layer();
-            this.addDestroy( this.layoutLayer );
-             this.roundLine = new Konva.Circle( {
-                x: this.cx
-                , y: this.cy
-                , radius: this.roundRadius
-                , stroke: this.lineColor
-                , strokeWidth: 2.5
-                , fill: 'rgba( 0, 0, 0, .5 )'
-            });
-            this.addDestroy( this.roundLine );
+            if( !this.inited ){
+                
+                this.layer = new Konva.Layer();
+                this.addDestroy(this.layer );
+                
+                this.layoutLayer = new Konva.Layer();
+                this.addDestroy( this.layoutLayer );
+                 this.roundLine = new Konva.Circle( {
+                    x: this.cx
+                    , y: this.cy
+                    , radius: this.roundRadius
+                    , stroke: this.lineColor
+                    , strokeWidth: 2.5
+                    , fill: 'rgba( 0, 0, 0, .5 )'
+                });
+                this.addDestroy( this.roundLine );
+            }
+             if( !this.inited ){
+                this.percentText = new Konva.Text( {
+                    x: this.cx
+                    , y: this.cy
+                    , text: this.getAttackText()
+                    , fontSize: 18 * this.sizeRate
+                    , fontFamily: 'HuXiaoBoKuHei'
+                    , fill: '#ffffff'
+                    , fontStyle: 'italic'
+                });
+                this.addDestroy( this.percentText );
+            }
+            this.percentText.text( this.getAttackText() );
+            this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
+            this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
+            if( !this.inited ){
+               let wedge = new Konva.Wedge({
+                  x: 0,
+                  y: -3,
+                  radius: 10,
+                  angle: 20,
+                  fill: '#ff5a00',
+                  stroke: '#ff5a00',
+                  strokeWidth: 1,
+                  rotation: 90
+                });
+                this.addDestroy( wedge );
+                let wedge1 = new Konva.Wedge({
+                  x: 0,
+                  y: -3,
+                  radius: 10,
+                  angle: 20,
+                  fill: '#973500',
+                  stroke: '#973500',
+                  strokeWidth: 1,
+                  rotation: 65
+                });
+                this.addDestroy( wedge1 );
+                 let group = new Konva.Group({
+                    x: this.cx
+                    , y: this.cy
+                });
+                this.addDestroy( group );
+                 group.add( wedge1 );
+                group.add( wedge );
+                 this.group = group;
+            }
+              this.initRoundText();
+             if( !this.inited ){
+                this.angle = this.arcOffset - 2;
+               
+                this.layer.add( this.group );
+                this.layer.add( this.roundLine );
+                this.layer.add( this.percentText );
+                //this.layer.add( this.percentSymbolText );
+                  this.drawCircle();
+                this.drawCircleLine();
+                this.drawArc();
+                this.drawArcLine();
+                this.drawArcText();
+                this.drawText();
+                this.drawTextRect();
+            }
+              this.stage.add( this.layer );
+            this.stage.add( this.layoutLayer );
             */
 
-            /*
-                    if( !this.inited ){
-                        this.percentText = new Konva.Text( {
-                            x: this.cx
-                            , y: this.cy
-                            , text: this.getAttackText()
-                            , fontSize: 18 * this.sizeRate
-                            , fontFamily: 'HuXiaoBoKuHei'
-                            , fill: '#ffffff'
-                            , fontStyle: 'italic'
-                        });
-                        this.addDestroy( this.percentText );
-                    }
-                    this.percentText.text( this.getAttackText() );
-                    this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
-                    this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
-            */
-            /*
-                   if( !this.inited ){
-                       let wedge = new Konva.Wedge({
-                          x: 0,
-                          y: -3,
-                          radius: 10,
-                          angle: 20,
-                          fill: '#ff5a00',
-                          stroke: '#ff5a00',
-                          strokeWidth: 1,
-                          rotation: 90
-                        });
-                        this.addDestroy( wedge );
-            
-                       let wedge1 = new Konva.Wedge({
-                          x: 0,
-                          y: -3,
-                          radius: 10,
-                          angle: 20,
-                          fill: '#973500',
-                          stroke: '#973500',
-                          strokeWidth: 1,
-                          rotation: 65
-                        });
-                        this.addDestroy( wedge1 );
-            
-                        let group = new Konva.Group({
-                            x: this.cx
-                            , y: this.cy
-                        });
-                        this.addDestroy( group );
-            
-                        group.add( wedge1 );
-                        group.add( wedge );
-            
-                        this.group = group;
-                    }
-            
-            
-                    this.initRoundText();
-            
-                    if( !this.inited ){
-                        this.angle = this.arcOffset - 2;
-                       
-                        this.layer.add( this.group );
-                        this.layer.add( this.roundLine );
-                        this.layer.add( this.percentText );
-                        //this.layer.add( this.percentSymbolText );
-            
-            
-                        this.drawCircle();
-                        this.drawCircleLine();
-                        this.drawArc();
-                        this.drawArcLine();
-                        this.drawArcText();
-                        this.drawText();
-                        this.drawTextRect();
-                    }
-            
-            
-                    this.stage.add( this.layer );
-                    this.stage.add( this.layoutLayer );
-            */
         }
     }, {
         key: 'animation',
         value: function animation() {
-            var _this7 = this;
+            var _this8 = this;
 
             //console.log( this.angle, this.animationAngle );
             if (this.isDestroy) return;
@@ -711,21 +700,23 @@ var Gauge = function (_VisChartBase) {
 
             this.updateWedge();
 
-            this.stage.add(this.layer);
+            //this.stage.add( this.layer );
 
             window.requestAnimationFrame(function () {
-                _this7.animation();
+                _this8.animation();
             });
         }
     }, {
         key: 'updateWedge',
         value: function updateWedge() {
-            var point = geometry.distanceAngleToPoint(this.roundRadius + 6, this.angle);
-            this.group.x(this.cx + point.x);
-            this.group.y(this.cy + point.y);
-            this.group.rotation(this.angle + 90);
-            this.group.rotation(this.angle + 90);
-            this.stage.add(this.layer);
+            /*
+            let point = geometry.distanceAngleToPoint(  this.roundRadius + 6, this.angle )
+            this.group.x( this.cx + point.x );
+            this.group.y( this.cy + point.y );
+            this.group.rotation( this.angle + 90 );
+            this.group.rotation( this.angle + 90 );
+            this.stage.add( this.layer );
+            */
         }
     }, {
         key: 'calcDataPosition',
@@ -746,17 +737,19 @@ var Gauge = function (_VisChartBase) {
         key: 'drawCircle',
         value: function drawCircle() {
             this.circleRadius = Math.ceil(this.circlePercent * this.max / 2) * this.sizeRate;
+
             /*
-                    this.circle = new Konva.Circle( {
-                        x: this.cx
-                        , y: this.cy
-                        , radius: this.circleRadius
-                        , stroke: this.lineColor
-                        , strokeWidth: 1
-                        , fill: '#ffffff00'
-                    });
-                    this.addDestroy( this.circle );
-                    this.layoutLayer.add( this.circle );*/
+            this.circle = new Konva.Circle( {
+                x: this.cx
+                , y: this.cy
+                , radius: this.circleRadius
+                , stroke: this.lineColor
+                , strokeWidth: 1
+                , fill: '#ffffff00'
+            });
+            this.addDestroy( this.circle );
+            this.layoutLayer.add( this.circle );
+            */
         }
     }, {
         key: 'drawCircleLine',
@@ -780,18 +773,19 @@ var Gauge = function (_VisChartBase) {
                     points.push('L');
                 }
             }
+
             /*
-                    this.circleLine = new Konva.Path( {
-                        data: points.join('')
-                        , x: this.cx
-                        , y: this.cy
-                        , stroke: this.lineColor
-                        , strokeWidth: 1.5
-                        , fill: '#ffffff00'
-                    });
-                    this.addDestroy( this.circleLine );
-            
-                    this.layoutLayer.add( this.circleLine );*/
+            this.circleLine = new Konva.Path( {
+                data: points.join('')
+                , x: this.cx
+                , y: this.cy
+                , stroke: this.lineColor
+                , strokeWidth: 1.5
+                , fill: '#ffffff00'
+            });
+            this.addDestroy( this.circleLine );
+             this.layoutLayer.add( this.circleLine );
+            */
         }
     }, {
         key: 'reset',
