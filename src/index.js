@@ -77,7 +77,7 @@ export default class VisThree extends VisChartBase {
             )
             this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
             this.renderer.setPixelRatio( window.devicePixelRatio );
-            //this.renderer.setClearColor( 0xffffff, .1 );
+            this.renderer.setClearColor( 0xffffff, .5 );
             this.renderer.sortObjects  = true;
             this.box.innerHTML = '';
             this.box.appendChild( this.renderer.domElement );
@@ -207,11 +207,13 @@ export default class VisThree extends VisChartBase {
                         break;
                     }
                     case constant.CHART_TYPE.gauge: {
+                        //console.log( 'gauge 1', Date.now() );
                         ins = new Gauge( this.box, this.width, this.height, this.camera );
                         break;
                     }
                 }
                 if( ins ){
+                    //console.log( 'gauge 2', Date.now() );
                     this.legend && ins.setLegend( this.legend );
                     ins.setOptions( {
                         renderer: this.renderer
@@ -225,6 +227,7 @@ export default class VisThree extends VisChartBase {
             }
 
             if( ins ){
+                //console.log( 'gauge 3', Date.now() );
                 this.options && ( ins.setOptions( this.options ) );
 
                 let fillData = this.getLegendData( val );

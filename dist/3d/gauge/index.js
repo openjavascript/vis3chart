@@ -43,10 +43,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Gauge = function (_VisChartBase) {
     _inherits(Gauge, _VisChartBase);
 
-    function Gauge(box, width, height) {
+    function Gauge(box, width, height, camera) {
         _classCallCheck(this, Gauge);
 
-        var _this = _possibleConstructorReturn(this, (Gauge.__proto__ || Object.getPrototypeOf(Gauge)).call(this, box, width, height));
+        var _this = _possibleConstructorReturn(this, (Gauge.__proto__ || Object.getPrototypeOf(Gauge)).call(this, box, width, height, camera));
 
         _this.name = 'Gauge' + Date.now();
 

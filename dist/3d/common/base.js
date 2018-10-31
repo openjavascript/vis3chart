@@ -118,6 +118,8 @@ var ThreeBase = function (_VisChartBase) {
                 });
             }
 
+            console.log('load images', Date.now(), this.images);
+
             this.images.map(function (item, key) {
                 item.opt = item.opt || {};
                 if (item.opt.issvgstring) {

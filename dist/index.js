@@ -113,7 +113,7 @@ var VisThree = function (_VisChartBase) {
                 this.camera.position.set(this.config.cameraPosition.x, this.config.cameraPosition.y, this.config.cameraPosition.z);
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                 this.renderer.setPixelRatio(window.devicePixelRatio);
-                //this.renderer.setClearColor( 0xffffff, .1 );
+                this.renderer.setClearColor(0xffffff, .5);
                 this.renderer.sortObjects = true;
                 this.box.innerHTML = '';
                 this.box.appendChild(this.renderer.domElement);
@@ -245,11 +245,13 @@ var VisThree = function (_VisChartBase) {
                             }
                         case constant.CHART_TYPE.gauge:
                             {
+                                //console.log( 'gauge 1', Date.now() );
                                 ins = new _index4.default(_this3.box, _this3.width, _this3.height, _this3.camera);
                                 break;
                             }
                     }
                     if (ins) {
+                        //console.log( 'gauge 2', Date.now() );
                         _this3.legend && ins.setLegend(_this3.legend);
                         ins.setOptions({
                             renderer: _this3.renderer,
@@ -263,6 +265,7 @@ var VisThree = function (_VisChartBase) {
                 }
 
                 if (ins) {
+                    //console.log( 'gauge 3', Date.now() );
                     _this3.options && ins.setOptions(_this3.options);
 
                     var fillData = _this3.getLegendData(val);

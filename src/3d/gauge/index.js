@@ -11,8 +11,8 @@ import * as utils from '../../common/utils.js';
 //import RoundStateText from '../icon/roundstatetext.js';
 
 export default class Gauge extends VisChartBase  {
-    constructor( box, width, height ){
-        super( box, width, height );
+    constructor( box, width, height, camera ){
+        super( box, width, height, camera );
 
         this.name = 'Gauge' + Date.now();
 

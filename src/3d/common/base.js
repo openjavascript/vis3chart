@@ -70,7 +70,6 @@ export default class ThreeBase extends VisChartBase {
 
         if( this.iconLayer ) this.iconLayer.remove();
 
-
         this.images = [];
         this._images = [];
         this.rotationBg = [];
@@ -90,6 +89,8 @@ export default class ThreeBase extends VisChartBase {
                 );
             });
         }
+
+        console.log( 'load images', Date.now(), this.images );
 
         this.images.map( ( item, key ) => {
             item.opt = item.opt || {};
