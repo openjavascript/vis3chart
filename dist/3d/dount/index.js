@@ -569,24 +569,27 @@ var Dount = function (_VisChartBase) {
             this.total = total;
 
             this.data.data.map(function (val) {
-                val._percent = utils.parseFinance(val.value / total, 8);
-                tmp = utils.parseFinance(tmp + val._percent);
-                val._totalPercent = tmp;
+                val._percent = val.value / total;
 
-                val.percent = parseInt(val._percent * 100 * _this7.getPrecision(val)) / _this7.getPrecision(val);
+                var precision = _this7.getPrecision(val) * 10;
+                val.percent = Math.round(Math.floor(val._percent * 100 * precision) / 10) / _this7.getPrecision(val);
+
+                val._percent = val.percent / 100;
+                tmp = tmp + val._percent;
+                val._totalPercent = tmp;
 
                 val.endAngle = _this7.totalAngle * val._totalPercent;
             });
 
             //修正浮点数精确度
             if (this.data.data.length) {
-                var item = this.data.data[this.data.data.length - 1];
-                tmp = tmp - item._percent;
+                var val = this.data.data[this.data.data.length - 1];
+                val._totalPercent = 1;
+                val._percent = 1 - (tmp - val._percent);
 
-                item._percent = 1 - tmp;
-                item.percent = parseInt(item._percent * 100 * this.getPrecision(item)) / this.getPrecision(item);
-                item._totalPercent = 1;
-                item.endAngle = this.totalAngle;
+                var precision = this.getPrecision(val) * 10;
+                val.percent = Math.round(Math.floor(val._percent * 100 * precision) / 10) / this.getPrecision(val);
+                val.endAngle = this.totalAngle;
             }
         }
     }, {
