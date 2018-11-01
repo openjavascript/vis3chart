@@ -219,6 +219,8 @@ var VisThree = function (_VisChartBase) {
         value: function initChart() {
             var _this3 = this;
 
+            //console.log( 'initChart', Date.now() );
+
             if (this.ins && this.ins.length && !this.redraw) {
                 this.emptyblock = 'kao';
             } else {

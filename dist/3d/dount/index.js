@@ -65,8 +65,6 @@ var Dount = function (_VisChartBase) {
         var _this = _possibleConstructorReturn(this, (Dount.__proto__ || Object.getPrototypeOf(Dount)).call(this, box, width, height, camera));
 
         _this.name = 'Dount_' + Date.now();
-
-        _this._setSize(width, height);
         return _this;
     }
 

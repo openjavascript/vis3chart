@@ -24,8 +24,6 @@ export default class Gauge extends VisChartBase  {
         super( box, width, height, camera );
 
         this.name = 'Gauge' + Date.now();
-
-        this._setSize( width, height );
     }
 
     _setSize( width, height ){
@@ -61,13 +59,14 @@ export default class Gauge extends VisChartBase  {
         this.arcLabelLength = 6;
         this.arcTextLength = 20;
 
+        this.arcAngleOffset = -50;
         this.arcAngle = 280;
         this.part = 22;
         this.arcTotal = 1100;
 
         this.textOffset = 0;
 
-        this.arcOffset = 90 + ( 360 - this.arcAngle ) / 2;
+        this.arcOffset = this.arcAngleOffset;
         this.arcOffsetPad = -5;
         this.partLabel = this.part / 2;
         this.partAngle = ( this.arcAngle ) / this.part;
@@ -116,7 +115,6 @@ export default class Gauge extends VisChartBase  {
         ];
 
         this.init();
-
     }
 
     getAttackRateAngle(){
@@ -155,6 +153,7 @@ export default class Gauge extends VisChartBase  {
     }
 
     init(){
+        //console.log( 'init', Date.now() );
         this.textRoundRadius = this.width * this.textRoundPercent * this.sizeRate;
 
         this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
@@ -162,7 +161,7 @@ export default class Gauge extends VisChartBase  {
         this.arcInRadius = geometry3d.to3d( this.width * this.arcInPercent * this.sizeRate );
         this.arcOutRadius = geometry3d.to3d( this.width * this.arcOutPercent * this.sizeRate );
 
-        this.arcLineRaidus = Math.ceil( this.arcLinePercent * this.max ) * this.sizeRate
+        this.arcLineRaidus = geometry3d.to3d( Math.ceil( this.arcLinePercent * this.max ) * this.sizeRate );
 
         this.textWidth = this.textRectWidthPercent * this.width ;
         this.textHeight = 38 * this.sizeRate;
@@ -185,20 +184,13 @@ export default class Gauge extends VisChartBase  {
             if( i && i < this.part ){
                 start = geometry.distanceAngleToPoint( this.arcInRadius, angle );
                 end = geometry.distanceAngleToPoint( this.arcOutRadius, angle );
-
-                this.arcPartLineAr.push( 'M' );
-                this.arcPartLineAr.push( [ start.x, start.y ].join(',') );
-                this.arcPartLineAr.push( 'L' );
-                this.arcPartLineAr.push( [ end.x, end.y ].join(',') );
+                this.arcPartLineAr.push( {start: start, end: end } );
             }
 
             start = geometry.distanceAngleToPoint( this.arcLineRaidus, angle );
             end = geometry.distanceAngleToPoint( this.arcLineRaidus + this.arcLabelLength, angle );
 
-            this.arcOutlinePartAr.push( 'M' );
-            this.arcOutlinePartAr.push( [ start.x, start.y ].join(',') );
-            this.arcOutlinePartAr.push( 'L' );
-            this.arcOutlinePartAr.push( [ end.x, end.y ].join(',') );
+            this.arcOutlinePartAr.push( { start: start, end: end } );
             
             if( !(i * this.partNum % 100) || i === 0 ){
                 let angleOffset = 8, lengthOffset = 0, rotationOffset = 0;
@@ -226,6 +218,8 @@ export default class Gauge extends VisChartBase  {
             }
 
         }
+
+        console.log( 'this.arcPartLineAr', this.arcPartLineAr, 'this.arcOutlinePartAr', this.arcOutlinePartAr );
     }
 
     initRoundText(){
@@ -264,6 +258,7 @@ export default class Gauge extends VisChartBase  {
     update( data, allData ){
         //this.stage.removeChildren();
         super.update( data, allData );
+
 
 
         //console.log( 123, data );
@@ -480,6 +475,68 @@ export default class Gauge extends VisChartBase  {
 
     drawArcLine(){
 
+        var line = new MeshLine(), points, geometryy, material, circle, curve;
+
+        curve = new THREE.EllipseCurve(
+            0,  this.fixCy(),            // ax, aY
+            this.arcLineRaidus,
+            this.arcLineRaidus,
+            geometry.radians( this.arcAngleOffset ),
+            geometry.radians( this.arcAngle + this.arcAngleOffset ),  
+            false,            // aClockwise
+            0                 // aRotation
+        );
+
+        points = curve.getPoints( 200 );
+        geometryy = new THREE.Geometry().setFromPoints( points );
+
+        line.setGeometry( geometryy );
+
+        material = new MeshLineMaterial( { 
+            color: new THREE.Color( this.lineColor )  
+            , lineWidth: 1
+        } );
+
+        circle = new THREE.Mesh( line.geometry, material );
+
+        circle.renderOrder = -1;
+        circle.material.depthTest=false;
+
+        this.scene.add( circle );
+        this.addDestroy( circle );
+     }
+    drawArcPartLine(){
+
+        
+        let partpoints, geometryy, line, material, part;
+        partpoints = [];
+        line = new MeshLine();
+        this.arcPartLineAr.map( ( item, key ) => {
+            console.log( key, item );
+
+            let line = new THREE.Line3( 
+                new THREE.Vector3( item.start.x, item.start.y, 1 )
+                , new THREE.Vector3( item.end.x, item.end.y, 1 )
+            );
+            partpoints.push( 
+                new THREE.Vector3( item.start.x, item.start.y, 1 )
+                , new THREE.Vector3( item.end.x, item.end.y, 1 )
+            );
+        });
+
+        geometryy = new THREE.Geometry().setFromPoints( partpoints );
+        line.setGeometry( geometryy );
+        material = new MeshLineMaterial( { 
+            color: new THREE.Color( 0xffffff )  
+            , lineWidth: 5
+        } );
+        part = new THREE.Mesh( line.geometry, material );
+
+        this.scene.add( part );
+        this.addDestroy( part );
+
+       /*
+
         let points = [];
             points.push( 'M' );
         for( let i = this.arcOffset; i <= ( this.arcOffset + this.arcAngle ); i+=0.5 ){
@@ -490,7 +547,6 @@ export default class Gauge extends VisChartBase  {
             }
         }
 
-        /*
         this.arcLine = new Konva.Path( {
             data: points.join('')
             , x: this.cx
@@ -525,33 +581,10 @@ export default class Gauge extends VisChartBase  {
         this.layoutLayer.add( this.arcPartLine );
         this.layoutLayer.add( this.arcOutlinePart );
         */
+
     }
 
     drawArc(){
-
-        /*
-        let params = {
-            x: this.cx
-            , y: this.cy
-            , innerRadius: this.arcInRadius
-            , outerRadius: this.arcOutRadius
-            , angle: this.arcAngle
-            //, fill: 'red'
-            , stroke: '#ffffff00'
-            , strokeWidth: 0
-            , rotation: this.arcOffset
-            , fillLinearGradientStartPoint: { x : -50, y : -50}
-            , fillLinearGradientEndPoint: { x : 50, y : 50}
-            , fillLinearGradientColorStops: 
-            [ 
-                0, '#ff9000'
-                , .5, '#64b185'
-                , 1, '#5a78ca'
-            ]
-        };
-        */
-
-        //console.log( this.arcInRadius, this.arcOutRadius );
 
         let line, material, geometryx, mesh, arc, tmp, color; 
 
@@ -562,8 +595,8 @@ export default class Gauge extends VisChartBase  {
                 , this.arcOutRadius
                 , 256 
                 , 1
-                , geometry.radians( -50 )
-                , geometry.radians( 280 )
+                , geometry.radians( this.arcAngleOffset )
+                , geometry.radians( this.arcAngle )
             );
 
         var texture = new THREE.Texture( this.generateGradientTexture() );
@@ -575,6 +608,10 @@ export default class Gauge extends VisChartBase  {
             //arc.renderOrder = 1;
 
             arc.position.y = this.fixCy();
+            /*
+            arc.renderOrder = 1;
+            arc.material.depthTest=false;
+            */
 
             this.scene.add( arc );
             this.addDestroy( arc );
@@ -659,16 +696,17 @@ export default class Gauge extends VisChartBase  {
             this.layer.add( this.percentText );
             //this.layer.add( this.percentSymbolText );
 
-            this.drawArcLine();
             this.drawArcText();
             this.drawText();
             this.drawTextRect();
             */
             this.drawArc();
+            this.drawArcLine();
             this.drawInnerCircle();
             this.drawInnerText();
             this.drawCircle();
             this.drawCircleLine();
+            this.drawArcPartLine();
         }
 
 
@@ -735,30 +773,10 @@ export default class Gauge extends VisChartBase  {
             this.stage.add( this.percentText  );
         }
 
-        /*
-            this.percentText = new Konva.Text( {
-                x: this.cx
-                , y: this.cy
-                , text: this.getAttackText()
-                , fontSize: 18 * this.sizeRate
-                , fontFamily: 'HuXiaoBoKuHei'
-                , fill: '#ffffff'
-                , fontStyle: 'italic'
-            });
-            this.addDestroy( this.percentText );
-        }
-        this.percentText.text( this.getAttackText() );
-        this.percentText.x( this.cx - this.percentText.textWidth / 2 + this.textOffsetX );
-        this.percentText.y( this.cy - this.percentText.textHeight / 2 + this.textOffsetY );
-        */
-
     }
 
     drawInnerCircle(){
         this.innerCircleRadius = geometry3d.to3d( this.roundRadius );
-        //console.log( 'innerCircleRadius', this.roundRadius, this.innerCircleRadius );
-        //console.log( this.circleRadius );
-
         var line = new MeshLine();
 
         var curve = new THREE.EllipseCurve(
@@ -836,7 +854,7 @@ export default class Gauge extends VisChartBase  {
         line.setGeometry( geometryy );
         var material = new MeshLineMaterial( { 
             color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
+            , lineWidth: 1
         } );
 
         var circle = new THREE.Mesh( line.geometry, material );
@@ -859,7 +877,7 @@ export default class Gauge extends VisChartBase  {
         line = new MeshLine();
         material = new MeshLineMaterial( { 
             color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
+            , lineWidth: 1
         } );
         geometryItem = new THREE.CircleGeometry(  
             this.circleLineRadius
@@ -878,7 +896,7 @@ export default class Gauge extends VisChartBase  {
         line = new MeshLine();
         material = new MeshLineMaterial( { 
             color: new THREE.Color( this.lineColor )  
-            , lineWidth: 2
+            , lineWidth: 1
         } );
         geometryItem = new THREE.CircleGeometry(  
             this.circleLineRadius
