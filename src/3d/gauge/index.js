@@ -597,7 +597,7 @@ export default class Gauge extends VisChartBase  {
         context.rect( -size / 2,  - size / 2, size + size / 2, size + size / 2 );
         var gradient = context.createLinearGradient( 0, 0, size, size );
         gradient.addColorStop(0, '#5a78ca'); 
-        gradient.addColorStop(0.5, '#64b185');
+        gradient.addColorStop(0.4, '#64b185');
         gradient.addColorStop(1, '#ff9000'); 
         context.fillStyle = gradient;
         context.fill();
