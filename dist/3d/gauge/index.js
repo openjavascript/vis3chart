@@ -234,7 +234,8 @@ var Gauge = function (_VisChartBase) {
                     angle = void 0;
                 angle = i * this.partAngle + this.arcOffset;
 
-                if (i && i < this.part) {
+                //if( i && i < this.part ){
+                if (true) {
                     start = geometry.distanceAngleToPoint(this.arcInRadius, angle);
                     end = geometry.distanceAngleToPoint(this.arcOutRadius, angle);
                     this.arcPartLineAr.push({ start: start, end: end });
@@ -273,7 +274,7 @@ var Gauge = function (_VisChartBase) {
                 }
             }
 
-            console.log('this.arcPartLineAr', this.arcPartLineAr, 'this.arcOutlinePartAr', this.arcOutlinePartAr);
+            //console.log( 'this.arcPartLineAr', this.arcPartLineAr, 'this.arcOutlinePartAr', this.arcOutlinePartAr );
         }
     }, {
         key: 'initRoundText',
@@ -573,27 +574,73 @@ var Gauge = function (_VisChartBase) {
                 geometryy = void 0,
                 line = void 0,
                 material = void 0,
-                part = void 0;
-            partpoints = [];
+                part = void 0,
+                indices = void 0,
+                count = 0;
+            partpoints = [], indices = [];
             line = new _three5.MeshLine();
+
             this.arcPartLineAr.map(function (item, key) {
-                console.log(key, item);
-
-                var line = new THREE.Line3(new THREE.Vector3(item.start.x, item.start.y, 1), new THREE.Vector3(item.end.x, item.end.y, 1));
                 partpoints.push(new THREE.Vector3(item.start.x, item.start.y, 1), new THREE.Vector3(item.end.x, item.end.y, 1));
+                indices.push(key);
             });
 
-            geometryy = new THREE.Geometry().setFromPoints(partpoints);
-            line.setGeometry(geometryy);
-            material = new _three5.MeshLineMaterial({
-                color: new THREE.Color(0xffffff),
-                lineWidth: 5
+            console.log(partpoints);
+
+            material = new THREE.LineBasicMaterial({
+                color: this.lineColor
             });
-            part = new THREE.Mesh(line.geometry, material);
 
-            this.scene.add(part);
-            this.addDestroy(part);
+            var vertices = partpoints;
+            indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
 
+            var positions = new Float32Array(vertices.length * 3);
+
+            for (var i = 0; i < vertices.length; i++) {
+
+                positions[i * 3] = vertices[i].x;
+                positions[i * 3 + 1] = vertices[i].y;
+                positions[i * 3 + 2] = vertices[i].z;
+            }
+
+            var geometry = new THREE.BufferGeometry();
+            geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+
+            line = new THREE.LineSegments(geometry, material);
+            this.scene.add(line);
+            /*
+            let partpoints, geometryy, line, material, part, indices, count = 0;
+            partpoints = [], indices = [];
+            line = new MeshLine();
+              this.arcPartLineAr.map( ( item, key ) => {
+                partpoints.push( 
+                    new THREE.Vector3( item.start.x, item.start.y, 1 )
+                    , new THREE.Vector3( item.end.x, item.end.y, 1 )
+                );
+                indices.push( key );
+            });
+            var positions = new Float32Array(partpoints.length * 3);
+            for (var i = 0; i < partpoints.length; i++) {
+            positions[i * 3] = partpoints[i].x;
+            positions[i * 3 + 1] = partpoints[i].y;
+            positions[i * 3 + 2] = partpoints[i].z;
+            }
+              //let spline = new THREE.SplineCurve3( partpoints );
+            //partpoints = spline.getPoints( 200 );
+            //geometryy = new THREE.Geometry().setFromPoints( partpoints );
+             geometryy = new THREE.BufferGeometry();
+            geometryy.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometryy.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+             line.setGeometry( geometryy );
+             material = new LineBasicMaterial( { 
+                color: 0xffffff,
+                lineWidth: 1
+            } );
+            part = new THREE.LineSegments( geometryy, material );
+             this.scene.add( part );
+            this.addDestroy( part );
+            */
             /*
               let points = [];
                  points.push( 'M' );
