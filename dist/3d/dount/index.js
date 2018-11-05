@@ -537,7 +537,8 @@ var Dount = function (_VisChartBase) {
 
                 var fontSize = geometry3d.to3d(25);
                 var texture = new _three2.default({
-                    text: val.percent + '%',
+                    //text: `${val.percent}%`,
+                    text: _this6.getLabel(val),
                     fontFamily: 'MicrosoftYaHei',
                     //fontSize: fontSize * 2,
                     fontSize: fontSize * 2,

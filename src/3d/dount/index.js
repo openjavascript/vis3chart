@@ -482,7 +482,8 @@ export default class Dount extends VisChartBase  {
 
             let fontSize = geometry3d.to3d( 25 );
             let texture = new TextTexture({
-              text: `${val.percent}%`,
+              //text: `${val.percent}%`,
+              text: this.getLabel( val ),
               fontFamily: 'MicrosoftYaHei',
               //fontSize: fontSize * 2,
               fontSize: fontSize * 2,
