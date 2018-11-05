@@ -24,7 +24,8 @@
     "lodash": "^4.17.11",
     "three.meshline": "^1.1.0",
     "three.textsprite": "^18.8.6",
-    "three.texttexture": "^18.8.6"
+    "three.texttexture": "^18.8.6",
+    "vischartbase": "^1.0.1"
   },
   "bugs": {
     "url": "https://github.com/openjavascript/vis3chart/issues"

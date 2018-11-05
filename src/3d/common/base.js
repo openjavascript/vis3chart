@@ -1,5 +1,5 @@
 
-import VisChartBase from '../../common/vischartbase.js';
+import VisChartBase from 'vischartbase';
 import * as geometry3d from '../../geometry/geometry3d.js';
 
 const THREE = require( 'three' );
