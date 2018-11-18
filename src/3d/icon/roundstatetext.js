@@ -65,11 +65,13 @@ export default class RoundStateText extends VisChartBase  {
             color = this.curColor;
         }
 
+        /*
         this.text.fill( color );
         this.circle.stroke( color );
         this.circleLine.stroke( color );
 
         this.stage.add( this.layer );
+        */
 
         //console.log( 'rate', rate );
 

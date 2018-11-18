@@ -13,6 +13,9 @@ export default class ThreeBase extends VisChartBase {
         super( box, width, height, camera );
         camera && ( this.camera = camera );
 
+        /*
+        */
+
         geometry3d.screenWidth = this.width;
         geometry3d.screenHeight = this.height;
         geometry3d.camera = this.camera;
@@ -159,7 +162,7 @@ export default class ThreeBase extends VisChartBase {
 
         pivot.position.y = this.fixCy();
 
-        this.scene.add( pivot );
+        this.stage.add( pivot );
         this.addDestroy( pivot );
 
         let data = { ele: pivot, item: item  };

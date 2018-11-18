@@ -17,11 +17,15 @@ import TextSprite from 'three.textsprite';
 import {MeshLine, MeshLineMaterial} from 'three.meshline'
 
 
-//import RoundStateText from '../icon/roundstatetext.js';
+import RoundStateText from '../icon/roundstatetext.js';
 
 export default class Gauge extends VisChartBase  {
     constructor( box, width, height, camera ){
         super( box, width, height, camera );
+
+        this.cx = 0;
+        this.cy = 0;
+        this.cpoint = { x: 0, y: 0 };
 
         this.name = 'Gauge' + Date.now();
     }
@@ -31,9 +35,7 @@ export default class Gauge extends VisChartBase  {
 
         this.totalPostfix = '次/时';
 
-        this.offsetCy = 15;
-
-        this.cy += this.offsetCy;
+        this.offsetCy = 35;
 
         this.curRate = 0;
         this.totalNum = 0;
@@ -79,7 +81,7 @@ export default class Gauge extends VisChartBase  {
         this.textRectWidthPercent = .5;
         this.textRectHeightPercent = .11;
 
-        this.textRoundPercent = .38;
+        this.textRoundPercent = .33;
         this.textRoundOffsetAngle = 160;
         this.textRoundPlusAngle = 110;
         this.textRoundMaxAngle = this.textRoundOffsetAngle + this.textRoundPlusAngle * 2;
@@ -171,9 +173,12 @@ export default class Gauge extends VisChartBase  {
 
 
         this.textRoundAngle.map( ( val, key ) => {
-            let point = geometry.distanceAngleToPoint( this.textRoundRadius, val.angle )
-            val.point = geometry.pointPlus( point, this.cpoint );
-            val.point.y += this.offsetCy;
+            let point = geometry.distanceAngleToPoint( geometry3d.to3d( this.textRoundRadius ), -val.angle )
+            console.log( key, point, val.angle );
+            //val.point = geometry.pointPlus( point, this.cpoint );
+            val.point = point;
+            //val.point.y += this.offsetCy;
+
         });
 
         this.arcPartLineAr = [];
@@ -196,11 +201,11 @@ export default class Gauge extends VisChartBase  {
 
             this.arcOutlinePartAr.push( { start: start, end: end } );
 
-            console.log( 'p1', i );
+            //console.log( 'p1', i );
             
             //if( !(i * this.partNum % 100) || i === 0 ){
             if( !(i * this.partNum % 100) || i === 0 ){
-                console.log( 'p2', i );
+                //console.log( 'p2', i );
                 let angleOffset = 8, lengthOffset = 0, rotationOffset = 0;
 
                 if( i === 0 ){
@@ -236,23 +241,29 @@ export default class Gauge extends VisChartBase  {
     }
 
     initRoundText(){
-        /*
         this.textRoundAngle.map( ( val ) => {
 
             if( !val.ins ){
                 val.ins = new RoundStateText( this.box, this.width, this.height );
                 val.ins.setOptions( Object.assign( val, {
                     stage: this.stage
+                    , scene: this.scene
                     , layer: this.layoutLayer
                     , data: this.data
                     , allData: this.allData
                 }) );
                 val.ins.init( );
+
+                var geometryx = new THREE.CircleGeometry( 5, 32 );
+                var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+                var circle = new THREE.Mesh( geometryx, material );
+                circle.position.x = val.point.x;
+                circle.position.y = val.point.y;
+                this.stage.add( circle );
             }
             val.ins.update( this.curRate );
 
         });
-        */
     }
     /*
 {
@@ -270,11 +281,22 @@ export default class Gauge extends VisChartBase  {
     ]
 }
     */
+    setOptions( json ){
+        if( json.stage ){
+            let group = new THREE.Group();
+            json.stage.add( group );
+
+            json.stage = group;
+
+            json.stage.position.y += -geometry3d.to3d( 20 );
+        }
+        super.setOptions( json );
+
+    }
     update( data, allData ){
         //this.stage.removeChildren();
+
         super.update( data, allData );
-
-
 
         //console.log( 123, data );
 
@@ -537,7 +559,7 @@ export default class Gauge extends VisChartBase  {
         circle.renderOrder = -1;
         circle.material.depthTest=false;
 
-        this.scene.add( circle );
+        this.stage.add( circle );
         this.addDestroy( circle );
      }
 
@@ -565,7 +587,7 @@ export default class Gauge extends VisChartBase  {
         });
 
 
-        console.log( partpoints );
+        //console.log( partpoints );
 
         material = new THREE.LineBasicMaterial({
             color: this.lineColor
@@ -592,7 +614,7 @@ export default class Gauge extends VisChartBase  {
         geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 
         line = new THREE.LineSegments(geometry, material);
-        this.scene.add(line);
+        this.stage.add(line);
     }
 
     drawArc(){
@@ -624,7 +646,7 @@ export default class Gauge extends VisChartBase  {
             arc.material.depthTest=false;
             */
 
-            this.scene.add( arc );
+            this.stage.add( arc );
             this.addDestroy( arc );
 
     }
@@ -717,10 +739,9 @@ export default class Gauge extends VisChartBase  {
             this.drawCircle();
             this.drawCircleLine();
             this.drawArcPartLine();
+
+            this.initRoundText();
         }
-
-        this.initRoundText();
-
 
     }
     animation(){
@@ -827,7 +848,7 @@ export default class Gauge extends VisChartBase  {
         circle.renderOrder = -1;
         circle.material.depthTest=false;
 
-        this.scene.add( circle );
+        this.stage.add( circle );
         this.addDestroy( circle );
 
     }
@@ -874,7 +895,7 @@ export default class Gauge extends VisChartBase  {
         circle.renderOrder = -1;
         circle.material.depthTest=false;
 
-        this.scene.add( circle );
+        this.stage.add( circle );
         this.addDestroy( circle );
 
     }
@@ -929,7 +950,7 @@ export default class Gauge extends VisChartBase  {
 
         this.circleLine = group;
 
-        this.scene.add( group );
+        this.stage.add( group );
         this.addDestroy( group );
     }
     fixCx(){

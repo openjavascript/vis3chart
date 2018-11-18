@@ -44,6 +44,9 @@ var ThreeBase = function (_VisChartBase) {
 
         camera && (_this.camera = camera);
 
+        /*
+        */
+
         geometry3d.screenWidth = _this.width;
         geometry3d.screenHeight = _this.height;
         geometry3d.camera = _this.camera;
@@ -184,7 +187,7 @@ var ThreeBase = function (_VisChartBase) {
 
             pivot.position.y = this.fixCy();
 
-            this.scene.add(pivot);
+            this.stage.add(pivot);
             this.addDestroy(pivot);
 
             var data = { ele: pivot, item: item };
