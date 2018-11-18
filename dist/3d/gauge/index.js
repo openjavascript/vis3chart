@@ -103,7 +103,7 @@ var Gauge = function (_VisChartBase) {
             this.arcInPercent = .305 / 2;
 
             this.arcLabelLength = 6;
-            this.arcTextLength = 20;
+            this.arcTextLength = 15;
 
             this.arcAngleOffset = -50;
             this.arcAngle = 280;
@@ -213,6 +213,7 @@ var Gauge = function (_VisChartBase) {
             this.arcOutRadius = geometry3d.to3d(this.width * this.arcOutPercent * this.sizeRate);
 
             this.arcLineRaidus = geometry3d.to3d(Math.ceil(this.arcLinePercent * this.max) * this.sizeRate);
+            this.arcTextLength = geometry3d.to3d(this.arcTextLength);
 
             this.textWidth = this.textRectWidthPercent * this.width;
             this.textHeight = 38 * this.sizeRate;
@@ -228,11 +229,12 @@ var Gauge = function (_VisChartBase) {
             this.arcPartLineAr = [];
             this.arcOutlinePartAr = [];
             this.textAr = [];
+
             for (var i = 0; i <= this.part; i++) {
                 var start = void 0,
                     end = void 0,
                     angle = void 0;
-                angle = i * this.partAngle + this.arcOffset;
+                angle = (this.part - i) * this.partAngle + this.arcOffset;
 
                 //if( i && i < this.part ){
                 if (true) {
@@ -246,7 +248,11 @@ var Gauge = function (_VisChartBase) {
 
                 this.arcOutlinePartAr.push({ start: start, end: end });
 
+                console.log('p1', i);
+
+                //if( !(i * this.partNum % 100) || i === 0 ){
                 if (!(i * this.partNum % 100) || i === 0) {
+                    console.log('p2', i);
                     var angleOffset = 8,
                         lengthOffset = 0,
                         rotationOffset = 0;
@@ -254,13 +260,18 @@ var Gauge = function (_VisChartBase) {
                     if (i === 0) {
                         angleOffset = 1;
                     }
+                    if (i) {
+                        angleOffset = 0;
+                    }
 
                     if (i >= 19) {
-                        angleOffset = 14;
-                        rotationOffset = 9;
+                        //angleOffset = 14;
+                        rotationOffset = -2;
+                        angleOffset = -2;
                     }
                     if (i >= 21) {
-                        angleOffset = 18;
+                        //angleOffset = 18;
+                        angleOffset = -5;
                     }
                     var text = {
                         text: i * this.partNum,
@@ -513,9 +524,29 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'drawArcText',
         value: function drawArcText() {
+            var _this8 = this;
+
             if (!(this.textAr && this.textAr.length)) return;
 
             this.textAr.map(function (val) {
+
+                var fontSize = geometry3d.to3d(16);
+                var texture = new _three2.default({
+                    text: val.text + '',
+                    fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
+                    fontSize: fontSize * 2
+                });
+                var material = new THREE.SpriteMaterial({
+                    map: texture,
+                    color: _this8.lineColor,
+                    rotation: geometry.radians(val.angle + 90 + (val.rotationOffset || 0) + 180)
+                });
+                var sprite = new THREE.Sprite(material);
+                sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
+                sprite.position.x = val.point.x;
+                sprite.position.y = val.point.y;
+                _this8.stage.add(sprite);
+
                 /*
                 let text = new Konva.Text( {
                     x: val.point.x + this.cx
@@ -723,10 +754,10 @@ var Gauge = function (_VisChartBase) {
                 this.layer.add( this.roundLine );
                 this.layer.add( this.percentText );
                 //this.layer.add( this.percentSymbolText );
-                 this.drawArcText();
-                this.drawText();
+                 this.drawText();
                 this.drawTextRect();
                 */
+                this.drawArcText();
                 this.drawArc();
                 this.drawArcLine();
                 this.drawInnerCircle();
@@ -739,7 +770,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'animation',
         value: function animation() {
-            var _this8 = this;
+            var _this9 = this;
 
             //console.log( this.angle, this.animationAngle );
             if (this.isDestroy) return;
@@ -756,7 +787,7 @@ var Gauge = function (_VisChartBase) {
             //this.stage.add( this.layer );
 
             window.requestAnimationFrame(function () {
-                _this8.animation();
+                _this9.animation();
             });
         }
     }, {

@@ -57,7 +57,7 @@ export default class Gauge extends VisChartBase  {
         this.arcInPercent = .305 / 2;
 
         this.arcLabelLength = 6;
-        this.arcTextLength = 20;
+        this.arcTextLength = 15;
 
         this.arcAngleOffset = -50;
         this.arcAngle = 280;
@@ -162,11 +162,13 @@ export default class Gauge extends VisChartBase  {
         this.arcOutRadius = geometry3d.to3d( this.width * this.arcOutPercent * this.sizeRate );
 
         this.arcLineRaidus = geometry3d.to3d( Math.ceil( this.arcLinePercent * this.max ) * this.sizeRate );
+        this.arcTextLength = geometry3d.to3d( this.arcTextLength );
 
         this.textWidth = this.textRectWidthPercent * this.width ;
         this.textHeight = 38 * this.sizeRate;
         this.textX = this.cx - this.textWidth / 2; 
         this.textY = this.cy + this.arcLineRaidus + this.arcTextLength / 2 + 2;
+
 
         this.textRoundAngle.map( ( val, key ) => {
             let point = geometry.distanceAngleToPoint( this.textRoundRadius, val.angle )
@@ -177,9 +179,10 @@ export default class Gauge extends VisChartBase  {
         this.arcPartLineAr = [];
         this.arcOutlinePartAr = [];
         this.textAr = [];
+
         for( let i = 0; i <= this.part; i++ ){
             let start, end, angle;
-            angle = i * this.partAngle + this.arcOffset;
+            angle = (this.part - i) * this.partAngle + this.arcOffset;
 
             //if( i && i < this.part ){
             if( true ){
@@ -192,20 +195,29 @@ export default class Gauge extends VisChartBase  {
             end = geometry.distanceAngleToPoint( this.arcLineRaidus + this.arcLabelLength, angle );
 
             this.arcOutlinePartAr.push( { start: start, end: end } );
+
+            console.log( 'p1', i );
             
+            //if( !(i * this.partNum % 100) || i === 0 ){
             if( !(i * this.partNum % 100) || i === 0 ){
+                console.log( 'p2', i );
                 let angleOffset = 8, lengthOffset = 0, rotationOffset = 0;
 
                 if( i === 0 ){
                     angleOffset = 1;
                 }
+                if( i ){
+                    angleOffset = 0;
+                }
 
                 if( i >= 19 ){
-                    angleOffset = 14;
-                    rotationOffset = 9;
+                    //angleOffset = 14;
+                    rotationOffset = -2;
+                    angleOffset = -2;
                 }
                 if( i >= 21 ){
-                    angleOffset = 18;
+                    //angleOffset = 18;
+                    angleOffset = -5;
                 }
                 let text = {
                     text: i * this.partNum
@@ -455,6 +467,26 @@ export default class Gauge extends VisChartBase  {
         if( !( this.textAr && this.textAr.length ) ) return;
 
         this.textAr.map( ( val ) => {
+
+            let fontSize = geometry3d.to3d( 16 );
+            let texture = new TextTexture({
+              text: val.text + '',
+              fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
+              fontSize: fontSize * 2,
+            });
+            let material = new THREE.SpriteMaterial({
+                map: texture
+                , color: this.lineColor 
+                , rotation: geometry.radians( 
+                    val.angle + 90 + ( val.rotationOffset || 0 ) + 180
+                )
+            });
+            let sprite =new THREE.Sprite(material);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
+            sprite.position.x = val.point.x
+            sprite.position.y = val.point.y
+            this.stage.add( sprite );
+
             /*
             let text = new Konva.Text( {
                 x: val.point.x + this.cx
@@ -673,10 +705,10 @@ export default class Gauge extends VisChartBase  {
             this.layer.add( this.percentText );
             //this.layer.add( this.percentSymbolText );
 
-            this.drawArcText();
             this.drawText();
             this.drawTextRect();
             */
+            this.drawArcText();
             this.drawArc();
             this.drawArcLine();
             this.drawInnerCircle();
@@ -740,7 +772,7 @@ export default class Gauge extends VisChartBase  {
               text: this.getAttackText(),
               fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
               fontSize: fontSize * 2,
-              fontStyle: 'italic',
+              fontStyle: 'italic'
             });
             let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
             let sprite =new THREE.Sprite(material);
