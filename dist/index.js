@@ -268,7 +268,9 @@ var VisThree = function (_VisChartBase) {
 
                 if (ins) {
                     //console.log( 'gauge 3', Date.now() );
-                    _this3.options && ins.setOptions(_this3.options);
+                    _this3.options = _this3.options || {};
+                    _this3.options.srcData = val;
+                    ins.setOptions(_this3.options);
 
                     var fillData = _this3.getLegendData(val);
                     ins.update(fillData, _jsonUtilsx2.default.clone(_this3.data));

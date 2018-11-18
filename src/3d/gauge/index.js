@@ -510,6 +510,8 @@ export default class Gauge extends VisChartBase  {
     drawArcPartLine(){
 
         let partpoints, geometryy, line, material, part, indices, count = 0 ;
+        var vertices, positions, geometry, i;
+
         partpoints = [], indices = [];
         line = new MeshLine();
 
@@ -520,127 +522,43 @@ export default class Gauge extends VisChartBase  {
             );
             indices.push( key );
         });
+        this.arcOutlinePartAr.map( ( item, key ) => {
+            partpoints.push( 
+                new THREE.Vector3( item.start.x, item.start.y, 1 )
+                , new THREE.Vector3( item.end.x, item.end.y, 1 )
+            );
+            indices.push( key );
+        });
+
 
         console.log( partpoints );
 
-material = new THREE.LineBasicMaterial({
-    color: this.lineColor
-});
+        material = new THREE.LineBasicMaterial({
+            color: this.lineColor
+        });
 
-var vertices = partpoints;
-indices = [];
-vertices.map( ( item, key ) => {
-    indices.push( key );
-});
-
-var positions = new Float32Array(vertices.length * 3);
-
-for (var i = 0; i < vertices.length; i++) {
-
-    positions[i * 3] = vertices[i].x;
-    positions[i * 3 + 1] = vertices[i].y;
-    positions[i * 3 + 2] = vertices[i].z;
-
-}
-
-
-var geometry = new THREE.BufferGeometry();
-geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
-
-line = new THREE.LineSegments(geometry, material);
-this.scene.add(line);
-        /*
-        let partpoints, geometryy, line, material, part, indices, count = 0;
-        partpoints = [], indices = [];
-        line = new MeshLine();
-
-
-        this.arcPartLineAr.map( ( item, key ) => {
-            partpoints.push( 
-                new THREE.Vector3( item.start.x, item.start.y, 1 )
-                , new THREE.Vector3( item.end.x, item.end.y, 1 )
-            );
+        vertices = partpoints;
+        indices = [];
+        vertices.map( ( item, key ) => {
             indices.push( key );
         });
 
-var positions = new Float32Array(partpoints.length * 3);
+        positions = new Float32Array(vertices.length * 3);
 
-for (var i = 0; i < partpoints.length; i++) {
+        for (i = 0; i < vertices.length; i++) {
 
-    positions[i * 3] = partpoints[i].x;
-    positions[i * 3 + 1] = partpoints[i].y;
-    positions[i * 3 + 2] = partpoints[i].z;
+            positions[i * 3] = vertices[i].x;
+            positions[i * 3 + 1] = vertices[i].y;
+            positions[i * 3 + 2] = vertices[i].z;
 
-}
-
-
-        //let spline = new THREE.SplineCurve3( partpoints );
-        //partpoints = spline.getPoints( 200 );
-        //geometryy = new THREE.Geometry().setFromPoints( partpoints );
-
-        geometryy = new THREE.BufferGeometry();
-        geometryy.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometryy.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
-
-        line.setGeometry( geometryy );
-
-        material = new LineBasicMaterial( { 
-            color: 0xffffff,
-            lineWidth: 1
-        } );
-        part = new THREE.LineSegments( geometryy, material );
-
-        this.scene.add( part );
-        this.addDestroy( part );
-*/
-       /*
-
-        let points = [];
-            points.push( 'M' );
-        for( let i = this.arcOffset; i <= ( this.arcOffset + this.arcAngle ); i+=0.5 ){
-            let tmp = geometry.distanceAngleToPoint( this.arcLineRaidus, i );
-            points.push( [ tmp.x, tmp.y ] .join(',') + ','  );
-            if( i == 90 ){
-                points.push( 'L' );
-            }
         }
 
-        this.arcLine = new Konva.Path( {
-            data: points.join('')
-            , x: this.cx
-            , y: this.cy
-            , stroke: this.lineColor
-            , strokeWidth: 1
-            , fill: '#ffffff00'
-        });
-        this.addDestroy( this.arcLine );
+        geometry = new THREE.BufferGeometry();
+        geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 
-        this.arcPartLine = new Konva.Path( {
-            data: this.arcPartLineAr.join('')
-            , x: this.cx
-            , y: this.cy
-            , stroke: '#00000088'
-            , strokeWidth: 1
-            , fill: '#ffffff00'
-        });
-        this.addDestroy( this.arcPartLine );
-
-        this.arcOutlinePart = new Konva.Path( {
-            data: this.arcOutlinePartAr.join('')
-            , x: this.cx
-            , y: this.cy
-            , stroke: this.lineColor
-            , strokeWidth: 1
-            , fill: '#ffffff00'
-        });
-        this.addDestroy( this.arcOutlinePart );
-
-        this.layoutLayer.add( this.arcLine );
-        this.layoutLayer.add( this.arcPartLine );
-        this.layoutLayer.add( this.arcOutlinePart );
-        */
-
+        line = new THREE.LineSegments(geometry, material);
+        this.scene.add(line);
     }
 
     drawArc(){
