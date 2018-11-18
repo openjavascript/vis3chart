@@ -226,7 +226,7 @@ var Gauge = function (_VisChartBase) {
 
             this.textRoundAngle.map(function (val, key) {
                 var point = geometry.distanceAngleToPoint(geometry3d.to3d(_this3.textRoundRadius), -val.angle);
-                console.log(key, point, val.angle);
+                //console.log( key, point, val.angle );
                 //val.point = geometry.pointPlus( point, this.cpoint );
                 val.point = point;
                 //val.point.y += this.offsetCy;

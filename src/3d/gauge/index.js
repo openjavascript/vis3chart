@@ -174,7 +174,7 @@ export default class Gauge extends VisChartBase  {
 
         this.textRoundAngle.map( ( val, key ) => {
             let point = geometry.distanceAngleToPoint( geometry3d.to3d( this.textRoundRadius ), -val.angle )
-            console.log( key, point, val.angle );
+            //console.log( key, point, val.angle );
             //val.point = geometry.pointPlus( point, this.cpoint );
             val.point = point;
             //val.point.y += this.offsetCy;

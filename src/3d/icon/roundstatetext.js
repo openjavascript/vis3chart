@@ -68,7 +68,7 @@ export default class RoundStateText extends VisChartBase  {
 
         this.initDataLayout();
 
-        console.log( this.point.x, this.point.y );
+        //console.log( this.point.x, this.point.y );
 
         this.animationCircleLine();
 
@@ -84,6 +84,11 @@ export default class RoundStateText extends VisChartBase  {
         if( rate >= this.min && rate < this.max ){
             color = this.curColor;
         }
+
+        this.text.material.color.set( color );
+        this.circle.material.uniforms.color.value.set( color );
+        this.linePartMaterial1.uniforms.color.value.set( color );
+        this.linePartMaterial2.uniforms.color.value.set( color );
 
         /*
         this.text.fill( color );
@@ -104,23 +109,6 @@ export default class RoundStateText extends VisChartBase  {
         this.drawCircleLine()
     }
     drawText(){
-        /*this.text = new Konva.Text( {
-            x: this.point.x
-            , y: this.point.y
-            , text: this.text
-            , fontSize: 32 * this.sizeRate
-            , fontFamily: 'HuXiaoBoKuHei'
-            , fill: this.lineColor
-            , fontStyle: 'italic'
-        });
-        this.addDestroy( this.text );
-
-        this.text.x( this.point.x - this.text.textWidth / 2 + this.textOffsetX );
-        this.text.y( this.point.y - this.text.textHeight / 2 + this.textOffsetY );
-
-
-        this.layer.add( this.text );*/
-
         let fontSize = geometry3d.to3d( 32 );
         let texture = new TextTexture({
           text: this.text,
@@ -178,6 +166,9 @@ export default class RoundStateText extends VisChartBase  {
         circle.renderOrder = -1;
         circle.material.depthTest=false;
 
+        this.circle = circle;
+        this.circleMaterial = material;
+
         this.stage.add( circle );
         this.addDestroy( circle );
 
@@ -209,6 +200,7 @@ export default class RoundStateText extends VisChartBase  {
         circle.material.depthTest=false;
         group.add( circle );
         this.addDestroy( circle );
+        this.linePartMaterial1 = material;
 
         line = new MeshLine();
         material = new MeshLineMaterial( { 
@@ -236,6 +228,7 @@ export default class RoundStateText extends VisChartBase  {
 
         this.stage.add( group );
         this.addDestroy( group );
+        this.linePartMaterial2 = material;
     }
 
 
