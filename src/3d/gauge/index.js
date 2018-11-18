@@ -41,20 +41,20 @@ export default class Gauge extends VisChartBase  {
 
         this.animationStep = 40 * 1;
 
-        this.roundRadiusPercent = .085;
+        this.roundRadiusPercent = .070;
 
         this.lineColor = '#596ea7';
 
-        this.circleLinePercent = .26;
-        this.circlePercent = .28;
+        this.circleLinePercent = .22;
+        this.circlePercent = .24;
 
         this.circleLineRotation = 0;
         this.circleLineRotationStep = 4;
 
-        this.arcLinePercent = .39 / 2;
+        this.arcLinePercent = .34 / 2;
 
-        this.arcOutPercent = .38 / 2;
-        this.arcInPercent = .305 / 2;
+        this.arcOutPercent = .33 / 2;
+        this.arcInPercent = .255 / 2;
 
         this.arcLabelLength = 6;
         this.arcTextLength = 15;
@@ -236,6 +236,7 @@ export default class Gauge extends VisChartBase  {
     }
 
     initRoundText(){
+        /*
         this.textRoundAngle.map( ( val ) => {
 
             if( !val.ins ){
@@ -251,6 +252,7 @@ export default class Gauge extends VisChartBase  {
             val.ins.update( this.curRate );
 
         });
+        */
     }
     /*
 {
@@ -692,7 +694,6 @@ export default class Gauge extends VisChartBase  {
         }
 
 
-        this.initRoundText();
 
         */
 
@@ -717,6 +718,8 @@ export default class Gauge extends VisChartBase  {
             this.drawCircleLine();
             this.drawArcPartLine();
         }
+
+        this.initRoundText();
 
 
     }
@@ -767,7 +770,7 @@ export default class Gauge extends VisChartBase  {
 
     drawInnerText(){
         if( !this.inited ){
-            let fontSize = geometry3d.to3d( 50 );
+            let fontSize = geometry3d.to3d( 44 );
             let texture = new TextTexture({
               text: this.getAttackText(),
               fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
@@ -929,6 +932,14 @@ export default class Gauge extends VisChartBase  {
         this.scene.add( group );
         this.addDestroy( group );
     }
+    fixCx(){
+        return 0;
+    }
+
+    fixCy(){
+        return 0;
+    }
+
 
     reset(){
     }

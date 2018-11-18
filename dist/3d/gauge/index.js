@@ -87,20 +87,20 @@ var Gauge = function (_VisChartBase) {
 
             this.animationStep = 40 * 1;
 
-            this.roundRadiusPercent = .085;
+            this.roundRadiusPercent = .070;
 
             this.lineColor = '#596ea7';
 
-            this.circleLinePercent = .26;
-            this.circlePercent = .28;
+            this.circleLinePercent = .22;
+            this.circlePercent = .24;
 
             this.circleLineRotation = 0;
             this.circleLineRotationStep = 4;
 
-            this.arcLinePercent = .39 / 2;
+            this.arcLinePercent = .34 / 2;
 
-            this.arcOutPercent = .38 / 2;
-            this.arcInPercent = .305 / 2;
+            this.arcOutPercent = .33 / 2;
+            this.arcInPercent = .255 / 2;
 
             this.arcLabelLength = 6;
             this.arcTextLength = 15;
@@ -289,24 +289,23 @@ var Gauge = function (_VisChartBase) {
         }
     }, {
         key: 'initRoundText',
-        value: function initRoundText() {
-            var _this4 = this;
+        value: function initRoundText() {}
+        /*
+        this.textRoundAngle.map( ( val ) => {
+             if( !val.ins ){
+                val.ins = new RoundStateText( this.box, this.width, this.height );
+                val.ins.setOptions( Object.assign( val, {
+                    stage: this.stage
+                    , layer: this.layoutLayer
+                    , data: this.data
+                    , allData: this.allData
+                }) );
+                val.ins.init( );
+            }
+            val.ins.update( this.curRate );
+         });
+        */
 
-            this.textRoundAngle.map(function (val) {
-
-                if (!val.ins) {
-                    val.ins = new RoundStateText(_this4.box, _this4.width, _this4.height);
-                    val.ins.setOptions(Object.assign(val, {
-                        stage: _this4.stage,
-                        layer: _this4.layoutLayer,
-                        data: _this4.data,
-                        allData: _this4.allData
-                    }));
-                    val.ins.init();
-                }
-                val.ins.update(_this4.curRate);
-            });
-        }
         /*
         {
         "series": [
@@ -327,7 +326,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'update',
         value: function update(data, allData) {
-            var _this5 = this;
+            var _this4 = this;
 
             //this.stage.removeChildren();
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'update', this).call(this, data, allData);
@@ -336,8 +335,8 @@ var Gauge = function (_VisChartBase) {
 
             if (data && data.data && data.data.length) {
                 data.data.map(function (val) {
-                    _this5.curRate = val.value;
-                    _this5.totalNum = val.total;
+                    _this4.curRate = val.value;
+                    _this4.totalNum = val.total;
                 });
             }
 
@@ -379,7 +378,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'animationCircleLine',
         value: function animationCircleLine() {
-            var _this6 = this;
+            var _this5 = this;
 
             if (this.isDestroy) return;
             if (!this.circleLine) return;
@@ -391,13 +390,13 @@ var Gauge = function (_VisChartBase) {
             this.circleLine.rotation.z -= .03;
 
             window.requestAnimationFrame(function () {
-                _this6.animationCircleLine();
+                _this5.animationCircleLine();
             });
         }
     }, {
         key: 'animationText',
         value: function animationText() {
-            var _this7 = this;
+            var _this6 = this;
 
             if (this.isDestroy) return;
 
@@ -418,7 +417,7 @@ var Gauge = function (_VisChartBase) {
             */
 
             window.requestAnimationFrame(function () {
-                _this7.animationText();
+                _this6.animationText();
             });
         }
     }, {
@@ -524,7 +523,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'drawArcText',
         value: function drawArcText() {
-            var _this8 = this;
+            var _this7 = this;
 
             if (!(this.textAr && this.textAr.length)) return;
 
@@ -538,14 +537,14 @@ var Gauge = function (_VisChartBase) {
                 });
                 var material = new THREE.SpriteMaterial({
                     map: texture,
-                    color: _this8.lineColor,
+                    color: _this7.lineColor,
                     rotation: geometry.radians(val.angle + 90 + (val.rotationOffset || 0) + 180)
                 });
                 var sprite = new THREE.Sprite(material);
                 sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
                 sprite.position.x = val.point.x;
                 sprite.position.y = val.point.y;
-                _this8.stage.add(sprite);
+                _this7.stage.add(sprite);
 
                 /*
                 let text = new Konva.Text( {
@@ -744,8 +743,7 @@ var Gauge = function (_VisChartBase) {
                 group.add( wedge );
                  this.group = group;
             }
-              this.initRoundText();
-             */
+               */
 
             if (!this.inited) {
                 /*
@@ -766,11 +764,13 @@ var Gauge = function (_VisChartBase) {
                 this.drawCircleLine();
                 this.drawArcPartLine();
             }
+
+            this.initRoundText();
         }
     }, {
         key: 'animation',
         value: function animation() {
-            var _this9 = this;
+            var _this8 = this;
 
             //console.log( this.angle, this.animationAngle );
             if (this.isDestroy) return;
@@ -787,7 +787,7 @@ var Gauge = function (_VisChartBase) {
             //this.stage.add( this.layer );
 
             window.requestAnimationFrame(function () {
-                _this9.animation();
+                _this8.animation();
             });
         }
     }, {
@@ -821,7 +821,7 @@ var Gauge = function (_VisChartBase) {
         key: 'drawInnerText',
         value: function drawInnerText() {
             if (!this.inited) {
-                var fontSize = geometry3d.to3d(50);
+                var fontSize = geometry3d.to3d(44);
                 var texture = new _three2.default({
                     text: this.getAttackText(),
                     fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
@@ -964,6 +964,16 @@ var Gauge = function (_VisChartBase) {
 
             this.scene.add(group);
             this.addDestroy(group);
+        }
+    }, {
+        key: 'fixCx',
+        value: function fixCx() {
+            return 0;
+        }
+    }, {
+        key: 'fixCy',
+        value: function fixCy() {
+            return 0;
         }
     }, {
         key: 'reset',
