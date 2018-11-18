@@ -229,7 +229,9 @@ export default class VisThree extends VisChartBase {
 
             if( ins ){
                 //console.log( 'gauge 3', Date.now() );
-                this.options && ( ins.setOptions( this.options ) );
+                this.options = this.options || {};
+                this.options.srcData = val;
+                ins.setOptions( this.options );
 
                 let fillData = this.getLegendData( val );
                 ins.update( fillData, ju.clone( this.data ) );

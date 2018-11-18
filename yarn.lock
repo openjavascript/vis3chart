@@ -2225,9 +2225,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vischartbase@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/vischartbase/-/vischartbase-1.0.1.tgz#ea934996f6ecc0d9f53414c597b04f8994e233fe"
+vischartbase@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vischartbase/-/vischartbase-1.0.2.tgz#388fee5611653f14adf80b98893c9673947138ad"
   dependencies:
     babel-cli "^6.26.0"
     babel-core "^6.26.3"
