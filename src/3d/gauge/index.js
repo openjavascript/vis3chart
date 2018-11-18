@@ -244,22 +244,24 @@ export default class Gauge extends VisChartBase  {
         this.textRoundAngle.map( ( val ) => {
 
             if( !val.ins ){
-                val.ins = new RoundStateText( this.box, this.width, this.height );
+                val.ins = new RoundStateText( this.box, this.width, this.height, this.camera );
                 val.ins.setOptions( Object.assign( val, {
                     stage: this.stage
                     , scene: this.scene
-                    , layer: this.layoutLayer
                     , data: this.data
                     , allData: this.allData
+                    , lineColor: this.lineColor
                 }) );
                 val.ins.init( );
 
+                /*
                 var geometryx = new THREE.CircleGeometry( 5, 32 );
                 var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
                 var circle = new THREE.Mesh( geometryx, material );
                 circle.position.x = val.point.x;
                 circle.position.y = val.point.y;
                 this.stage.add( circle );
+                */
             }
             val.ins.update( this.curRate );
 
@@ -285,6 +287,7 @@ export default class Gauge extends VisChartBase  {
         if( json.stage ){
             let group = new THREE.Group();
             json.stage.add( group );
+            this.addDestroy( group );
 
             json.stage = group;
 
@@ -510,6 +513,7 @@ export default class Gauge extends VisChartBase  {
             sprite.position.x = val.point.x
             sprite.position.y = val.point.y
             this.stage.add( sprite );
+            this.addDestroy( sprite );
 
             /*
             let text = new Konva.Text( {
@@ -615,6 +619,7 @@ export default class Gauge extends VisChartBase  {
 
         line = new THREE.LineSegments(geometry, material);
         this.stage.add(line);
+        this.addDestroy( line );
     }
 
     drawArc(){
@@ -804,6 +809,7 @@ export default class Gauge extends VisChartBase  {
             this.percentText = sprite;
 
             this.stage.add( this.percentText  );
+            this.addDestroy( this.percentText );
         }
 
     }

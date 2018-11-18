@@ -301,22 +301,24 @@ var Gauge = function (_VisChartBase) {
             this.textRoundAngle.map(function (val) {
 
                 if (!val.ins) {
-                    val.ins = new _roundstatetext2.default(_this4.box, _this4.width, _this4.height);
+                    val.ins = new _roundstatetext2.default(_this4.box, _this4.width, _this4.height, _this4.camera);
                     val.ins.setOptions(Object.assign(val, {
                         stage: _this4.stage,
                         scene: _this4.scene,
-                        layer: _this4.layoutLayer,
                         data: _this4.data,
-                        allData: _this4.allData
+                        allData: _this4.allData,
+                        lineColor: _this4.lineColor
                     }));
                     val.ins.init();
 
-                    var geometryx = new THREE.CircleGeometry(5, 32);
-                    var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-                    var circle = new THREE.Mesh(geometryx, material);
+                    /*
+                    var geometryx = new THREE.CircleGeometry( 5, 32 );
+                    var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+                    var circle = new THREE.Mesh( geometryx, material );
                     circle.position.x = val.point.x;
                     circle.position.y = val.point.y;
-                    _this4.stage.add(circle);
+                    this.stage.add( circle );
+                    */
                 }
                 val.ins.update(_this4.curRate);
             });
@@ -344,6 +346,7 @@ var Gauge = function (_VisChartBase) {
             if (json.stage) {
                 var group = new THREE.Group();
                 json.stage.add(group);
+                this.addDestroy(group);
 
                 json.stage = group;
 
@@ -574,6 +577,7 @@ var Gauge = function (_VisChartBase) {
                 sprite.position.x = val.point.x;
                 sprite.position.y = val.point.y;
                 _this8.stage.add(sprite);
+                _this8.addDestroy(sprite);
 
                 /*
                 let text = new Konva.Text( {
@@ -677,6 +681,7 @@ var Gauge = function (_VisChartBase) {
 
             line = new THREE.LineSegments(geometry, material);
             this.stage.add(line);
+            this.addDestroy(line);
         }
     }, {
         key: 'drawArc',
@@ -863,6 +868,7 @@ var Gauge = function (_VisChartBase) {
                 this.percentText = sprite;
 
                 this.stage.add(this.percentText);
+                this.addDestroy(this.percentText);
             }
         }
     }, {
