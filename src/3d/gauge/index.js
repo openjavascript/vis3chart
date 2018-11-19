@@ -469,59 +469,91 @@ export default class Gauge extends VisChartBase  {
         group.add( bgPlane );
         this.addDestroy( bgPlane );
 
+        let partpoints, geometryy, line, material, part, indices, count = 0 ;
+        var vertices, positions, geometry, i;
+
+        partpoints = [], indices = [];
+
+        let height = this.getBoxSize( bgPlane ).y;
+        let top = this.getPosition( bgPlane.matrixWorld ).y + height + geometry3d.to3d( 4 );
+        let arrowLength = geometry3d.to3d( 6 );
+
+        let points = [ 
+            {
+                start: { x: -textWidth / 2 + arrowLength, y: top }
+                , end: { x: -textWidth / 2, y: top }
+            }
+            , {
+                start: { x: -textWidth / 2, y: top }
+                , end: { x: -textWidth / 2, y: top - arrowLength }
+            }
+            , {
+                start: { x: -textWidth / 2 + arrowLength, y: top - height }
+                , end: { x: -textWidth / 2, y: top - height }
+            }
+            , {
+                start: { x: -textWidth / 2  , y: top - height +  arrowLength}
+                , end: { x: -textWidth / 2, y: top - height }
+            }
+            , {
+                start: { x: textWidth / 2 - arrowLength, y: top }
+                , end: { x: textWidth / 2, y: top }
+            }
+            , {
+                start: { x: textWidth / 2, y: top }
+                , end: { x: textWidth / 2, y: top - arrowLength }
+            }
+            , {
+                start: { x: textWidth / 2 - arrowLength, y: top - height }
+                , end: { x: textWidth / 2, y: top - height }
+            }
+            , {
+                start: { x: textWidth / 2, y: top - height + arrowLength  }
+                , end: { x: textWidth / 2, y: top - height }
+            }
+        ];
+
+        points.map( ( item, key ) => {
+            partpoints.push( 
+                new THREE.Vector3( item.start.x, item.start.y, 1 )
+                , new THREE.Vector3( item.end.x, item.end.y, 1 )
+            );
+            indices.push( key );
+        });
+
+        //console.log( partpoints );
+
+        material = new THREE.LineBasicMaterial({
+            color: this.lineColor
+        });
+
+        vertices = partpoints;
+        indices = [];
+        vertices.map( ( item, key ) => {
+            indices.push( key );
+        });
+
+        positions = new Float32Array(vertices.length * 3);
+
+        for (i = 0; i < vertices.length; i++) {
+
+            positions[i * 3] = vertices[i].x;
+            positions[i * 3 + 1] = vertices[i].y;
+            positions[i * 3 + 2] = vertices[i].z;
+
+        }
+
+        geometry = new THREE.BufferGeometry();
+        geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
+
+        line = new THREE.LineSegments(geometry, material);
+        this.stage.add(line);
+        this.addDestroy( line );
+
+
         this.scene.add( group );
         this.addDestroy( group );
-
-        /*
-
-        */
-
-        /*
-        this.textRect = new Konva.Rect( {
-            fill: '#596ea7'
-            , stroke: '#ffffff00'
-            , strokeWidth: 0
-            , opacity: .3
-            , width: textWidth
-            , height: this.textHeight
-            , x: textX
-            , y: textY
-        });
-        this.addDestroy( this.textRect );
-        */
-
-        /*
-        let points = [];
-        points.push( 'M', [ textX, textY + this.textLineLength ].join(',') );
-        points.push( 'L', [ textX, textY ].join(',') );
-        points.push( 'L', [ textX + this.textLineLength, textY ].join(',') );
-
-        points.push( 'M', [ textX + textWidth - this.textLineLength, textY ].join(',') );
-        points.push( 'L', [ textX + textWidth, textY ].join(',') );
-        points.push( 'L', [ textX + textWidth, textY + this.textLineLength ].join(',') );
-
-        points.push( 'M', [ textX + textWidth, textY + this.textHeight - this.textLineLength ].join(',') );
-        points.push( 'L', [ textX + textWidth, textY + this.textHeight ].join(',') );
-        points.push( 'L', [ textX + textWidth - this.textLineLength, textY + this.textHeight ].join(',') );
-
-        points.push( 'M', [ textX + this.textLineLength, textY + this.textHeight ].join(',') );
-        points.push( 'L', [ textX, textY + this.textHeight ].join(',') );
-        points.push( 'L', [ textX, textY + this.textHeight - this.textLineLength ].join(',') );
-        */
-
-        /*
-        this.textLinePath = new Konva.Path( {
-            data: points.join('')
-            , stroke: this.lineColor
-            , strokeWidth: 1
-        });
-        this.addDestroy( this.textLinePath );
-
-        this.layoutLayer.add( this.textLinePath );
-        this.layoutLayer.add( this.textRect );
-        //this.layoutLayer.add( this.totalText );
-        this.layoutLayer.add( this.totalTextGroup );
-        */
     }
 
     drawArcText() {
@@ -590,7 +622,6 @@ export default class Gauge extends VisChartBase  {
         var vertices, positions, geometry, i;
 
         partpoints = [], indices = [];
-        line = new MeshLine();
 
         this.arcPartLineAr.map( ( item, key ) => {
             partpoints.push( 
