@@ -153,7 +153,7 @@ var RoundStateText = function (_VisChartBase) {
     }, {
         key: 'drawText',
         value: function drawText() {
-            var fontSize = geometry3d.to3d(32);
+            var fontSize = geometry3d.to3d(38);
             var texture = new _three2.default({
                 text: this.text,
                 fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',

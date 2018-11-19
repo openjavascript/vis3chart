@@ -99,7 +99,7 @@ export default class RoundStateText extends VisChartBase  {
         this.drawCircleLine()
     }
     drawText(){
-        let fontSize = geometry3d.to3d( 32 );
+        let fontSize = geometry3d.to3d( 38 );
         let texture = new TextTexture({
           text: this.text,
           fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
