@@ -486,7 +486,7 @@ var Gauge = function (_VisChartBase) {
             }, this.totalTextGroup);
 
             this.totalTextGroup.position.y = -(this.arcOutRadius + geometry3d.to3d(25));
-            this.totalTextGroup.position.x = -this.totalTextPostfix.position.x + this.totalTextPostfix.scale.x / 2;
+            this.totalTextGroup.position.x = -(this.totalTextPostfix.scale.x / 2);
         }
     }, {
         key: 'drawTextRect',
@@ -518,7 +518,7 @@ var Gauge = function (_VisChartBase) {
             });
             var bgPlane = new THREE.Mesh(bgGeometry, bgMaterial);
 
-            bgPlane.position.y = -(this.arcOutRadius + geometry3d.to3d(25) + rectHeight / 2 + 1);
+            bgPlane.position.y = -(this.arcOutRadius + geometry3d.to3d(25) + rectHeight / 2 + 2);
 
             group.add(bgPlane);
             this.addDestroy(bgPlane);

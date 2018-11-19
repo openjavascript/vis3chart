@@ -437,7 +437,7 @@ export default class Gauge extends VisChartBase  {
         );
 
         this.totalTextGroup.position.y = -( this.arcOutRadius + geometry3d.to3d( 25 ) );
-        this.totalTextGroup.position.x = -( this.totalTextPostfix.position.x ) + this.totalTextPostfix.scale.x / 2;
+        this.totalTextGroup.position.x = -( this.totalTextPostfix.scale.x / 2 ) ;
     }
     drawTextRect(){
 
@@ -471,7 +471,7 @@ export default class Gauge extends VisChartBase  {
         } );
         var bgPlane = new THREE.Mesh( bgGeometry, bgMaterial );
 
-        bgPlane.position.y = -( this.arcOutRadius + geometry3d.to3d( 25 ) + rectHeight / 2 + 1 );
+        bgPlane.position.y = -( this.arcOutRadius + geometry3d.to3d( 25 ) + rectHeight / 2 + 2 );
 
         group.add( bgPlane );
         this.addDestroy( bgPlane );
