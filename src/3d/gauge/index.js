@@ -236,8 +236,6 @@ export default class Gauge extends VisChartBase  {
             }
 
         }
-
-        //console.log( 'this.arcPartLineAr', this.arcPartLineAr, 'this.arcOutlinePartAr', this.arcOutlinePartAr );
     }
 
     initRoundText(){
@@ -252,16 +250,7 @@ export default class Gauge extends VisChartBase  {
                     , allData: this.allData
                     , lineColor: this.lineColor
                 }) );
-                val.ins.init( );
-
-                /*
-                var geometryx = new THREE.CircleGeometry( 5, 32 );
-                var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-                var circle = new THREE.Mesh( geometryx, material );
-                circle.position.x = val.point.x;
-                circle.position.y = val.point.y;
-                this.stage.add( circle );
-                */
+                val.ins.init();
             }
             val.ins.update( this.curRate );
 
@@ -297,11 +286,7 @@ export default class Gauge extends VisChartBase  {
 
     }
     update( data, allData ){
-        //this.stage.removeChildren();
-
         super.update( data, allData );
-
-        //console.log( 123, data );
 
         if( (data && data.data && data.data.length) ){
             data.data.map( val => {
@@ -310,17 +295,10 @@ export default class Gauge extends VisChartBase  {
             });
         }
 
-        /*
-        this.curRate = 600;
-        this.totalNum = 234567;
-        */
-
         this.initDataLayout();
 
-        //console.log( 'gauge update', this.getAttackRateAngle() )
         this.angle = this.arcOffset + this.arcOffsetPad;
         this.animationAngle =  this.getAttackRateAngle() + this.arcOffsetPad;
-        //console.log( this.angle, this.animationAngle );
 
         this.updateWedge();
 
@@ -797,23 +775,6 @@ export default class Gauge extends VisChartBase  {
             );
         }
 
-    }
-
-    createText( size = 44, textureParams = {}, params = {}, callback ){
-        let texture = new TextTexture( params );
-        textureParams.map = texture;
-        let material = new THREE.SpriteMaterial(
-            textureParams
-        );
-        let sprite =new THREE.Sprite(material);
-        sprite.scale.setX(texture.imageAspect).multiplyScalar(size);
-
-        callback && callback( sprite, material, texture, textureParams, params );
-
-        this.stage.add( sprite  );
-        this.addDestroy( sprite );
-
-        return sprite;
     }
 
     drawInnerCircle(){

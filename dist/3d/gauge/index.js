@@ -290,8 +290,6 @@ var Gauge = function (_VisChartBase) {
                     this.textAr.push(text);
                 }
             }
-
-            //console.log( 'this.arcPartLineAr', this.arcPartLineAr, 'this.arcOutlinePartAr', this.arcOutlinePartAr );
         }
     }, {
         key: 'initRoundText',
@@ -310,15 +308,6 @@ var Gauge = function (_VisChartBase) {
                         lineColor: _this4.lineColor
                     }));
                     val.ins.init();
-
-                    /*
-                    var geometryx = new THREE.CircleGeometry( 5, 32 );
-                    var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-                    var circle = new THREE.Mesh( geometryx, material );
-                    circle.position.x = val.point.x;
-                    circle.position.y = val.point.y;
-                    this.stage.add( circle );
-                    */
                 }
                 val.ins.update(_this4.curRate);
             });
@@ -359,11 +348,7 @@ var Gauge = function (_VisChartBase) {
         value: function update(data, allData) {
             var _this5 = this;
 
-            //this.stage.removeChildren();
-
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'update', this).call(this, data, allData);
-
-            //console.log( 123, data );
 
             if (data && data.data && data.data.length) {
                 data.data.map(function (val) {
@@ -372,17 +357,10 @@ var Gauge = function (_VisChartBase) {
                 });
             }
 
-            /*
-            this.curRate = 600;
-            this.totalNum = 234567;
-            */
-
             this.initDataLayout();
 
-            //console.log( 'gauge update', this.getAttackRateAngle() )
             this.angle = this.arcOffset + this.arcOffsetPad;
             this.animationAngle = this.getAttackRateAngle() + this.arcOffsetPad;
-            //console.log( this.angle, this.animationAngle );
 
             this.updateWedge();
 
@@ -844,27 +822,6 @@ var Gauge = function (_VisChartBase) {
                     fontStyle: 'italic'
                 });
             }
-        }
-    }, {
-        key: 'createText',
-        value: function createText() {
-            var size = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 44;
-            var textureParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-            var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-            var callback = arguments[3];
-
-            var texture = new _three2.default(params);
-            textureParams.map = texture;
-            var material = new THREE.SpriteMaterial(textureParams);
-            var sprite = new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(size);
-
-            callback && callback(sprite, material, texture, textureParams, params);
-
-            this.stage.add(sprite);
-            this.addDestroy(sprite);
-
-            return sprite;
         }
     }, {
         key: 'drawInnerCircle',

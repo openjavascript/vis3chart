@@ -8,6 +8,11 @@ require( '../../common/SVGLoader.js' );
 
 import ju from 'json-utilsx';
 
+import TextTexture from 'three.texttexture';
+import TextSprite from 'three.textsprite';
+
+import {MeshLine, MeshLineMaterial} from 'three.meshline'
+
 export default class ThreeBase extends VisChartBase {
     constructor( box, width, height, camera ){
         super( box, width, height, camera );
@@ -20,6 +25,44 @@ export default class ThreeBase extends VisChartBase {
         geometry3d.screenHeight = this.height;
         geometry3d.camera = this.camera;
     }
+    /*
+        let fontSize = geometry3d.to3d( 16 );
+        this.createText(
+            fontSize
+            , {
+                color: this.lineColor 
+                , rotation: geometry.radians( 
+                    val.angle + 90 + ( val.rotationOffset || 0 ) + 180
+                )
+            }
+            , {
+              text: val.text + '',
+              fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
+              fontSize: fontSize * 2,
+            }
+            , ( sprite ) => {
+                sprite.position.x = val.point.x
+                sprite.position.y = val.point.y
+            }
+        );
+    */
+    createText( size = 44, textureParams = {}, params = {}, callback ){
+        let texture = new TextTexture( params );
+        textureParams.map = texture;
+        let material = new THREE.SpriteMaterial(
+            textureParams
+        );
+        let sprite =new THREE.Sprite(material);
+        sprite.scale.setX(texture.imageAspect).multiplyScalar(size);
+
+        callback && callback( sprite, material, texture, textureParams, params );
+
+        this.stage.add( sprite  );
+        this.addDestroy( sprite );
+
+        return sprite;
+    }
+
 
     _setSize( width, height ){
         super._setSize( width, height );

@@ -20,6 +20,16 @@ var _jsonUtilsx = require('json-utilsx');
 
 var _jsonUtilsx2 = _interopRequireDefault(_jsonUtilsx);
 
+var _three = require('three.texttexture');
+
+var _three2 = _interopRequireDefault(_three);
+
+var _three3 = require('three.textsprite');
+
+var _three4 = _interopRequireDefault(_three3);
+
+var _three5 = require('three.meshline');
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -52,8 +62,51 @@ var ThreeBase = function (_VisChartBase) {
         geometry3d.camera = _this.camera;
         return _this;
     }
+    /*
+        let fontSize = geometry3d.to3d( 16 );
+        this.createText(
+            fontSize
+            , {
+                color: this.lineColor 
+                , rotation: geometry.radians( 
+                    val.angle + 90 + ( val.rotationOffset || 0 ) + 180
+                )
+            }
+            , {
+              text: val.text + '',
+              fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
+              fontSize: fontSize * 2,
+            }
+            , ( sprite ) => {
+                sprite.position.x = val.point.x
+                sprite.position.y = val.point.y
+            }
+        );
+    */
+
 
     _createClass(ThreeBase, [{
+        key: 'createText',
+        value: function createText() {
+            var size = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 44;
+            var textureParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+            var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+            var callback = arguments[3];
+
+            var texture = new _three2.default(params);
+            textureParams.map = texture;
+            var material = new THREE.SpriteMaterial(textureParams);
+            var sprite = new THREE.Sprite(material);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(size);
+
+            callback && callback(sprite, material, texture, textureParams, params);
+
+            this.stage.add(sprite);
+            this.addDestroy(sprite);
+
+            return sprite;
+        }
+    }, {
         key: '_setSize',
         value: function _setSize(width, height) {
             _get(ThreeBase.prototype.__proto__ || Object.getPrototypeOf(ThreeBase.prototype), '_setSize', this).call(this, width, height);
