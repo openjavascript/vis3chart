@@ -456,18 +456,20 @@ var Gauge = function (_VisChartBase) {
         key: 'drawText',
         value: function drawText() {
 
+            var params = {
+                text: 0 + '',
+                fontSize: 30 * this.sizeRate,
+                fontFamily: 'Agency FB',
+                fill: '#ffffff',
+                fontStyle: 'italic',
+                letterSpacing: 1.5
+            },
+                tmp = _jsonUtilsx2.default.clone(params);
+            tmp.text = this.totalNum;
+
             /*
             this.totalTextGroup = new Konva.Group();
             this.addDestroy( this.totalTextGroup );
-             let params = {
-                text: 0 + ''
-                , fontSize: 30 * this.sizeRate
-                , fontFamily: 'Agency FB'
-                , fill: '#ffffff'
-                , fontStyle: 'italic'
-                , letterSpacing: 1.5
-            }, tmp = ju.clone( params );
-            tmp.text = this.totalNum;
              this.totalText = new Konva.Text( params );
             this.addDestroy( this.totalText );
              let params1 = {
@@ -491,22 +493,22 @@ var Gauge = function (_VisChartBase) {
              this.tmpTotalText = new Konva.Text( tmp );
             this.addDestroy( this.tmpTotalText );
             */
-
         }
     }, {
         key: 'drawTextRect',
         value: function drawTextRect() {
 
-            var textWidth = this.tmpTotalText.textWidth + 30 + this.totalTextPostfix.textWidth + 5,
-                textX = 0,
-                textY = 0;
-
-            if (textWidth < 170) {
+            /*
+            let textWidth =  this.tmpTotalText.textWidth + 30 + this.totalTextPostfix.textWidth + 5
+                , textX = 0
+                , textY = 0
+                ;
+             if( textWidth < 170 ){
                 textWidth = 170;
             }
             textX = this.cx - textWidth / 2 + 2;;
-
-            textY = this.textY - (this.textHeight - this.totalText.textHeight) / 2;
+             textY = this.textY - ( this.textHeight - this.totalText.textHeight ) / 2;
+            */
 
             /*
             this.textRect = new Konva.Rect( {
@@ -522,22 +524,21 @@ var Gauge = function (_VisChartBase) {
             this.addDestroy( this.textRect );
             */
 
-            var points = [];
-            points.push('M', [textX, textY + this.textLineLength].join(','));
-            points.push('L', [textX, textY].join(','));
-            points.push('L', [textX + this.textLineLength, textY].join(','));
-
-            points.push('M', [textX + textWidth - this.textLineLength, textY].join(','));
-            points.push('L', [textX + textWidth, textY].join(','));
-            points.push('L', [textX + textWidth, textY + this.textLineLength].join(','));
-
-            points.push('M', [textX + textWidth, textY + this.textHeight - this.textLineLength].join(','));
-            points.push('L', [textX + textWidth, textY + this.textHeight].join(','));
-            points.push('L', [textX + textWidth - this.textLineLength, textY + this.textHeight].join(','));
-
-            points.push('M', [textX + this.textLineLength, textY + this.textHeight].join(','));
-            points.push('L', [textX, textY + this.textHeight].join(','));
-            points.push('L', [textX, textY + this.textHeight - this.textLineLength].join(','));
+            /*
+            let points = [];
+            points.push( 'M', [ textX, textY + this.textLineLength ].join(',') );
+            points.push( 'L', [ textX, textY ].join(',') );
+            points.push( 'L', [ textX + this.textLineLength, textY ].join(',') );
+             points.push( 'M', [ textX + textWidth - this.textLineLength, textY ].join(',') );
+            points.push( 'L', [ textX + textWidth, textY ].join(',') );
+            points.push( 'L', [ textX + textWidth, textY + this.textLineLength ].join(',') );
+             points.push( 'M', [ textX + textWidth, textY + this.textHeight - this.textLineLength ].join(',') );
+            points.push( 'L', [ textX + textWidth, textY + this.textHeight ].join(',') );
+            points.push( 'L', [ textX + textWidth - this.textLineLength, textY + this.textHeight ].join(',') );
+             points.push( 'M', [ textX + this.textLineLength, textY + this.textHeight ].join(',') );
+            points.push( 'L', [ textX, textY + this.textHeight ].join(',') );
+            points.push( 'L', [ textX, textY + this.textHeight - this.textLineLength ].join(',') );
+            */
 
             /*
             this.textLinePath = new Konva.Path( {
@@ -562,37 +563,17 @@ var Gauge = function (_VisChartBase) {
             this.textAr.map(function (val) {
 
                 var fontSize = geometry3d.to3d(16);
-                var texture = new _three2.default({
+                _this8.createText(fontSize, {
+                    color: _this8.lineColor,
+                    rotation: geometry.radians(val.angle + 90 + (val.rotationOffset || 0) + 180)
+                }, {
                     text: val.text + '',
                     fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
                     fontSize: fontSize * 2
+                }, function (sprite) {
+                    sprite.position.x = val.point.x;
+                    sprite.position.y = val.point.y;
                 });
-                var material = new THREE.SpriteMaterial({
-                    map: texture,
-                    color: _this8.lineColor,
-                    rotation: geometry.radians(val.angle + 90 + (val.rotationOffset || 0) + 180)
-                });
-                var sprite = new THREE.Sprite(material);
-                sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-                sprite.position.x = val.point.x;
-                sprite.position.y = val.point.y;
-                _this8.stage.add(sprite);
-                _this8.addDestroy(sprite);
-
-                /*
-                let text = new Konva.Text( {
-                    x: val.point.x + this.cx
-                    , y: val.point.y + this.cy
-                    , text: val.text + ''
-                    , fontSize: 11 * this.sizeRate
-                    //, rotation: val.angle
-                    , fontFamily: 'MicrosoftYaHei'
-                    , fill: this.lineColor
-                });
-                this.addDestroy( text );
-                 text.rotation( val.angle + 90 + ( val.rotationOffset || 0 ) );
-                 this.layoutLayer.add( text );
-                */
             });
         }
     }, {
@@ -786,9 +767,9 @@ var Gauge = function (_VisChartBase) {
                 this.layer.add( this.roundLine );
                 this.layer.add( this.percentText );
                 //this.layer.add( this.percentSymbolText );
-                 this.drawText();
+                 */
+                this.drawText();
                 this.drawTextRect();
-                */
                 this.drawArcText();
                 this.drawArc();
                 this.drawArcLine();
@@ -855,21 +836,35 @@ var Gauge = function (_VisChartBase) {
         key: 'drawInnerText',
         value: function drawInnerText() {
             if (!this.inited) {
-                var fontSize = geometry3d.to3d(44);
-                var texture = new _three2.default({
+                var fontSize = geometry3d.to3d(46);
+                this.percentText = this.createText(fontSize, { color: 0xffffff }, {
                     text: this.getAttackText(),
                     fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
                     fontSize: fontSize * 2,
                     fontStyle: 'italic'
                 });
-                var material = new THREE.SpriteMaterial({ map: texture, color: 0xffffff });
-                var sprite = new THREE.Sprite(material);
-                sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-                this.percentText = sprite;
-
-                this.stage.add(this.percentText);
-                this.addDestroy(this.percentText);
             }
+        }
+    }, {
+        key: 'createText',
+        value: function createText() {
+            var size = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 44;
+            var textureParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+            var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+            var callback = arguments[3];
+
+            var texture = new _three2.default(params);
+            textureParams.map = texture;
+            var material = new THREE.SpriteMaterial(textureParams);
+            var sprite = new THREE.Sprite(material);
+            sprite.scale.setX(texture.imageAspect).multiplyScalar(size);
+
+            callback && callback(sprite, material, texture, textureParams, params);
+
+            this.stage.add(sprite);
+            this.addDestroy(sprite);
+
+            return sprite;
         }
     }, {
         key: 'drawInnerCircle',

@@ -385,9 +385,6 @@ export default class Gauge extends VisChartBase  {
 
     drawText(){
 
-        /*
-        this.totalTextGroup = new Konva.Group();
-        this.addDestroy( this.totalTextGroup );
 
         let params = {
             text: 0 + ''
@@ -398,6 +395,10 @@ export default class Gauge extends VisChartBase  {
             , letterSpacing: 1.5
         }, tmp = ju.clone( params );
         tmp.text = this.totalNum;
+
+        /*
+        this.totalTextGroup = new Konva.Group();
+        this.addDestroy( this.totalTextGroup );
 
         this.totalText = new Konva.Text( params );
         this.addDestroy( this.totalText );
@@ -432,6 +433,7 @@ export default class Gauge extends VisChartBase  {
     }
     drawTextRect(){
 
+        /*
         let textWidth =  this.tmpTotalText.textWidth + 30 + this.totalTextPostfix.textWidth + 5
             , textX = 0
             , textY = 0
@@ -443,6 +445,7 @@ export default class Gauge extends VisChartBase  {
         textX = this.cx - textWidth / 2 + 2;;
 
         textY = this.textY - ( this.textHeight - this.totalText.textHeight ) / 2;
+        */
 
         /*
         this.textRect = new Konva.Rect( {
@@ -458,6 +461,7 @@ export default class Gauge extends VisChartBase  {
         this.addDestroy( this.textRect );
         */
 
+        /*
         let points = [];
         points.push( 'M', [ textX, textY + this.textLineLength ].join(',') );
         points.push( 'L', [ textX, textY ].join(',') );
@@ -474,6 +478,7 @@ export default class Gauge extends VisChartBase  {
         points.push( 'M', [ textX + this.textLineLength, textY + this.textHeight ].join(',') );
         points.push( 'L', [ textX, textY + this.textHeight ].join(',') );
         points.push( 'L', [ textX, textY + this.textHeight - this.textLineLength ].join(',') );
+        */
 
         /*
         this.textLinePath = new Konva.Path( {
@@ -496,41 +501,24 @@ export default class Gauge extends VisChartBase  {
         this.textAr.map( ( val ) => {
 
             let fontSize = geometry3d.to3d( 16 );
-            let texture = new TextTexture({
-              text: val.text + '',
-              fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
-              fontSize: fontSize * 2,
-            });
-            let material = new THREE.SpriteMaterial({
-                map: texture
-                , color: this.lineColor 
-                , rotation: geometry.radians( 
-                    val.angle + 90 + ( val.rotationOffset || 0 ) + 180
-                )
-            });
-            let sprite =new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-            sprite.position.x = val.point.x
-            sprite.position.y = val.point.y
-            this.stage.add( sprite );
-            this.addDestroy( sprite );
-
-            /*
-            let text = new Konva.Text( {
-                x: val.point.x + this.cx
-                , y: val.point.y + this.cy
-                , text: val.text + ''
-                , fontSize: 11 * this.sizeRate
-                //, rotation: val.angle
-                , fontFamily: 'MicrosoftYaHei'
-                , fill: this.lineColor
-            });
-            this.addDestroy( text );
-
-            text.rotation( val.angle + 90 + ( val.rotationOffset || 0 ) );
-
-            this.layoutLayer.add( text );
-            */
+            this.createText(
+                fontSize
+                , {
+                    color: this.lineColor 
+                    , rotation: geometry.radians( 
+                        val.angle + 90 + ( val.rotationOffset || 0 ) + 180
+                    )
+                }
+                , {
+                  text: val.text + '',
+                  fontFamily: 'MicrosoftYaHei, "Times New Roman", Times, serif',
+                  fontSize: fontSize * 2,
+                }
+                , ( sprite ) => {
+                    sprite.position.x = val.point.x
+                    sprite.position.y = val.point.y
+                }
+            );
         });
     }
 
@@ -733,9 +721,9 @@ export default class Gauge extends VisChartBase  {
             this.layer.add( this.percentText );
             //this.layer.add( this.percentSymbolText );
 
+            */
             this.drawText();
             this.drawTextRect();
-            */
             this.drawArcText();
             this.drawArc();
             this.drawArcLine();
@@ -796,22 +784,36 @@ export default class Gauge extends VisChartBase  {
 
     drawInnerText(){
         if( !this.inited ){
-            let fontSize = geometry3d.to3d( 44 );
-            let texture = new TextTexture({
-              text: this.getAttackText(),
-              fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
-              fontSize: fontSize * 2,
-              fontStyle: 'italic'
-            });
-            let material = new THREE.SpriteMaterial({map: texture, color: 0xffffff });
-            let sprite =new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
-            this.percentText = sprite;
-
-            this.stage.add( this.percentText  );
-            this.addDestroy( this.percentText );
+            let fontSize = geometry3d.to3d( 46 );
+            this.percentText = this.createText( 
+                fontSize
+                , { color: 0xffffff }
+                , {
+                  text: this.getAttackText(),
+                  fontFamily: 'HuXiaoBoKuHei, "Times New Roman", Times, serif',
+                  fontSize: fontSize * 2,
+                  fontStyle: 'italic'
+                }
+            );
         }
 
+    }
+
+    createText( size = 44, textureParams = {}, params = {}, callback ){
+        let texture = new TextTexture( params );
+        textureParams.map = texture;
+        let material = new THREE.SpriteMaterial(
+            textureParams
+        );
+        let sprite =new THREE.Sprite(material);
+        sprite.scale.setX(texture.imageAspect).multiplyScalar(size);
+
+        callback && callback( sprite, material, texture, textureParams, params );
+
+        this.stage.add( sprite  );
+        this.addDestroy( sprite );
+
+        return sprite;
     }
 
     drawInnerCircle(){
