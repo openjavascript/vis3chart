@@ -434,18 +434,46 @@ export default class Gauge extends VisChartBase  {
     }
     drawTextRect(){
 
-        /*
-        let textWidth =  this.tmpTotalText.textWidth + 30 + this.totalTextPostfix.textWidth + 5
+        let textWidth =  ( ( this.totalTextPostfix.position.x ) + this.totalTextPostfix.scale.x / 2 ) * 2 + 5
+            , rectHeight = geometry3d.to3d( this.tmpTotalText.scale.y + 4 )
             , textX = 0
             , textY = 0
             ;
 
+        console.log( 'textWidth', textWidth, textX, textY );
         if( textWidth < 170 ){
             textWidth = 170;
         }
-        textX = this.cx - textWidth / 2 + 2;;
+        textY = -( this.arcOutRadius + geometry3d.to3d( 25 ) );
 
-        textY = this.textY - ( this.textHeight - this.totalText.textHeight ) / 2;
+        textWidth = geometry3d.to3d( textWidth );
+        rectHeight = geometry3d.to3d( rectHeight );
+
+        let group = new THREE.Group();
+            group.transparent = true;
+
+        var bgGeometry = new THREE.PlaneGeometry( 
+            ( textWidth )
+            , ( rectHeight  )
+            , 32, 32 );
+        var bgMaterial = new THREE.MeshBasicMaterial( {
+            color: this.parseColor( this.lineColor )
+            , side: THREE.DoubleSide
+            , opacity: .2
+            , transparent: true
+        } );
+        var bgPlane = new THREE.Mesh( bgGeometry, bgMaterial );
+
+        bgPlane.position.y = -( this.arcOutRadius + geometry3d.to3d( 25 ) + rectHeight / 2 + 1 );
+
+        group.add( bgPlane );
+        this.addDestroy( bgPlane );
+
+        this.scene.add( group );
+        this.addDestroy( group );
+
+        /*
+
         */
 
         /*
