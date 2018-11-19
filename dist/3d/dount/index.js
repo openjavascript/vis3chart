@@ -534,19 +534,17 @@ var Dount = function (_VisChartBase) {
             this.realLineWidth = this.lineWidth;
 
             this.data.data.map(function (val, key) {
-
                 var fontSize = geometry3d.to3d(25);
-                var texture = new _three2.default({
+                var sprite = _this6.createText(fontSize, { color: _this6.lineColor }, {
                     //text: `${val.percent}%`,
                     text: _this6.getLabel(val),
                     fontFamily: 'MicrosoftYaHei',
                     //fontSize: fontSize * 2,
                     fontSize: fontSize * 2,
                     fontStyle: 'italic'
+                }, function (sprite) {
+                    sprite.position.x = -10000;
                 });
-                var material = new THREE.SpriteMaterial({ map: texture, color: _this6.lineColor });
-                var sprite = new THREE.Sprite(material);
-                sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
                 _this6.clearList.push(sprite);
                 _this6.textar.push(sprite);
             });

@@ -160,24 +160,16 @@ var Legend = function (_VisChartBase) {
                     _this2.addDestroy(rectPlane);
 
                     var fontSize = geometry3d.to3d(22);
-
-                    var textTexture = new _three2.default({
+                    var textSprite = _this2.createText(fontSize, { color: _this2.parseColor(_this2.textColor) }, {
                         text: label,
                         fontFamily: 'MicrosoftYaHei',
                         fontSize: fontSize * 2,
                         fontStyle: 'normal',
                         transparent: true
-                    });
-                    var textMaterial = new THREE.SpriteMaterial({ map: textTexture, color: _this2.parseColor(_this2.textColor) });
-                    var textSprite = new THREE.Sprite(textMaterial);
-                    textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(fontSize);
-
-                    textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + textSprite.scale.x / 2 - 3;
-                    textSprite.position.y = pos.y;
-
-                    group.add(textSprite);
-                    _this2.addDestroy(textSprite);
-
+                    }, function (textSprite, textMaterial) {
+                        textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + textSprite.scale.x / 2 - 3;
+                        textSprite.position.y = pos.y;
+                    }, group);
                     _this2.scene.add(group);
                     _this2.addDestroy(group);
 
@@ -187,8 +179,7 @@ var Legend = function (_VisChartBase) {
                         disabled: false,
                         rect: rectPlane,
                         bg: bgPlane,
-                        text: textSprite,
-                        imageAspect: textTexture.imageAspect
+                        text: textSprite
                     };
                     _this2.group.push(data);
                     _this2.domEvents.bind(group, 'click', function () {
@@ -223,29 +214,24 @@ var Legend = function (_VisChartBase) {
 
                     _item.text.parent.remove(_item.text);
                     var _fontSize = geometry3d.to3d(22);
-                    var _textTexture = new _three2.default({
+                    _textSprite = _this2.createText(_fontSize, { color: _this2.parseColor(_this2.textColor) }, {
                         text: label,
                         fontFamily: 'MicrosoftYaHei',
                         fontSize: _fontSize * 5,
                         fontStyle: 'normal',
                         transparent: true
-                    });
-                    var _textMaterial = new THREE.SpriteMaterial({ map: _textTexture, color: _this2.parseColor(_this2.textColor) });
-                    _textSprite = new THREE.Sprite(_textMaterial);
+                    }, function (textSprite, textMaterial) {
+                        textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + textSprite.scale.x / 2 - 3;
+                        textSprite.position.y = pos.y;
+
+                        if (_item.disabled) {
+                            //group.opacity( .6 );
+                            textMaterial.opacity = .6;
+                        } else {
+                            textMaterial.opacity = 1;
+                        }
+                    }, _group);
                     _item.text = _textSprite;
-                    _textSprite.scale.setX(_textTexture.imageAspect).multiplyScalar(_fontSize);
-                    _textSprite.position.x = pos.x + _this2.itemWidth() + geometry3d.to3d(_this2.iconSpace) + _textSprite.scale.x / 2 - 3;
-                    _textSprite.position.y = pos.y;
-
-                    if (_item.disabled) {
-                        //group.opacity( .6 );
-                        _textMaterial.opacity = .6;
-                    } else {
-                        _textMaterial.opacity = 1;
-                    }
-
-                    _group.add(_textSprite);
-                    _this2.addDestroy(_textSprite);
                 }
             });
             //this.stage.add( this.layer );

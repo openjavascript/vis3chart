@@ -479,19 +479,22 @@ export default class Dount extends VisChartBase  {
         this.realLineWidth = this.lineWidth;
 
         this.data.data.map( ( val, key ) => {
-
             let fontSize = geometry3d.to3d( 25 );
-            let texture = new TextTexture({
-              //text: `${val.percent}%`,
-              text: this.getLabel( val ),
-              fontFamily: 'MicrosoftYaHei',
-              //fontSize: fontSize * 2,
-              fontSize: fontSize * 2,
-              fontStyle: 'italic',
-            });
-            let material = new THREE.SpriteMaterial({map: texture, color: this.lineColor });
-            let sprite =new THREE.Sprite(material);
-            sprite.scale.setX(texture.imageAspect).multiplyScalar(fontSize);
+            let sprite = this.createText( 
+                fontSize
+                , { color: this.lineColor }
+                , {
+                  //text: `${val.percent}%`,
+                  text: this.getLabel( val ),
+                  fontFamily: 'MicrosoftYaHei',
+                  //fontSize: fontSize * 2,
+                  fontSize: fontSize * 2,
+                  fontStyle: 'italic',
+                }
+                , ( sprite ) => {
+                    sprite.position.x = -10000;
+                }
+            );
             this.clearList.push( sprite );
             this.textar.push( sprite );
         });

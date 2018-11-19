@@ -118,24 +118,22 @@ export default class Legend extends VisChartBase  {
                 this.addDestroy( rectPlane );
 
                 let fontSize = geometry3d.to3d( 22 );
-
-                let textTexture = new TextTexture({
-                  text: label,
-                  fontFamily: 'MicrosoftYaHei',
-                  fontSize: fontSize * 2,
-                  fontStyle: 'normal',
-                  transparent: true
-                });
-                let textMaterial = new THREE.SpriteMaterial({map: textTexture, color: this.parseColor( this.textColor ) });
-                let textSprite = new THREE.Sprite(textMaterial);
-                textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(fontSize);
-
-                textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
-                textSprite.position.y = pos.y;
-
-                group.add( textSprite );
-                this.addDestroy( textSprite );
-
+                let textSprite = this.createText(
+                    fontSize
+                    , {color: this.parseColor( this.textColor ) }
+                    , {
+                          text: label,
+                          fontFamily: 'MicrosoftYaHei',
+                          fontSize: fontSize * 2,
+                          fontStyle: 'normal',
+                          transparent: true
+                        }
+                    , ( textSprite, textMaterial ) => {
+                        textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
+                        textSprite.position.y = pos.y;
+                    }
+                    , group
+                );
                 this.scene.add( group );
                 this.addDestroy( group );
 
@@ -146,7 +144,6 @@ export default class Legend extends VisChartBase  {
                     , rect: rectPlane
                     , bg: bgPlane
                     , text: textSprite
-                    , imageAspect: textTexture.imageAspect
                 };
                 this.group.push( data );
                 this.domEvents.bind( group, 'click', ()=>{
@@ -187,30 +184,32 @@ export default class Legend extends VisChartBase  {
 
                 item.text.parent.remove( item.text );
                 let fontSize = geometry3d.to3d( 22 );
-                let textTexture = new TextTexture({
-                  text: label,
-                  fontFamily: 'MicrosoftYaHei',
-                  fontSize: fontSize * 5,
-                  fontStyle: 'normal',
-                  transparent: true
-                });
-                let textMaterial = new THREE.SpriteMaterial({map: textTexture, color: this.parseColor( this.textColor ) });
-                textSprite = new THREE.Sprite(textMaterial);
+                textSprite = this.createText(
+                    fontSize
+                    , {color: this.parseColor( this.textColor ) }
+                    , {
+                      text: label,
+                      fontFamily: 'MicrosoftYaHei',
+                      fontSize: fontSize * 5,
+                      fontStyle: 'normal',
+                      transparent: true
+                    }
+                    , ( textSprite, textMaterial ) => {
+                        textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
+                        textSprite.position.y = pos.y;
+
+
+                        if( item.disabled ){
+                            //group.opacity( .6 );
+                            textMaterial.opacity = .6;
+                        }else{
+                            textMaterial.opacity = 1;
+                        }
+
+                    }
+                    , group
+                );
                 item.text = textSprite;
-                textSprite.scale.setX(textTexture.imageAspect).multiplyScalar(fontSize);
-                textSprite.position.x = pos.x + this.itemWidth() + geometry3d.to3d( this.iconSpace ) + textSprite.scale.x / 2 - 3;
-                textSprite.position.y = pos.y;
-
-                if( item.disabled ){
-                    //group.opacity( .6 );
-                    textMaterial.opacity = .6;
-                }else{
-                    textMaterial.opacity = 1;
-                }
-
-                group.add( textSprite );
-                this.addDestroy( textSprite );
-
             }
         });
         //this.stage.add( this.layer );
