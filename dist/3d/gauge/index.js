@@ -93,7 +93,7 @@ var Gauge = function (_VisChartBase) {
 
             this.roundRadiusPercent = .070;
 
-            this.lineColor = '#596ea7';
+            this.lineColor = 0x596ea7;
 
             this.circleLinePercent = .22;
             this.circlePercent = .24;
@@ -433,44 +433,53 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'drawText',
         value: function drawText() {
+            var _this8 = this;
 
+            this.totalTextGroup = new THREE.Group();
+            this.stage.add(this.totalTextGroup);
+            this.addDestroy(this.totalTextGroup);
+
+            var fontSize = geometry3d.to3d(36);
+            var labelFontSize = geometry3d.to3d(22);
             var params = {
                 text: 0 + '',
-                fontSize: 30 * this.sizeRate,
-                fontFamily: 'Agency FB',
-                fill: '#ffffff',
+                fontFamily: '"Agency FB",MicrosoftYaHei',
+                fontSize: fontSize * 2,
                 fontStyle: 'italic',
                 letterSpacing: 1.5
             },
-                tmp = _jsonUtilsx2.default.clone(params);
-            tmp.text = this.totalNum;
+                colorParams = {
+                color: this.textColor
+            },
+                tmpParams = _jsonUtilsx2.default.clone(params),
+                labelParams = _jsonUtilsx2.default.clone(params);
 
-            /*
-            this.totalTextGroup = new Konva.Group();
-            this.addDestroy( this.totalTextGroup );
-             this.totalText = new Konva.Text( params );
-            this.addDestroy( this.totalText );
-             let params1 = {
+            //params.text = '1100'
+            tmpParams.text = this.totalNum + '';
+
+            labelParams = Object.assign(labelParams, {
+                fontSize: labelFontSize,
+                fontFamily: 'MicrosoftYaHei',
                 text: this.totalPostfix
-                , x: this.totalText.textWidth + 5
-                , fontSize: 12 * this.sizeRate
-                , fontFamily: 'MicrosoftYaHei'
-                , fill: '#ffffff'
-                , fontStyle: 'italic'
-                , letterSpacing: 1.5
-            };
-             this.totalTextPostfix = new Konva.Text( params1 );
-            this.totalTextPostfix.y( this.totalText.textHeight - this.totalTextPostfix.textHeight - 4 );
-            this.addDestroy( this.totalTextPostfix );
-             this.totalTextGroup.add( this.totalText );
-            this.totalTextGroup.add( this.totalTextPostfix );
-             //console.log( this.totalTextGroup, this.totalTextGroup.getClipWidth(), this.totalTextGroup.width(), this.totalTextGroup.size()  );
-             //this.totalTextGroup.x( this.cx - this.totalTextGroup.width / 2 );
-            this.totalTextGroup.y( this.textY);
-            this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
-             this.tmpTotalText = new Konva.Text( tmp );
-            this.addDestroy( this.tmpTotalText );
-            */
+            });
+
+            this.tmpTotalText = this.createText(fontSize, colorParams, tmpParams, function (sprite) {
+                sprite.position.x = Math.pow(10, 10);
+            }, this.totalTextGroup);
+            this.tmpTotalText.matrixWorldNeedsUpdate = true;
+
+            this.render();
+
+            this.totalTextPostfix = this.createText(labelFontSize, colorParams, labelParams, function (sprite) {
+                sprite.position.x = _this8.tmpTotalText.scale.x / 2 + sprite.scale.x / 2 - geometry3d.to3d(5);
+            }, this.totalTextGroup);
+
+            this.totalText = this.createText(fontSize, colorParams, params, function (sprite) {
+                sprite.position.x = _this8.totalTextPostfix.position.x - _this8.totalTextPostfix.scale.x / 2 - sprite.scale.x / 2 + geometry3d.to3d(5);
+            }, this.totalTextGroup);
+
+            this.totalTextGroup.position.y = -(this.arcOutRadius + geometry3d.to3d(25));
+            this.totalTextGroup.position.x = -this.totalTextPostfix.position.x + this.totalTextPostfix.scale.x / 2;
         }
     }, {
         key: 'drawTextRect',
@@ -534,15 +543,15 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'drawArcText',
         value: function drawArcText() {
-            var _this8 = this;
+            var _this9 = this;
 
             if (!(this.textAr && this.textAr.length)) return;
 
             this.textAr.map(function (val) {
 
                 var fontSize = geometry3d.to3d(16);
-                _this8.createText(fontSize, {
-                    color: _this8.lineColor,
+                _this9.createText(fontSize, {
+                    color: _this9.lineColor,
                     rotation: geometry.radians(val.angle + 90 + (val.rotationOffset || 0) + 180)
                 }, {
                     text: val.text + '',
@@ -763,7 +772,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'animation',
         value: function animation() {
-            var _this9 = this;
+            var _this10 = this;
 
             //console.log( this.angle, this.animationAngle );
             if (this.isDestroy) return;
@@ -780,7 +789,7 @@ var Gauge = function (_VisChartBase) {
             //this.stage.add( this.layer );
 
             window.requestAnimationFrame(function () {
-                _this9.animation();
+                _this10.animation();
             });
         }
     }, {

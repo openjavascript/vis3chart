@@ -45,7 +45,7 @@ export default class Gauge extends VisChartBase  {
 
         this.roundRadiusPercent = .070;
 
-        this.lineColor = '#596ea7';
+        this.lineColor = 0x596ea7;
 
         this.circleLinePercent = .22;
         this.circlePercent = .24;
@@ -363,51 +363,74 @@ export default class Gauge extends VisChartBase  {
 
     drawText(){
 
-
-        let params = {
-            text: 0 + ''
-            , fontSize: 30 * this.sizeRate
-            , fontFamily: 'Agency FB'
-            , fill: '#ffffff'
-            , fontStyle: 'italic'
-            , letterSpacing: 1.5
-        }, tmp = ju.clone( params );
-        tmp.text = this.totalNum;
-
-        /*
-        this.totalTextGroup = new Konva.Group();
+        this.totalTextGroup = new THREE.Group();
+        this.stage.add( this.totalTextGroup );
         this.addDestroy( this.totalTextGroup );
 
-        this.totalText = new Konva.Text( params );
-        this.addDestroy( this.totalText );
+        let fontSize = geometry3d.to3d( 36 );
+        let labelFontSize = geometry3d.to3d( 22 );
+        let params = {
+                text: 0 + ''
+                , fontFamily: '"Agency FB",MicrosoftYaHei'
+                , fontSize: fontSize * 2
+                , fontStyle: 'italic'
+                , letterSpacing: 1.5
+            }
+            , colorParams = { 
+                color: this.textColor
+            }
+            , tmpParams = ju.clone( params )
+            , labelParams = ju.clone( params )
+            ;
 
-        let params1 = {
-            text: this.totalPostfix
-            , x: this.totalText.textWidth + 5
-            , fontSize: 12 * this.sizeRate
+        //params.text = '1100'
+        tmpParams.text = this.totalNum + '';
+
+        labelParams = Object.assign( labelParams, {
+            fontSize: labelFontSize
             , fontFamily: 'MicrosoftYaHei'
-            , fill: '#ffffff'
-            , fontStyle: 'italic'
-            , letterSpacing: 1.5
-        };
+            , text: this.totalPostfix
+        });
 
-        this.totalTextPostfix = new Konva.Text( params1 );
-        this.totalTextPostfix.y( this.totalText.textHeight - this.totalTextPostfix.textHeight - 4 );
-        this.addDestroy( this.totalTextPostfix );
+        this.tmpTotalText = this.createText(
+            fontSize
+            , colorParams
+            , tmpParams
+            , ( sprite ) => {
+                sprite.position.x = Math.pow( 10, 10 );
+            }
+            , this.totalTextGroup
+        );
+        this.tmpTotalText.matrixWorldNeedsUpdate = true;
 
-        this.totalTextGroup.add( this.totalText );
-        this.totalTextGroup.add( this.totalTextPostfix );
+        this.render();
 
-        //console.log( this.totalTextGroup, this.totalTextGroup.getClipWidth(), this.totalTextGroup.width(), this.totalTextGroup.size()  );
+        this.totalTextPostfix = this.createText(
+            labelFontSize
+            , colorParams
+            , labelParams
+            , ( sprite ) => {
+                sprite.position.x = this.tmpTotalText.scale.x / 2 + sprite.scale.x / 2 - geometry3d.to3d( 5 );
+            }
+            , this.totalTextGroup
+        );
 
-        //this.totalTextGroup.x( this.cx - this.totalTextGroup.width / 2 );
-        this.totalTextGroup.y( this.textY);
-        this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
+        this.totalText = this.createText(
+            fontSize
+            , colorParams
+            , params
+            , ( sprite ) => {
+                sprite.position.x = this.totalTextPostfix.position.x 
+                                    - this.totalTextPostfix.scale.x / 2 
+                                    - sprite.scale.x / 2 
+                                    + geometry3d.to3d( 5 )
+                                    ;
+            }
+            , this.totalTextGroup
+        );
 
-        this.tmpTotalText = new Konva.Text( tmp );
-        this.addDestroy( this.tmpTotalText );
-        */
-
+        this.totalTextGroup.position.y = -( this.arcOutRadius + geometry3d.to3d( 25 ) );
+        this.totalTextGroup.position.x = -( this.totalTextPostfix.position.x ) + this.totalTextPostfix.scale.x / 2;
     }
     drawTextRect(){
 

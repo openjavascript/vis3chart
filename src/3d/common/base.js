@@ -18,8 +18,8 @@ export default class ThreeBase extends VisChartBase {
         super( box, width, height, camera );
         camera && ( this.camera = camera );
 
-        /*
-        */
+        this.textColor = 0xffffff;
+        //this.lineColor = 0x596ea7;
 
         geometry3d.screenWidth = this.width;
         geometry3d.screenHeight = this.height;
@@ -46,7 +46,7 @@ export default class ThreeBase extends VisChartBase {
             }
         );
     */
-    createText( size = 44, textureParams = {}, params = {}, callback ){
+    createText( size = 44, textureParams = {}, params = {}, callback, parent ){
         let texture = new TextTexture( params );
         textureParams.map = texture;
         let material = new THREE.SpriteMaterial(
@@ -57,10 +57,30 @@ export default class ThreeBase extends VisChartBase {
 
         callback && callback( sprite, material, texture, textureParams, params );
 
-        this.stage.add( sprite  );
+        parent = parent || this.stage;
+
+        parent.add( sprite  );
         this.addDestroy( sprite );
 
         return sprite;
+    }
+
+    getBox( mesh ){
+        let box = new THREE.Box3().setFromObject( mesh );
+        /*
+        let size = box.getSize( new THREE.Vector3 );
+        return size;
+        */
+        return box;
+    }
+
+    getBoxSize( mesh ){
+        return this.getBox( mesh ).getSize( new THREE.Vector3() );
+    }
+
+    getPosition( matrixWorld ){
+        var position = new THREE.Vector3();
+        return position.setFromMatrixPosition( matrixWorld );
     }
 
 

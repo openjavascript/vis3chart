@@ -54,8 +54,8 @@ var ThreeBase = function (_VisChartBase) {
 
         camera && (_this.camera = camera);
 
-        /*
-        */
+        _this.textColor = 0xffffff;
+        //this.lineColor = 0x596ea7;
 
         geometry3d.screenWidth = _this.width;
         geometry3d.screenHeight = _this.height;
@@ -92,6 +92,7 @@ var ThreeBase = function (_VisChartBase) {
             var textureParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
             var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
             var callback = arguments[3];
+            var parent = arguments[4];
 
             var texture = new _three2.default(params);
             textureParams.map = texture;
@@ -101,10 +102,33 @@ var ThreeBase = function (_VisChartBase) {
 
             callback && callback(sprite, material, texture, textureParams, params);
 
-            this.stage.add(sprite);
+            parent = parent || this.stage;
+
+            parent.add(sprite);
             this.addDestroy(sprite);
 
             return sprite;
+        }
+    }, {
+        key: 'getBox',
+        value: function getBox(mesh) {
+            var box = new THREE.Box3().setFromObject(mesh);
+            /*
+            let size = box.getSize( new THREE.Vector3 );
+            return size;
+            */
+            return box;
+        }
+    }, {
+        key: 'getBoxSize',
+        value: function getBoxSize(mesh) {
+            return this.getBox(mesh).getSize(new THREE.Vector3());
+        }
+    }, {
+        key: 'getPosition',
+        value: function getPosition(matrixWorld) {
+            var position = new THREE.Vector3();
+            return position.setFromMatrixPosition(matrixWorld);
         }
     }, {
         key: '_setSize',
