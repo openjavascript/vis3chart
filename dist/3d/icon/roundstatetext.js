@@ -141,15 +141,6 @@ var RoundStateText = function (_VisChartBase) {
             this.linePartMaterial1.uniforms.color.value.set(color);
             this.linePartMaterial2.uniforms.color.value.set(color);
 
-            /*
-            this.text.fill( color );
-            this.circle.stroke( color );
-            this.circleLine.stroke( color );
-             this.stage.add( this.layer );
-            */
-
-            //console.log( 'rate', rate );
-
             return this;
         }
     }, {
