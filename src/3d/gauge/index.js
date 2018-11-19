@@ -349,6 +349,9 @@ export default class Gauge extends VisChartBase  {
             this.totalNumCount = this.totalNum;
         };
 
+        this.totalTextTexture.text = this.totalNumCount + '';
+        this.totalTextTexture.redraw();
+
         /*
         this.totalText.text( this.totalNumCount );
         this.totalTextPostfix.x( this.totalText.textWidth + 5 );
@@ -368,6 +371,7 @@ export default class Gauge extends VisChartBase  {
         this.addDestroy( this.totalTextGroup );
 
         let fontSize = geometry3d.to3d( 36 );
+        let fontSize1 = geometry3d.to3d( 36 );
         let labelFontSize = geometry3d.to3d( 22 );
         let params = {
                 text: 0 + ''
@@ -383,7 +387,7 @@ export default class Gauge extends VisChartBase  {
             , labelParams = ju.clone( params )
             ;
 
-        //params.text = '1100'
+        params.text = this.totalNum + '';
         tmpParams.text = this.totalNum + '';
 
         labelParams = Object.assign( labelParams, {
@@ -419,12 +423,15 @@ export default class Gauge extends VisChartBase  {
             fontSize
             , colorParams
             , params
-            , ( sprite ) => {
+            , ( sprite, material, texture ) => {
                 sprite.position.x = this.totalTextPostfix.position.x 
                                     - this.totalTextPostfix.scale.x / 2 
                                     - sprite.scale.x / 2 
                                     + geometry3d.to3d( 5 )
                                     ;
+                //console.log( 'texture', texture, sprite );
+                texture.text = '0';
+                this.totalTextTexture = texture;
             }
             , this.totalTextGroup
         );

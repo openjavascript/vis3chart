@@ -419,6 +419,9 @@ var Gauge = function (_VisChartBase) {
                 this.totalNumCount = this.totalNum;
             };
 
+            this.totalTextTexture.text = this.totalNumCount + '';
+            this.totalTextTexture.redraw();
+
             /*
             this.totalText.text( this.totalNumCount );
             this.totalTextPostfix.x( this.totalText.textWidth + 5 );
@@ -440,6 +443,7 @@ var Gauge = function (_VisChartBase) {
             this.addDestroy(this.totalTextGroup);
 
             var fontSize = geometry3d.to3d(36);
+            var fontSize1 = geometry3d.to3d(36);
             var labelFontSize = geometry3d.to3d(22);
             var params = {
                 text: 0 + '',
@@ -454,7 +458,7 @@ var Gauge = function (_VisChartBase) {
                 tmpParams = _jsonUtilsx2.default.clone(params),
                 labelParams = _jsonUtilsx2.default.clone(params);
 
-            //params.text = '1100'
+            params.text = this.totalNum + '';
             tmpParams.text = this.totalNum + '';
 
             labelParams = Object.assign(labelParams, {
@@ -474,8 +478,11 @@ var Gauge = function (_VisChartBase) {
                 sprite.position.x = _this8.tmpTotalText.scale.x / 2 + sprite.scale.x / 2 - geometry3d.to3d(5);
             }, this.totalTextGroup);
 
-            this.totalText = this.createText(fontSize, colorParams, params, function (sprite) {
+            this.totalText = this.createText(fontSize, colorParams, params, function (sprite, material, texture) {
                 sprite.position.x = _this8.totalTextPostfix.position.x - _this8.totalTextPostfix.scale.x / 2 - sprite.scale.x / 2 + geometry3d.to3d(5);
+                //console.log( 'texture', texture, sprite );
+                texture.text = '0';
+                _this8.totalTextTexture = texture;
             }, this.totalTextGroup);
 
             this.totalTextGroup.position.y = -(this.arcOutRadius + geometry3d.to3d(25));
