@@ -447,12 +447,13 @@ export default class Gauge extends VisChartBase  {
         this.totalTextGroup.position.x = -( this.totalTextPostfix.scale.x / 2 ) ;
     }
     drawTextRect(){
+        this.dispose( this.textReatGroupIns );
 
         let textWidth =  ( ( this.totalTextPostfix.position.x ) + this.totalTextPostfix.scale.x / 2 ) * 2 + 5
             , heightPad = 0
             , rectHeight = geometry3d.to3d( 28 )
             , textX = 0
-            , textY = -( this.arcOutRadius + geometry3d.to3d( 25 ) + this.tmpTotalText.scale.y / 2 + .5 )
+            , textY = -( this.arcOutRadius + geometry3d.to3d( 25 ) )
             ;
 
         if( textWidth < 170 ){
@@ -476,7 +477,7 @@ export default class Gauge extends VisChartBase  {
         } );
         var bgPlane = new THREE.Mesh( bgGeometry, bgMaterial );
 
-        bgPlane.position.y = textY;
+        bgPlane.position.y = textY - Math.abs( this.getPosition( this.tmpTotalText.matrixWorld ).y );
 
         group.add( bgPlane );
         this.addDestroy( bgPlane );
@@ -486,42 +487,42 @@ export default class Gauge extends VisChartBase  {
 
         partpoints = [], indices = [];
 
-        let height = -this.getBoxSize( bgPlane ).y;
-        let top = this.getPosition( bgPlane.matrixWorld ).y;
+        let height = this.getBoxSize( bgPlane ).y;
+        let top = this.getPosition( bgPlane.matrixWorld ).y + 2;
         let arrowLength = geometry3d.to3d( 6 );
 
         let points = [ 
             {
-                start: { x: -textWidth / 2 + arrowLength, y: top + arrowLength * 1 }
-                , end: { x: -textWidth / 2, y: top + arrowLength * 1 }
+                start: { x: -textWidth / 2 + arrowLength, y: top + arrowLength * 2 }
+                , end: { x: -textWidth / 2, y: top + arrowLength * 2 }
             }
             , {
                 start: { x: -textWidth / 2, y: top + arrowLength * 2 }
-                , end: { x: -textWidth / 2, y: top + arrowLength }
+                , end: { x: -textWidth / 2, y: top + arrowLength * 1  }
             }
             , {
-                start: { x: -textWidth / 2 + arrowLength, y: top - height +  arrowLength }
-                , end: { x: -textWidth / 2, y: top - height +  arrowLength }
+                start: { x: -textWidth / 2 + arrowLength, y: top - height +  arrowLength * 2 }
+                , end: { x: -textWidth / 2, y: top - height +  arrowLength * 2 }
             }
             , {
-                start: { x: -textWidth / 2  , y: top - height +  arrowLength}
-                , end: { x: -textWidth / 2, y: top - height }
+                start: { x: -textWidth / 2  , y: top - height +  arrowLength * 2 }
+                , end: { x: -textWidth / 2, y: top - height + arrowLength * 3 }
             }
             , {
-                start: { x: textWidth / 2 - arrowLength, y: top + arrowLength }
-                , end: { x: textWidth / 2, y: top + arrowLength }
+                start: { x: textWidth / 2 - arrowLength, y: top + arrowLength * 2 }
+                , end: { x: textWidth / 2, y: top + arrowLength + arrowLength * 1 }
             }
             , {
                 start: { x: textWidth / 2, y: top + arrowLength * 2 }
                 , end: { x: textWidth / 2, y: top + arrowLength }
             }
             , {
-                start: { x: textWidth / 2 - arrowLength, y: top - height + arrowLength }
-                , end: { x: textWidth / 2, y: top - height + arrowLength }
+                start: { x: textWidth / 2 - arrowLength, y: top - height + arrowLength * 2 }
+                , end: { x: textWidth / 2, y: top - height + arrowLength * 2 }
             }
             , {
-                start: { x: textWidth / 2, y: top - height + arrowLength  }
-                , end: { x: textWidth / 2, y: top - height }
+                start: { x: textWidth / 2, y: top - height + arrowLength * 2 }
+                , end: { x: textWidth / 2, y: top - height + arrowLength * 3 }
             }
         ];
 
@@ -556,8 +557,10 @@ export default class Gauge extends VisChartBase  {
         geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 
         line = new THREE.LineSegments(geometry, material);
-        this.stage.add(line);
+        group.add(line);
         this.addDestroy( line );
+
+        this.textReatGroupIns = group;
 
         this.scene.add( group );
         this.addDestroy( group );
@@ -725,12 +728,10 @@ export default class Gauge extends VisChartBase  {
 
     initDataLayout(){
 
-        this.drawText();
         this.drawArcText();
         if( !this.inited ){
             this.drawInnerText();
             this.drawInnerCircle();
-            this.drawTextRect();
             this.drawArc();
             this.drawArcLine();
             this.drawCircle();
@@ -738,6 +739,8 @@ export default class Gauge extends VisChartBase  {
             this.drawArcPartLine();
             this.initRoundText();
         }
+        this.drawText();
+        this.drawTextRect();
         this.drawArrow();
         this.updateArrow();
     }

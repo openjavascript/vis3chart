@@ -507,12 +507,13 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'drawTextRect',
         value: function drawTextRect() {
+            this.dispose(this.textReatGroupIns);
 
             var textWidth = (this.totalTextPostfix.position.x + this.totalTextPostfix.scale.x / 2) * 2 + 5,
                 heightPad = 0,
                 rectHeight = geometry3d.to3d(28),
                 textX = 0,
-                textY = -(this.arcOutRadius + geometry3d.to3d(25) + this.tmpTotalText.scale.y / 2 + .5);
+                textY = -(this.arcOutRadius + geometry3d.to3d(25));
 
             if (textWidth < 170) {
                 textWidth = 170;
@@ -532,7 +533,7 @@ var Gauge = function (_VisChartBase) {
             });
             var bgPlane = new THREE.Mesh(bgGeometry, bgMaterial);
 
-            bgPlane.position.y = textY;
+            bgPlane.position.y = textY - Math.abs(this.getPosition(this.tmpTotalText.matrixWorld).y);
 
             group.add(bgPlane);
             this.addDestroy(bgPlane);
@@ -548,34 +549,34 @@ var Gauge = function (_VisChartBase) {
 
             partpoints = [], indices = [];
 
-            var height = -this.getBoxSize(bgPlane).y;
-            var top = this.getPosition(bgPlane.matrixWorld).y;
+            var height = this.getBoxSize(bgPlane).y;
+            var top = this.getPosition(bgPlane.matrixWorld).y + 2;
             var arrowLength = geometry3d.to3d(6);
 
             var points = [{
-                start: { x: -textWidth / 2 + arrowLength, y: top + arrowLength * 1 },
-                end: { x: -textWidth / 2, y: top + arrowLength * 1 }
+                start: { x: -textWidth / 2 + arrowLength, y: top + arrowLength * 2 },
+                end: { x: -textWidth / 2, y: top + arrowLength * 2 }
             }, {
                 start: { x: -textWidth / 2, y: top + arrowLength * 2 },
-                end: { x: -textWidth / 2, y: top + arrowLength }
+                end: { x: -textWidth / 2, y: top + arrowLength * 1 }
             }, {
-                start: { x: -textWidth / 2 + arrowLength, y: top - height + arrowLength },
-                end: { x: -textWidth / 2, y: top - height + arrowLength }
+                start: { x: -textWidth / 2 + arrowLength, y: top - height + arrowLength * 2 },
+                end: { x: -textWidth / 2, y: top - height + arrowLength * 2 }
             }, {
-                start: { x: -textWidth / 2, y: top - height + arrowLength },
-                end: { x: -textWidth / 2, y: top - height }
+                start: { x: -textWidth / 2, y: top - height + arrowLength * 2 },
+                end: { x: -textWidth / 2, y: top - height + arrowLength * 3 }
             }, {
-                start: { x: textWidth / 2 - arrowLength, y: top + arrowLength },
-                end: { x: textWidth / 2, y: top + arrowLength }
+                start: { x: textWidth / 2 - arrowLength, y: top + arrowLength * 2 },
+                end: { x: textWidth / 2, y: top + arrowLength + arrowLength * 1 }
             }, {
                 start: { x: textWidth / 2, y: top + arrowLength * 2 },
                 end: { x: textWidth / 2, y: top + arrowLength }
             }, {
-                start: { x: textWidth / 2 - arrowLength, y: top - height + arrowLength },
-                end: { x: textWidth / 2, y: top - height + arrowLength }
+                start: { x: textWidth / 2 - arrowLength, y: top - height + arrowLength * 2 },
+                end: { x: textWidth / 2, y: top - height + arrowLength * 2 }
             }, {
-                start: { x: textWidth / 2, y: top - height + arrowLength },
-                end: { x: textWidth / 2, y: top - height }
+                start: { x: textWidth / 2, y: top - height + arrowLength * 2 },
+                end: { x: textWidth / 2, y: top - height + arrowLength * 3 }
             }];
 
             points.map(function (item, key) {
@@ -606,8 +607,10 @@ var Gauge = function (_VisChartBase) {
             geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 
             line = new THREE.LineSegments(geometry, material);
-            this.stage.add(line);
+            group.add(line);
             this.addDestroy(line);
+
+            this.textReatGroupIns = group;
 
             this.scene.add(group);
             this.addDestroy(group);
@@ -775,12 +778,10 @@ var Gauge = function (_VisChartBase) {
         key: 'initDataLayout',
         value: function initDataLayout() {
 
-            this.drawText();
             this.drawArcText();
             if (!this.inited) {
                 this.drawInnerText();
                 this.drawInnerCircle();
-                this.drawTextRect();
                 this.drawArc();
                 this.drawArcLine();
                 this.drawCircle();
@@ -788,6 +789,8 @@ var Gauge = function (_VisChartBase) {
                 this.drawArcPartLine();
                 this.initRoundText();
             }
+            this.drawText();
+            this.drawTextRect();
             this.drawArrow();
             this.updateArrow();
         }
