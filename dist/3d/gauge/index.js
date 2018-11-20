@@ -89,7 +89,7 @@ var Gauge = function (_VisChartBase) {
             this.totalNum = 0;
             this.totalNumStep = 5;
 
-            this.animationStep = 40 * 1;
+            this.animationStep = 30 * 1;
 
             this.roundRadiusPercent = .070;
 
@@ -121,6 +121,8 @@ var Gauge = function (_VisChartBase) {
             this.partLabel = this.part / 2;
             this.partAngle = this.arcAngle / this.part;
             this.partNum = this.arcTotal / this.part;
+
+            this.startAngle = this.arcAngle + this.arcAngleOffset + this.arcOffsetPad;
 
             this.textOffsetX = -1;
             this.textOffsetY = -8;
@@ -362,12 +364,16 @@ var Gauge = function (_VisChartBase) {
             this.angle = this.arcOffset + this.arcOffsetPad;
             this.animationAngle = this.getAttackRateAngle() + this.arcOffsetPad;
 
-            this.updateWedge();
+            this.updateArrow();
 
             if (this.curRate) {
                 this.rateStep = Math.floor(this.curRate / (this.animationStep * 2));
+                this.angleStep = Math.abs(this.animationAngle) / this.animationStep;
                 !this.inited && this.animation();
             }
+
+            //console.log( 'this.rateStep', this.rateStep, this.curRate, this.animationStep );
+
             if (parseInt(this.totalNum)) {
                 this.totalNumStep = Math.floor(this.totalNum / this.animationStep);
                 this.totalNumStep < 1 && (this.totalNumStep = 1);
@@ -451,6 +457,7 @@ var Gauge = function (_VisChartBase) {
                 fontSize: fontSize * 2,
                 fontStyle: 'italic',
                 letterSpacing: 1.5
+                //, fontWeight: 'bold'
             },
                 colorParams = {
                 color: this.textColor
@@ -464,7 +471,8 @@ var Gauge = function (_VisChartBase) {
             labelParams = Object.assign(labelParams, {
                 fontSize: labelFontSize,
                 fontFamily: 'MicrosoftYaHei',
-                text: this.totalPostfix
+                text: this.totalPostfix,
+                fontWeight: 'normal'
             });
 
             this.tmpTotalText = this.createText(fontSize, colorParams, tmpParams, function (sprite) {
@@ -497,7 +505,7 @@ var Gauge = function (_VisChartBase) {
                 textX = 0,
                 textY = 0;
 
-            console.log('textWidth', textWidth, textX, textY);
+            //console.log( 'textWidth', textWidth, textX, textY );
             if (textWidth < 170) {
                 textWidth = 170;
             }
@@ -568,8 +576,6 @@ var Gauge = function (_VisChartBase) {
                 partpoints.push(new THREE.Vector3(item.start.x, item.start.y, 1), new THREE.Vector3(item.end.x, item.end.y, 1));
                 indices.push(key);
             });
-
-            //console.log( partpoints );
 
             material = new THREE.LineBasicMaterial({
                 color: this.lineColor
@@ -681,8 +687,6 @@ var Gauge = function (_VisChartBase) {
                 partpoints.push(new THREE.Vector3(item.start.x, item.start.y, 1), new THREE.Vector3(item.end.x, item.end.y, 1));
                 indices.push(key);
             });
-
-            //console.log( partpoints );
 
             material = new THREE.LineBasicMaterial({
                 color: this.lineColor
@@ -805,29 +809,96 @@ var Gauge = function (_VisChartBase) {
                 group.add( wedge );
                  this.group = group;
             }
-               */
+            */
 
             if (!this.inited) {
-                /*
-                this.angle = this.arcOffset - 2;
-                            this.layer.add( this.group );
-                this.layer.add( this.roundLine );
-                this.layer.add( this.percentText );
-                //this.layer.add( this.percentSymbolText );
-                 */
+                this.drawInnerText();
+                this.drawInnerCircle();
                 this.drawText();
                 this.drawTextRect();
                 this.drawArcText();
                 this.drawArc();
                 this.drawArcLine();
-                this.drawInnerCircle();
-                this.drawInnerText();
                 this.drawCircle();
                 this.drawCircleLine();
                 this.drawArcPartLine();
 
                 this.initRoundText();
+
+                this.drawArrow();
             }
+        }
+    }, {
+        key: 'drawArrow',
+        value: function drawArrow() {
+
+            var group = new THREE.Group();
+
+            var geo = void 0,
+                mat = void 0,
+                tri = void 0,
+                width = 4,
+                top = 12;
+
+            geo = new THREE.Geometry();
+            geo.vertices = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(width, 0, 0), new THREE.Vector3(0, top, 0)];
+
+            geo.faces.push(new THREE.Face3(0, 1, 2));
+            geo.faces[0].color.setHex(0x973500);
+            geo.center();
+
+            mat = new THREE.MeshBasicMaterial({
+                color: 0x973500,
+                vertexColors: THREE.FaceColors
+                //, wireframe: true
+                //, wireframeLinewidth: 1
+            });
+            tri = new THREE.Mesh(geo, mat);
+            tri.position.x = width;
+            group.add(tri);
+
+            geo = new THREE.Geometry();
+            geo.vertices = [new THREE.Vector3(-width, 0, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, top, 0)];
+
+            geo.faces.push(new THREE.Face3(0, 1, 2));
+            geo.faces[0].color.setHex(0xff5a00);
+            geo.center();
+
+            mat = new THREE.MeshBasicMaterial({
+                color: 0xff5a00,
+                vertexColors: THREE.FaceColors
+                //, wireframe: true
+                //, wireframeLinewidth: 1
+            });
+            tri = new THREE.Mesh(geo, mat);
+            group.add(tri);
+
+            group.position.x = 100;
+            //group.rotateZ( 0 );
+            //group.rotation.z = geometry.radians( 135 );
+
+
+            this.arrowIcon = group;
+
+            this.stage.add(group);
+            this.addDestroy(group);
+        }
+    }, {
+        key: 'updateArrow',
+        value: function updateArrow() {
+            var angle = -(-180 + this.angle);
+
+            if (this.preAngle === this.angle) return;
+            this.preAngle = this.angle;
+
+            var point = geometry.distanceAngleToPoint(this.roundRadius + 6, angle);
+
+            this.arrowIcon.position.x = point.x;
+            this.arrowIcon.position.y = point.y;
+
+            this.arrowIcon.rotation.z = geometry.radians(angle - 90);
+
+            //console.log( 'arrow point', this.angle + 10, angle );
         }
     }, {
         key: 'animation',
@@ -838,31 +909,19 @@ var Gauge = function (_VisChartBase) {
             if (this.isDestroy) return;
             if (this.angle > this.animationAngle) return;
 
-            this.angle += this.rateStep;
+            this.angle += this.angleStep;
 
             if (this.angle >= this.animationAngle || !this.isAnimation()) {
                 this.angle = this.animationAngle;
             };
 
-            this.updateWedge();
+            this.updateArrow();
 
             //this.stage.add( this.layer );
 
             window.requestAnimationFrame(function () {
                 _this10.animation();
             });
-        }
-    }, {
-        key: 'updateWedge',
-        value: function updateWedge() {
-            /*
-            let point = geometry.distanceAngleToPoint(  this.roundRadius + 6, this.angle )
-            this.group.x( this.cx + point.x );
-            this.group.y( this.cy + point.y );
-            this.group.rotation( this.angle + 90 );
-            this.group.rotation( this.angle + 90 );
-            this.stage.add( this.layer );
-            */
         }
     }, {
         key: 'calcDataPosition',
@@ -935,7 +994,6 @@ var Gauge = function (_VisChartBase) {
         key: 'drawCircle',
         value: function drawCircle() {
             this.circleRadius = geometry3d.to3d(Math.ceil(this.circlePercent * this.max / 2) * this.sizeRate);
-            //console.log( this.circleRadius );
 
             var line = new _three5.MeshLine();
 
