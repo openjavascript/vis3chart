@@ -304,8 +304,6 @@ export default class Gauge extends VisChartBase  {
 
         !this.isRunAnimation && this.animation(); 
 
-        //console.log( 'this.totalNum', this.totalNum );
-
         if( parseInt( this.totalNum ) ){
             this.totalNumStep = Math.floor( this.totalNum / this.animationStep );
             this.totalNumStep < 1 && ( this.totalNumStep = 1 );
@@ -317,6 +315,9 @@ export default class Gauge extends VisChartBase  {
         !this.inited && this.animationCircleLine();
 
         this.inited = 1;
+    }
+    resize( width, height, data = null, allData = null ){
+        super.resize( width, height, data, allData );
     }
 
     animationCircleLine(){
@@ -421,7 +422,6 @@ export default class Gauge extends VisChartBase  {
                                     - sprite.scale.x / 2 
                                     + geometry3d.to3d( 5 )
                                     ;
-                //console.log( 'texture', texture, sprite );
                 texture.text = '0';
                 this.totalTextTexture = texture;
             }
@@ -440,7 +440,6 @@ export default class Gauge extends VisChartBase  {
             , textY = -( this.arcOutRadius + geometry3d.to3d( 25 ) + this.tmpTotalText.scale.y / 2 + .5 )
             ;
 
-        //console.log( 'textWidth', textWidth, textX, textY );
         if( textWidth < 170 ){
             textWidth = 170;
         }
@@ -449,9 +448,6 @@ export default class Gauge extends VisChartBase  {
 
         let group = new THREE.Group();
             group.transparent = true;
-
-
-        //console.log( textWidth, rectHeight, this.tmpTotalText.scale.y );
 
         var bgGeometry = new THREE.PlaneGeometry( 
             ( textWidth )
@@ -790,15 +786,12 @@ export default class Gauge extends VisChartBase  {
         group.add( tri );
         this.addDestroy( tri );
 
-        //group.position.x = 100;
-
         this.arrowIcon = group;
 
         group.renderOrder = -3;
 
         this.stage.add( group );
         this.addDestroy( group );
-
     }
 
     updateArrow(){
@@ -838,22 +831,6 @@ export default class Gauge extends VisChartBase  {
         this.updateArrow();
 
         window.requestAnimationFrame( ()=>{ this.animation() } );
-    }
-
-    calcDataPosition() {
-    }
-
-    animationLine(){
-    }
-
-    addIcon( path, layer ){
-    }
-
-    addText( path, layer ){
-
-    }
-
-    calcLayoutPosition() {
     }
 
     drawInnerText(){
@@ -1023,11 +1000,6 @@ export default class Gauge extends VisChartBase  {
     fixCy(){
         return 0;
     }
-
-
-    reset(){
-    }
-
     destroy(){
         super.destroy();
         this.textRoundAngle.map( ( val ) => {

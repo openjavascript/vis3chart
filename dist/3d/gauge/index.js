@@ -367,8 +367,6 @@ var Gauge = function (_VisChartBase) {
 
             !this.isRunAnimation && this.animation();
 
-            //console.log( 'this.totalNum', this.totalNum );
-
             if (parseInt(this.totalNum)) {
                 this.totalNumStep = Math.floor(this.totalNum / this.animationStep);
                 this.totalNumStep < 1 && (this.totalNumStep = 1);
@@ -379,6 +377,14 @@ var Gauge = function (_VisChartBase) {
             !this.inited && this.animationCircleLine();
 
             this.inited = 1;
+        }
+    }, {
+        key: 'resize',
+        value: function resize(width, height) {
+            var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+            var allData = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+
+            _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'resize', this).call(this, width, height, data, allData);
         }
     }, {
         key: 'animationCircleLine',
@@ -474,7 +480,6 @@ var Gauge = function (_VisChartBase) {
 
             this.totalText = this.createText(fontSize, colorParams, params, function (sprite, material, texture) {
                 sprite.position.x = _this8.totalTextPostfix.position.x - _this8.totalTextPostfix.scale.x / 2 - sprite.scale.x / 2 + geometry3d.to3d(5);
-                //console.log( 'texture', texture, sprite );
                 texture.text = '0';
                 _this8.totalTextTexture = texture;
             }, this.totalTextGroup);
@@ -492,7 +497,6 @@ var Gauge = function (_VisChartBase) {
                 textX = 0,
                 textY = -(this.arcOutRadius + geometry3d.to3d(25) + this.tmpTotalText.scale.y / 2 + .5);
 
-            //console.log( 'textWidth', textWidth, textX, textY );
             if (textWidth < 170) {
                 textWidth = 170;
             }
@@ -501,8 +505,6 @@ var Gauge = function (_VisChartBase) {
 
             var group = new THREE.Group();
             group.transparent = true;
-
-            //console.log( textWidth, rectHeight, this.tmpTotalText.scale.y );
 
             var bgGeometry = new THREE.PlaneGeometry(textWidth, rectHeight, 32, 32);
             var bgMaterial = new THREE.MeshBasicMaterial({
@@ -826,8 +828,6 @@ var Gauge = function (_VisChartBase) {
             group.add(tri);
             this.addDestroy(tri);
 
-            //group.position.x = 100;
-
             this.arrowIcon = group;
 
             group.renderOrder = -3;
@@ -880,21 +880,6 @@ var Gauge = function (_VisChartBase) {
                 _this10.animation();
             });
         }
-    }, {
-        key: 'calcDataPosition',
-        value: function calcDataPosition() {}
-    }, {
-        key: 'animationLine',
-        value: function animationLine() {}
-    }, {
-        key: 'addIcon',
-        value: function addIcon(path, layer) {}
-    }, {
-        key: 'addText',
-        value: function addText(path, layer) {}
-    }, {
-        key: 'calcLayoutPosition',
-        value: function calcLayoutPosition() {}
     }, {
         key: 'drawInnerText',
         value: function drawInnerText() {
@@ -1046,9 +1031,6 @@ var Gauge = function (_VisChartBase) {
         value: function fixCy() {
             return 0;
         }
-    }, {
-        key: 'reset',
-        value: function reset() {}
     }, {
         key: 'destroy',
         value: function destroy() {
