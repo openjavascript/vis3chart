@@ -385,6 +385,15 @@ var ThreeBase = function (_VisChartBase) {
     }, {
         key: 'dispose',
         value: function dispose(item) {
+            var _this6 = this;
+
+            if (!item) return this;
+
+            if (item.children && item.children.length) {
+                item.children.map(function (sitem) {
+                    _this6.dispose(sitem);
+                });
+            }
 
             try {
                 item.geometry && item.parent && item.geometry.dispose && item.geometry.dispose();

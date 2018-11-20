@@ -326,6 +326,14 @@ export default class ThreeBase extends VisChartBase {
 
     dispose( item ){
 
+        if( !item ) return this;
+
+        if( item.children && item.children.length ){
+            item.children.map( sitem => {
+                this.dispose( sitem );
+            });
+        }
+
         try{ 
             item.geometry 
                 && item.parent

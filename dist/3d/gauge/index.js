@@ -369,8 +369,10 @@ var Gauge = function (_VisChartBase) {
             if (this.curRate) {
                 this.rateStep = Math.floor(this.curRate / (this.animationStep * 2));
                 this.angleStep = Math.abs(this.animationAngle) / this.animationStep;
-                !this.inited && this.animation();
+                //!this.inited && this.animation();
             }
+
+            !this.isRunAnimation && this.animation();
 
             //console.log( 'this.rateStep', this.rateStep, this.curRate, this.animationStep );
 
@@ -444,6 +446,10 @@ var Gauge = function (_VisChartBase) {
         value: function drawText() {
             var _this8 = this;
 
+            if (this.totalTextGroup) {
+                this.dispose(this.totalTextGroup);
+            }
+
             this.totalTextGroup = new THREE.Group();
             this.stage.add(this.totalTextGroup);
             this.addDestroy(this.totalTextGroup);
@@ -501,21 +507,22 @@ var Gauge = function (_VisChartBase) {
         value: function drawTextRect() {
 
             var textWidth = (this.totalTextPostfix.position.x + this.totalTextPostfix.scale.x / 2) * 2 + 5,
-                rectHeight = geometry3d.to3d(this.tmpTotalText.scale.y + 4),
+                heightPad = 0,
+                rectHeight = geometry3d.to3d(28),
                 textX = 0,
-                textY = 0;
+                textY = -(this.arcOutRadius + geometry3d.to3d(25) + this.tmpTotalText.scale.y / 2 + .5);
 
             //console.log( 'textWidth', textWidth, textX, textY );
             if (textWidth < 170) {
                 textWidth = 170;
             }
-            textY = -(this.arcOutRadius + geometry3d.to3d(25));
 
             textWidth = geometry3d.to3d(textWidth);
-            rectHeight = geometry3d.to3d(rectHeight);
 
             var group = new THREE.Group();
             group.transparent = true;
+
+            console.log(textWidth, rectHeight, this.tmpTotalText.scale.y);
 
             var bgGeometry = new THREE.PlaneGeometry(textWidth, rectHeight, 32, 32);
             var bgMaterial = new THREE.MeshBasicMaterial({
@@ -526,7 +533,7 @@ var Gauge = function (_VisChartBase) {
             });
             var bgPlane = new THREE.Mesh(bgGeometry, bgMaterial);
 
-            bgPlane.position.y = -(this.arcOutRadius + geometry3d.to3d(25) + rectHeight / 2 + 2);
+            bgPlane.position.y = textY;
 
             group.add(bgPlane);
             this.addDestroy(bgPlane);
@@ -542,31 +549,33 @@ var Gauge = function (_VisChartBase) {
 
             partpoints = [], indices = [];
 
-            var height = this.getBoxSize(bgPlane).y;
-            var top = this.getPosition(bgPlane.matrixWorld).y + height + geometry3d.to3d(4);
+            console.log(this.getBoxSize(bgPlane), this.getPosition(bgPlane.matrixWorld));
+
+            var height = -this.getBoxSize(bgPlane).y;
+            var top = this.getPosition(bgPlane.matrixWorld).y;
             var arrowLength = geometry3d.to3d(6);
 
             var points = [{
-                start: { x: -textWidth / 2 + arrowLength, y: top },
-                end: { x: -textWidth / 2, y: top }
+                start: { x: -textWidth / 2 + arrowLength, y: top + arrowLength * 1 },
+                end: { x: -textWidth / 2, y: top + arrowLength * 1 }
             }, {
-                start: { x: -textWidth / 2, y: top },
-                end: { x: -textWidth / 2, y: top - arrowLength }
+                start: { x: -textWidth / 2, y: top + arrowLength * 2 },
+                end: { x: -textWidth / 2, y: top + arrowLength }
             }, {
-                start: { x: -textWidth / 2 + arrowLength, y: top - height },
-                end: { x: -textWidth / 2, y: top - height }
+                start: { x: -textWidth / 2 + arrowLength, y: top - height + arrowLength },
+                end: { x: -textWidth / 2, y: top - height + arrowLength }
             }, {
                 start: { x: -textWidth / 2, y: top - height + arrowLength },
                 end: { x: -textWidth / 2, y: top - height }
             }, {
-                start: { x: textWidth / 2 - arrowLength, y: top },
-                end: { x: textWidth / 2, y: top }
+                start: { x: textWidth / 2 - arrowLength, y: top + arrowLength },
+                end: { x: textWidth / 2, y: top + arrowLength }
             }, {
-                start: { x: textWidth / 2, y: top },
-                end: { x: textWidth / 2, y: top - arrowLength }
+                start: { x: textWidth / 2, y: top + arrowLength * 2 },
+                end: { x: textWidth / 2, y: top + arrowLength }
             }, {
-                start: { x: textWidth / 2 - arrowLength, y: top - height },
-                end: { x: textWidth / 2, y: top - height }
+                start: { x: textWidth / 2 - arrowLength, y: top - height + arrowLength },
+                end: { x: textWidth / 2, y: top - height + arrowLength }
             }, {
                 start: { x: textWidth / 2, y: top - height + arrowLength },
                 end: { x: textWidth / 2, y: top - height }
@@ -590,7 +599,6 @@ var Gauge = function (_VisChartBase) {
             positions = new Float32Array(vertices.length * 3);
 
             for (i = 0; i < vertices.length; i++) {
-
                 positions[i * 3] = vertices[i].x;
                 positions[i * 3 + 1] = vertices[i].y;
                 positions[i * 3 + 2] = vertices[i].z;
@@ -736,14 +744,8 @@ var Gauge = function (_VisChartBase) {
 
             material = new THREE.MeshBasicMaterial({ /*color: color,*/map: texture, side: THREE.DoubleSide, transparent: true });
             arc = new THREE.Mesh(geometryx, material);
-            //arc.rotation.z = geometry.radians( -80 );
-            //arc.renderOrder = 1;
 
             arc.position.y = this.fixCy();
-            /*
-            arc.renderOrder = 1;
-            arc.material.depthTest=false;
-            */
 
             this.stage.add(arc);
             this.addDestroy(arc);
@@ -776,45 +778,10 @@ var Gauge = function (_VisChartBase) {
         key: 'initDataLayout',
         value: function initDataLayout() {
 
-            /*
-            if( !this.inited ){
-               let wedge = new Konva.Wedge({
-                  x: 0,
-                  y: -3,
-                  radius: 10,
-                  angle: 20,
-                  fill: '#ff5a00',
-                  stroke: '#ff5a00',
-                  strokeWidth: 1,
-                  rotation: 90
-                });
-                this.addDestroy( wedge );
-                let wedge1 = new Konva.Wedge({
-                  x: 0,
-                  y: -3,
-                  radius: 10,
-                  angle: 20,
-                  fill: '#973500',
-                  stroke: '#973500',
-                  strokeWidth: 1,
-                  rotation: 65
-                });
-                this.addDestroy( wedge1 );
-                 let group = new Konva.Group({
-                    x: this.cx
-                    , y: this.cy
-                });
-                this.addDestroy( group );
-                 group.add( wedge1 );
-                group.add( wedge );
-                 this.group = group;
-            }
-            */
-
+            this.drawText();
             if (!this.inited) {
                 this.drawInnerText();
                 this.drawInnerCircle();
-                this.drawText();
                 this.drawTextRect();
                 this.drawArcText();
                 this.drawArc();
@@ -822,23 +789,25 @@ var Gauge = function (_VisChartBase) {
                 this.drawCircle();
                 this.drawCircleLine();
                 this.drawArcPartLine();
-
                 this.initRoundText();
-
-                this.drawArrow();
             }
+            this.drawArrow();
+            this.updateArrow();
         }
     }, {
         key: 'drawArrow',
         value: function drawArrow() {
+
+            this.dispose(this.arrowIcon);
+            this.preAngle = 0;
 
             var group = new THREE.Group();
 
             var geo = void 0,
                 mat = void 0,
                 tri = void 0,
-                width = 4,
-                top = 12;
+                width = geometry3d.to3d(5),
+                top = geometry3d.to3d(14);
 
             geo = new THREE.Geometry();
             geo.vertices = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(width, 0, 0), new THREE.Vector3(0, top, 0)];
@@ -853,7 +822,9 @@ var Gauge = function (_VisChartBase) {
                 //, wireframe: true
                 //, wireframeLinewidth: 1
             });
+            mat.depthTest = false;
             tri = new THREE.Mesh(geo, mat);
+            tri.renderOrder = -3;
             tri.position.x = width;
             group.add(tri);
 
@@ -870,15 +841,16 @@ var Gauge = function (_VisChartBase) {
                 //, wireframe: true
                 //, wireframeLinewidth: 1
             });
+            mat.depthTest = false;
             tri = new THREE.Mesh(geo, mat);
+            tri.renderOrder = -3;
             group.add(tri);
 
-            group.position.x = 100;
-            //group.rotateZ( 0 );
-            //group.rotation.z = geometry.radians( 135 );
-
+            //group.position.x = 100;
 
             this.arrowIcon = group;
+
+            group.renderOrder = -3;
 
             this.stage.add(group);
             this.addDestroy(group);
@@ -886,28 +858,35 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'updateArrow',
         value: function updateArrow() {
+            if (isNaN(this.angle)) {
+                this.angle = -55;
+            }
             var angle = -(-180 + this.angle);
 
             if (this.preAngle === this.angle) return;
             this.preAngle = this.angle;
 
-            var point = geometry.distanceAngleToPoint(this.roundRadius + 6, angle);
+            var point = geometry.distanceAngleToPoint(this.innerCircleRadius + geometry3d.to3d(6), angle);
 
             this.arrowIcon.position.x = point.x;
             this.arrowIcon.position.y = point.y;
 
             this.arrowIcon.rotation.z = geometry.radians(angle - 90);
-
-            //console.log( 'arrow point', this.angle + 10, angle );
         }
     }, {
         key: 'animation',
         value: function animation() {
             var _this10 = this;
 
-            //console.log( this.angle, this.animationAngle );
-            if (this.isDestroy) return;
-            if (this.angle > this.animationAngle) return;
+            if (this.isDestroy) {
+                this.isRunAnimation = false;
+                return;
+            }
+            if (this.angle > this.animationAngle) {
+                this.isRunAnimation = false;
+                return;
+            }
+            this.isRunAnimation = true;
 
             this.angle += this.angleStep;
 
@@ -916,8 +895,6 @@ var Gauge = function (_VisChartBase) {
             };
 
             this.updateArrow();
-
-            //this.stage.add( this.layer );
 
             window.requestAnimationFrame(function () {
                 _this10.animation();
