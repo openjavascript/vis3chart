@@ -65,6 +65,11 @@ export default class ThreeBase extends VisChartBase {
         return sprite;
     }
 
+    setRedraw( val ){
+        this.redraw = val;
+        return this;
+    }
+
     getBox( mesh ){
         let box = new THREE.Box3().setFromObject( mesh );
         /*

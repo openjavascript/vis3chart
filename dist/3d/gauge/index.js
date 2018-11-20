@@ -73,6 +73,8 @@ var Gauge = function (_VisChartBase) {
         _this.cpoint = { x: 0, y: 0 };
 
         _this.name = 'Gauge' + Date.now();
+
+        _this.clearTextList = [];
         return _this;
     }
 
@@ -337,16 +339,31 @@ var Gauge = function (_VisChartBase) {
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'setOptions', this).call(this, json);
         }
     }, {
+        key: 'clearText',
+        value: function clearText() {
+            var _this5 = this;
+
+            //console.log( 'clearText', this.clearTextList );
+
+            this.clearTextList.map(function (item, key) {
+                _this5.dispose(item);
+            });
+
+            this.clearTextList = [];
+        }
+    }, {
         key: 'update',
         value: function update(data, allData) {
-            var _this5 = this;
+            var _this6 = this;
 
             _get(Gauge.prototype.__proto__ || Object.getPrototypeOf(Gauge.prototype), 'update', this).call(this, data, allData);
 
+            this.clearText();
+
             if (data && data.data && data.data.length) {
                 data.data.map(function (val) {
-                    _this5.curRate = val.value;
-                    _this5.totalNum = val.total;
+                    _this6.curRate = val.value;
+                    _this6.totalNum = val.total;
                 });
             } else {
                 this.curRate = 0;
@@ -389,7 +406,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'animationCircleLine',
         value: function animationCircleLine() {
-            var _this6 = this;
+            var _this7 = this;
 
             if (this.isDestroy) return;
             if (!this.circleLine) return;
@@ -401,13 +418,13 @@ var Gauge = function (_VisChartBase) {
             this.circleLine.rotation.z -= .03;
 
             window.requestAnimationFrame(function () {
-                _this6.animationCircleLine();
+                _this7.animationCircleLine();
             });
         }
     }, {
         key: 'animationText',
         value: function animationText() {
-            var _this7 = this;
+            var _this8 = this;
 
             if (this.isDestroy) return;
 
@@ -424,13 +441,13 @@ var Gauge = function (_VisChartBase) {
             this.totalTextTexture.redraw();
 
             window.requestAnimationFrame(function () {
-                _this7.animationText();
+                _this8.animationText();
             });
         }
     }, {
         key: 'drawText',
         value: function drawText() {
-            var _this8 = this;
+            var _this9 = this;
 
             if (this.totalTextGroup) {
                 this.dispose(this.totalTextGroup);
@@ -475,13 +492,13 @@ var Gauge = function (_VisChartBase) {
             this.render();
 
             this.totalTextPostfix = this.createText(labelFontSize, colorParams, labelParams, function (sprite) {
-                sprite.position.x = _this8.tmpTotalText.scale.x / 2 + sprite.scale.x / 2 - geometry3d.to3d(5);
+                sprite.position.x = _this9.tmpTotalText.scale.x / 2 + sprite.scale.x / 2 - geometry3d.to3d(5);
             }, this.totalTextGroup);
 
             this.totalText = this.createText(fontSize, colorParams, params, function (sprite, material, texture) {
-                sprite.position.x = _this8.totalTextPostfix.position.x - _this8.totalTextPostfix.scale.x / 2 - sprite.scale.x / 2 + geometry3d.to3d(5);
+                sprite.position.x = _this9.totalTextPostfix.position.x - _this9.totalTextPostfix.scale.x / 2 - sprite.scale.x / 2 + geometry3d.to3d(5);
                 texture.text = '0';
-                _this8.totalTextTexture = texture;
+                _this9.totalTextTexture = texture;
             }, this.totalTextGroup);
 
             this.totalTextGroup.position.y = -(this.arcOutRadius + geometry3d.to3d(25));
@@ -598,15 +615,14 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'drawArcText',
         value: function drawArcText() {
-            var _this9 = this;
+            var _this10 = this;
 
             if (!(this.textAr && this.textAr.length)) return;
 
-            this.textAr.map(function (val) {
-
+            this.textAr.map(function (val, key) {
                 var fontSize = geometry3d.to3d(16);
-                _this9.createText(fontSize, {
-                    color: _this9.lineColor,
+                var text = _this10.createText(fontSize, {
+                    color: _this10.lineColor,
                     rotation: geometry.radians(val.angle + 90 + (val.rotationOffset || 0) + 180)
                 }, {
                     text: val.text + '',
@@ -615,6 +631,8 @@ var Gauge = function (_VisChartBase) {
                 }, function (sprite) {
                     sprite.position.x = val.point.x;
                     sprite.position.y = val.point.y;
+
+                    _this10.clearTextList.push(sprite);
                 });
             });
         }
@@ -689,7 +707,6 @@ var Gauge = function (_VisChartBase) {
             positions = new Float32Array(vertices.length * 3);
 
             for (i = 0; i < vertices.length; i++) {
-
                 positions[i * 3] = vertices[i].x;
                 positions[i * 3 + 1] = vertices[i].y;
                 positions[i * 3 + 2] = vertices[i].z;
@@ -759,11 +776,11 @@ var Gauge = function (_VisChartBase) {
         value: function initDataLayout() {
 
             this.drawText();
+            this.drawArcText();
             if (!this.inited) {
                 this.drawInnerText();
                 this.drawInnerCircle();
                 this.drawTextRect();
-                this.drawArcText();
                 this.drawArc();
                 this.drawArcLine();
                 this.drawCircle();
@@ -856,7 +873,7 @@ var Gauge = function (_VisChartBase) {
     }, {
         key: 'animation',
         value: function animation() {
-            var _this10 = this;
+            var _this11 = this;
 
             if (this.isDestroy) {
                 this.isRunAnimation = false;
@@ -877,7 +894,7 @@ var Gauge = function (_VisChartBase) {
             this.updateArrow();
 
             window.requestAnimationFrame(function () {
-                _this10.animation();
+                _this11.animation();
             });
         }
     }, {

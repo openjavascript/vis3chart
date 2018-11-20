@@ -220,6 +220,7 @@ var VisThree = function (_VisChartBase) {
             var _this3 = this;
 
             //console.log( 'initChart', Date.now() );
+            this.redraw = 0;
 
             if (this.ins && this.ins.length && !this.redraw) {
                 this.emptyblock = 'kao';

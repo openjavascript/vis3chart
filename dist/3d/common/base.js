@@ -110,6 +110,12 @@ var ThreeBase = function (_VisChartBase) {
             return sprite;
         }
     }, {
+        key: 'setRedraw',
+        value: function setRedraw(val) {
+            this.redraw = val;
+            return this;
+        }
+    }, {
         key: 'getBox',
         value: function getBox(mesh) {
             var box = new THREE.Box3().setFromObject(mesh);

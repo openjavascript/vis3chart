@@ -183,6 +183,7 @@ export default class VisThree extends VisChartBase {
 
     initChart(){
         //console.log( 'initChart', Date.now() );
+        this.redraw = 0;
 
         if( this.ins && this.ins.length &&  !this.redraw  ){
                 this.emptyblock = 'kao';

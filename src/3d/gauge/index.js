@@ -28,6 +28,8 @@ export default class Gauge extends VisChartBase  {
         this.cpoint = { x: 0, y: 0 };
 
         this.name = 'Gauge' + Date.now();
+
+        this.clearTextList = [];
     }
 
     _setSize( width, height ){
@@ -277,8 +279,21 @@ export default class Gauge extends VisChartBase  {
         super.setOptions( json );
 
     }
+
+    clearText() {
+        //console.log( 'clearText', this.clearTextList );
+
+        this.clearTextList.map( ( item, key ) => {
+            this.dispose( item );
+        });
+
+        this.clearTextList = [];
+    }
+    
     update( data, allData ){
         super.update( data, allData );
+
+        this.clearText();
 
         if( (data && data.data && data.data.length) ){
             data.data.map( val => {
@@ -551,10 +566,9 @@ export default class Gauge extends VisChartBase  {
     drawArcText() {
         if( !( this.textAr && this.textAr.length ) ) return;
 
-        this.textAr.map( ( val ) => {
-
+        this.textAr.map( ( val, key ) => {
             let fontSize = geometry3d.to3d( 16 );
-            this.createText(
+            let text = this.createText(
                 fontSize
                 , {
                     color: this.lineColor 
@@ -570,6 +584,8 @@ export default class Gauge extends VisChartBase  {
                 , ( sprite ) => {
                     sprite.position.x = val.point.x
                     sprite.position.y = val.point.y
+
+                    this.clearTextList.push( sprite );
                 }
             );
         });
@@ -643,11 +659,9 @@ export default class Gauge extends VisChartBase  {
         positions = new Float32Array(vertices.length * 3);
 
         for (i = 0; i < vertices.length; i++) {
-
             positions[i * 3] = vertices[i].x;
             positions[i * 3 + 1] = vertices[i].y;
             positions[i * 3 + 2] = vertices[i].z;
-
         }
 
         geometry = new THREE.BufferGeometry();
@@ -712,11 +726,11 @@ export default class Gauge extends VisChartBase  {
     initDataLayout(){
 
         this.drawText();
+        this.drawArcText();
         if( !this.inited ){
             this.drawInnerText();
             this.drawInnerCircle();
             this.drawTextRect();
-            this.drawArcText();
             this.drawArc();
             this.drawArcLine();
             this.drawCircle();
