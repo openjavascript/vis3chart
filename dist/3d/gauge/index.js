@@ -210,7 +210,6 @@ var Gauge = function (_VisChartBase) {
         value: function init() {
             var _this3 = this;
 
-            //console.log( 'init', Date.now() );
             this.textRoundRadius = this.width * this.textRoundPercent * this.sizeRate;
 
             this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
@@ -228,10 +227,7 @@ var Gauge = function (_VisChartBase) {
 
             this.textRoundAngle.map(function (val, key) {
                 var point = geometry.distanceAngleToPoint(geometry3d.to3d(_this3.textRoundRadius), -val.angle);
-                //console.log( key, point, val.angle );
-                //val.point = geometry.pointPlus( point, this.cpoint );
                 val.point = point;
-                //val.point.y += this.offsetCy;
             });
 
             this.arcPartLineAr = [];
@@ -244,7 +240,6 @@ var Gauge = function (_VisChartBase) {
                     angle = void 0;
                 angle = (this.part - i) * this.partAngle + this.arcOffset;
 
-                //if( i && i < this.part ){
                 if (true) {
                     start = geometry.distanceAngleToPoint(this.arcInRadius, angle);
                     end = geometry.distanceAngleToPoint(this.arcOutRadius, angle);
@@ -256,11 +251,7 @@ var Gauge = function (_VisChartBase) {
 
                 this.arcOutlinePartAr.push({ start: start, end: end });
 
-                //console.log( 'p1', i );
-
-                //if( !(i * this.partNum % 100) || i === 0 ){
                 if (!(i * this.partNum % 100) || i === 0) {
-                    //console.log( 'p2', i );
                     var angleOffset = 8,
                         lengthOffset = 0,
                         rotationOffset = 0;
@@ -357,6 +348,9 @@ var Gauge = function (_VisChartBase) {
                     _this5.curRate = val.value;
                     _this5.totalNum = val.total;
                 });
+            } else {
+                this.curRate = 0;
+                this.totalNum = 0;
             }
 
             this.initDataLayout();
@@ -369,25 +363,18 @@ var Gauge = function (_VisChartBase) {
             if (this.curRate) {
                 this.rateStep = Math.floor(this.curRate / (this.animationStep * 2));
                 this.angleStep = Math.abs(this.animationAngle) / this.animationStep;
-                //!this.inited && this.animation();
             }
 
             !this.isRunAnimation && this.animation();
 
-            //console.log( 'this.rateStep', this.rateStep, this.curRate, this.animationStep );
+            //console.log( 'this.totalNum', this.totalNum );
 
             if (parseInt(this.totalNum)) {
                 this.totalNumStep = Math.floor(this.totalNum / this.animationStep);
                 this.totalNumStep < 1 && (this.totalNumStep = 1);
                 this.totalNumCount = 0;
                 this.animationText();
-            } else {
-                /*
-                this.totalText.text( this.totalNum + '' );
-                this.totalTextPostfix.x( this.totalText.textWidth + 5 );
-                this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
-                */
-            }
+            } else {}
 
             !this.inited && this.animationCircleLine();
 
@@ -429,13 +416,6 @@ var Gauge = function (_VisChartBase) {
 
             this.totalTextTexture.text = this.totalNumCount + '';
             this.totalTextTexture.redraw();
-
-            /*
-            this.totalText.text( this.totalNumCount );
-            this.totalTextPostfix.x( this.totalText.textWidth + 5 );
-             this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
-             this.layoutLayer.add( this.totalTextGroup );
-            */
 
             window.requestAnimationFrame(function () {
                 _this7.animationText();
@@ -522,7 +502,7 @@ var Gauge = function (_VisChartBase) {
             var group = new THREE.Group();
             group.transparent = true;
 
-            console.log(textWidth, rectHeight, this.tmpTotalText.scale.y);
+            //console.log( textWidth, rectHeight, this.tmpTotalText.scale.y );
 
             var bgGeometry = new THREE.PlaneGeometry(textWidth, rectHeight, 32, 32);
             var bgMaterial = new THREE.MeshBasicMaterial({
@@ -548,8 +528,6 @@ var Gauge = function (_VisChartBase) {
             var vertices, positions, geometry, i;
 
             partpoints = [], indices = [];
-
-            console.log(this.getBoxSize(bgPlane), this.getPosition(bgPlane.matrixWorld));
 
             var height = -this.getBoxSize(bgPlane).y;
             var top = this.getPosition(bgPlane.matrixWorld).y;
@@ -827,6 +805,7 @@ var Gauge = function (_VisChartBase) {
             tri.renderOrder = -3;
             tri.position.x = width;
             group.add(tri);
+            this.addDestroy(tri);
 
             geo = new THREE.Geometry();
             geo.vertices = [new THREE.Vector3(-width, 0, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, top, 0)];
@@ -845,6 +824,7 @@ var Gauge = function (_VisChartBase) {
             tri = new THREE.Mesh(geo, mat);
             tri.renderOrder = -3;
             group.add(tri);
+            this.addDestroy(tri);
 
             //group.position.x = 100;
 

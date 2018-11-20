@@ -157,7 +157,6 @@ export default class Gauge extends VisChartBase  {
     }
 
     init(){
-        //console.log( 'init', Date.now() );
         this.textRoundRadius = this.width * this.textRoundPercent * this.sizeRate;
 
         this.roundRadius = this.width * this.roundRadiusPercent * this.sizeRate;
@@ -176,11 +175,7 @@ export default class Gauge extends VisChartBase  {
 
         this.textRoundAngle.map( ( val, key ) => {
             let point = geometry.distanceAngleToPoint( geometry3d.to3d( this.textRoundRadius ), -val.angle )
-            //console.log( key, point, val.angle );
-            //val.point = geometry.pointPlus( point, this.cpoint );
             val.point = point;
-            //val.point.y += this.offsetCy;
-
         });
 
         this.arcPartLineAr = [];
@@ -191,7 +186,6 @@ export default class Gauge extends VisChartBase  {
             let start, end, angle;
             angle = (this.part - i) * this.partAngle + this.arcOffset;
 
-            //if( i && i < this.part ){
             if( true ){
                 start = geometry.distanceAngleToPoint( this.arcInRadius, angle );
                 end = geometry.distanceAngleToPoint( this.arcOutRadius, angle );
@@ -202,12 +196,8 @@ export default class Gauge extends VisChartBase  {
             end = geometry.distanceAngleToPoint( this.arcLineRaidus + this.arcLabelLength, angle );
 
             this.arcOutlinePartAr.push( { start: start, end: end } );
-
-            //console.log( 'p1', i );
             
-            //if( !(i * this.partNum % 100) || i === 0 ){
             if( !(i * this.partNum % 100) || i === 0 ){
-                //console.log( 'p2', i );
                 let angleOffset = 8, lengthOffset = 0, rotationOffset = 0;
 
                 if( i === 0 ){
@@ -295,6 +285,9 @@ export default class Gauge extends VisChartBase  {
                 this.curRate = val.value;
                 this.totalNum = val.total
             });
+        }else{
+            this.curRate = 0;
+            this.totalNum = 0;
         }
 
         this.initDataLayout();
@@ -307,12 +300,11 @@ export default class Gauge extends VisChartBase  {
         if( this.curRate ){
             this.rateStep = Math.floor( this.curRate / ( this.animationStep * 2 ) )
             this.angleStep = Math.abs( this.animationAngle ) /  this.animationStep;
-            //!this.inited && this.animation();
         }
 
         !this.isRunAnimation && this.animation(); 
 
-        //console.log( 'this.rateStep', this.rateStep, this.curRate, this.animationStep );
+        //console.log( 'this.totalNum', this.totalNum );
 
         if( parseInt( this.totalNum ) ){
             this.totalNumStep = Math.floor( this.totalNum / this.animationStep );
@@ -320,11 +312,6 @@ export default class Gauge extends VisChartBase  {
             this.totalNumCount = 0;
             this.animationText();
         }else{
-            /*
-            this.totalText.text( this.totalNum + '' );
-            this.totalTextPostfix.x( this.totalText.textWidth + 5 );
-            this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
-            */
         }
 
         !this.inited && this.animationCircleLine();
@@ -359,15 +346,6 @@ export default class Gauge extends VisChartBase  {
 
         this.totalTextTexture.text = this.totalNumCount + '';
         this.totalTextTexture.redraw();
-
-        /*
-        this.totalText.text( this.totalNumCount );
-        this.totalTextPostfix.x( this.totalText.textWidth + 5 );
-
-        this.totalTextGroup.x(  ( this.width - this.totalTextPostfix.textWidth -  this.totalText.textWidth - 5 ) / 2 );
-
-        this.layoutLayer.add( this.totalTextGroup );
-        */
 
         window.requestAnimationFrame( ()=>{ this.animationText() } );
     }
@@ -473,7 +451,7 @@ export default class Gauge extends VisChartBase  {
             group.transparent = true;
 
 
-        console.log( textWidth, rectHeight, this.tmpTotalText.scale.y );
+        //console.log( textWidth, rectHeight, this.tmpTotalText.scale.y );
 
         var bgGeometry = new THREE.PlaneGeometry( 
             ( textWidth )
@@ -496,11 +474,6 @@ export default class Gauge extends VisChartBase  {
         var vertices, positions, geometry, i;
 
         partpoints = [], indices = [];
-
-        console.log( 
-            this.getBoxSize( bgPlane ) 
-            , this.getPosition( bgPlane.matrixWorld ) 
-        );
 
         let height = -this.getBoxSize( bgPlane ).y;
         let top = this.getPosition( bgPlane.matrixWorld ).y;
@@ -792,6 +765,7 @@ export default class Gauge extends VisChartBase  {
         tri.renderOrder = -3;
         tri.position.x = width;
         group.add( tri );
+        this.addDestroy( tri );
 
         geo = new THREE.Geometry();
         geo.vertices = [
@@ -814,6 +788,7 @@ export default class Gauge extends VisChartBase  {
         tri = new THREE.Mesh( geo, mat );
         tri.renderOrder = -3;
         group.add( tri );
+        this.addDestroy( tri );
 
         //group.position.x = 100;
 
