@@ -177,6 +177,16 @@ export default class VisThree extends VisChartBase {
                 this.legend.update( this.data.legend );
             }
         }
+
+        /*
+        if( this.renderer ){
+            this.renderer.setSize( this.width, this.height );
+            this.renderer.setPixelRatio( window.devicePixelRatio );
+            this.camera.aspect = this.width / this.height;
+            this.camera.updateProjectionMatrix();
+            this.render();
+        }
+        */
         this.initChart();
         return this;
     }
